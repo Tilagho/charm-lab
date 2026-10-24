@@ -1,1 +1,1 @@
-# charm-lab
+charm lab: design mockup, placeholder brand
