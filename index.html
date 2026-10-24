@@ -51,12 +51,15 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 .b3d{background:var(--lime)}
 .selbar{position:absolute;left:12px;right:12px;bottom:12px;display:flex;justify-content:center;flex-wrap:wrap;gap:12px;z-index:2;pointer-events:none}
 .selbar>*{pointer-events:auto}
+.hint.fade{opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s}
 .hint{background:rgba(255,255,255,.92);border:2.5px solid var(--ink);border-radius:999px;padding:10px 16px;font-weight:600;font-size:16px;text-align:center}
 .del{background:var(--pink);color:#fff}
 /* sheet */
 #sheet{flex:none;height:clamp(240px,36dvh,420px);margin-top:14px;background:#fff;border-top:3px solid var(--ink);border-radius:30px 30px 0 0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden}
-#app.collapsed #sheet{height:40px}
-.grab{flex:none;height:40px;display:grid;place-items:center;cursor:pointer;touch-action:none;border:0;background:none;width:100%}
+#app.collapsed #sheet{height:48px}
+#sheet{position:relative;z-index:2;will-change:transform}
+#tabbar{position:relative;z-index:3}
+.grab{flex:none;height:48px;display:grid;place-items:center;cursor:pointer;touch-action:none;border:0;background:none;width:100%}
 .grab::before{content:'';width:56px;height:6px;border-radius:9px;background:#d6cdea}
 .panels{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:0 16px 24px}
 .panel{display:none}.panel.on{display:block;animation:pin .22s ease}
@@ -253,7 +256,10 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 </div>
 <script type="module">
 const INK='#17142e';
-const CY=20, HALF=140, TAB_R=26, HOLE_R=10;
+const CY=20, HALF=140, TAB_R=24, HOLE_R=10;
+// laser-cut model: art is printed on clear acrylic, the laser cuts a clean contour offset CUT_M outside the art
+// (~2mm on a 2" charm), plus a tab around the keyring hole. ART_HALF keeps the overall cut size at 2*HALF.
+const CUT_M=12, ART_HALF=HALF-CUT_M, HOLE_CLEAR=5;
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -300,7 +306,7 @@ function radial(fn,n=240){const p=[];for(let i=0;i<n;i++){const t=i/n*Math.PI*2;
 function circlesUnion(cs,n=320){return radial(t=>{const dx=Math.cos(t),dy=Math.sin(t);let best=0;for(const [cx,cy,R] of cs){const b=dx*cx+dy*cy;const disc=b*b-(cx*cx+cy*cy-R*R);if(disc>=0){const tt=b+Math.sqrt(disc);if(tt>best)best=tt;}}return best;},n);}
 function chaikin(p,it){for(let k=0;k<it;k++){const q=[];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];q.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]);}p=q;}return p;}
 function roundRect(w,h,r,n=40){const p=[];const cs=[[w/2-r,h/2-r,0],[-(w/2-r),h/2-r,Math.PI/2],[-(w/2-r),-(h/2-r),Math.PI],[w/2-r,-(h/2-r),Math.PI*1.5]];for(const [cx,cy,a0] of cs){for(let i=0;i<n;i++){const a=a0+i/n*Math.PI/2;p.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}}return p;}
-function fit(p){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const[x,y]of p){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}const s=2*HALF/Math.max(x1-x0,y1-y0);const cx=(x0+x1)/2,cy=(y0+y1)/2;return p.map(([x,y])=>[(x-cx)*s,(y-cy)*s+CY]);}
+function fit(p){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const[x,y]of p){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}const s=2*ART_HALF/Math.max(x1-x0,y1-y0);const cx=(x0+x1)/2,cy=(y0+y1)/2;return p.map(([x,y])=>[(x-cx)*s,(y-cy)*s+CY]);}
 const SHAPES=[
  {id:'heart',name:'heart',gen:()=>{const p=[];const n=300;for(let i=0;i<n;i++){const t=i/n*Math.PI*2;p.push([16*Math.pow(Math.sin(t),3),-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))]);}return p;}},
  {id:'star',name:'star',gen:()=>{const p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5;const r=i%2?0.52:1;p.push([r*Math.cos(a),r*Math.sin(a)]);}return chaikin(p,4);}},
@@ -312,14 +318,14 @@ const SHAPES=[
  {id:'pill',name:'name tag',gen:()=>roundRect(2,1.05,0.525)},
 ];
 function rayPoly(cx,cy,dx,dy,poly){let best=0;for(let i=0;i<poly.length;i++){const a=poly[i],b=poly[(i+1)%poly.length];const ex=b[0]-a[0],ey=b[1]-a[1];const den=dx*ey-dy*ex;if(Math.abs(den)<1e-12)continue;const ax=a[0]-cx,ay=a[1]-cy;const t=(ax*ey-ay*ex)/den;const u=(ax*dy-ay*dx)/den;if(t>0&&u>=-1e-9&&u<=1+1e-9&&t>best)best=t;}return best;}
-/* outline = smooth union of body + hanging tab, traced from a distance field (no radial ray-casting, so
+/* cut contour = smooth union of (art offset by CUT_M) + hanging tab, traced from a distance field (no radial ray-casting, so
    notched shapes like plumeria/heart get a clean filleted tab instead of straight chords across the notch) */
 function sdPoly(px,py,P){let d=1e18,sg=1;for(let i=0,j=P.length-1;i<P.length;j=i++){const ax=P[j][0],ay=P[j][1],bx=P[i][0],by=P[i][1];const ex=bx-ax,ey=by-ay,wx=px-ax,wy=py-ay;const t=clamp((wx*ex+wy*ey)/(ex*ex+ey*ey),0,1);const dx=wx-ex*t,dy=wy-ey*t;const dd=dx*dx+dy*dy;if(dd<d)d=dd;const c1=py>=ay,c2=py<by,c3=ex*wy>ey*wx;if((c1&&c2&&c3)||(!c1&&!c2&&!c3))sg=-sg;}return sg*Math.sqrt(d);}
 function unionOutline(body,tab,k=22,st=3){
  const P=body.filter((_,i)=>i%3===0);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const[x,y]of body){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
- y0=Math.min(y0,tab.y-TAB_R);x0-=12;x1+=12;y0-=12;y1+=12;const nx=Math.ceil((x1-x0)/st)+1,ny=Math.ceil((y1-y0)/st)+1;
+ y0=Math.min(y0,tab.y-TAB_R);const pad=CUT_M+10;x0-=pad;x1+=pad;y0-=pad;y1+=pad;const nx=Math.ceil((x1-x0)/st)+1,ny=Math.ceil((y1-y0)/st)+1;
  const F=new Float32Array(nx*ny);
- for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const x=x0+i*st,y=y0+j*st;const a=sdPoly(x,y,P),b=Math.hypot(x-tab.x,y-tab.y)-TAB_R;const h=Math.max(k-Math.abs(a-b),0)/k;F[j*nx+i]=Math.min(a,b)-h*h*k/4;}
+ for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const x=x0+i*st,y=y0+j*st;const a=sdPoly(x,y,P)-CUT_M,b=Math.hypot(x-tab.x,y-tab.y)-TAB_R;const h=Math.max(k-Math.abs(a-b),0)/k;F[j*nx+i]=Math.min(a,b)-h*h*k/4;}
  const v=(i,j)=>F[j*nx+i],pt=(i,j)=>[x0+i*st,y0+j*st];const lerp=(p,q,a,b)=>{const t=a/(a-b);return [p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];};
  const pos={},adj={};const link=(a,b)=>{(adj[a]=adj[a]||[]).push(b);(adj[b]=adj[b]||[]).push(a);};
  for(let j=0;j<ny-1;j++)for(let i=0;i<nx-1;i++){const a=v(i,j),b=v(i+1,j),c=v(i+1,j+1),d=v(i,j+1);const E=[];
@@ -343,16 +349,20 @@ function geo(id){
  if(GEO[id])return GEO[id];
  const body=fit(SHAPES.find(s=>s.id===id).gen());
  const top=CY-rayPoly(0,CY,0,-1,body);
- const tab={x:0,y:top-TAB_R*0.2};
+ // keyring hole sits fully in the clear margin: walk up from the art's top until it clears the art by HOLE_CLEAR
+ let hy=top;while(sdPoly(0,hy,body)<HOLE_R+HOLE_CLEAR&&hy>top-80)hy-=1;
+ const tab={x:0,y:hy};
  const outer=unionOutline(body,tab);
- const print=body.map(([x,y])=>[x*0.88,(y-CY)*0.88+CY]);
+ const print=body;// printed art area = the shape itself; the clear border comes from the offset cut
  const hr=HOLE_R;
  return GEO[id]={body,outer,print,tab,bodyD:pd(body),outerD:pd(outer),printD:pd(print),holeD:`M${tab.x-hr},${tab.y}a${hr},${hr} 0 1,0 ${2*hr},0a${hr},${hr} 0 1,0 ${-2*hr},0Z`,minY:Math.min(...outer.map(p=>p[1])),maxY:Math.max(...outer.map(p=>p[1]))};
 }
 /* ---------- state + history ---------- */
 const FONTS=[{id:'Bagel Fat One',label:'bubble'},{id:'Pacifico',label:'script'},{id:'Press Start 2P',label:'pixel'},{id:'Rubik Bubbles',label:'puffy'}];
 const FILLS=['#ffc2e2','#ff3ea5','#b8ff3c','#2e5bff','#ffe14a','#c9b2ff','#8fd8ff','#5cf2c8','#ff8a3d','#ffffff','#17142e','none'];
-const OUTLINES=['#ff3ea5','#17142e','#2e5bff','#b8ff3c','#ffe14a','#ffffff','none'];
+const OUTLINES=['#ff3ea5','#17142e','#2e5bff','#b8ff3c','#ffe14a','#ffffff'];// solid printable colors only
+const OUTLINE_FALLBACK='#ffffff';
+const safeOutline=c=>OUTLINES.includes(c)?c:OUTLINE_FALLBACK;
 const TCOLORS=['#17142e','#ff3ea5','#2e5bff','#b8ff3c','#ffe14a','#ffffff','#c9b2ff','#ff8a3d'];
 const SIZE_PRICE={'1.5':12,'2':14,'2.5':16};
 const ATT={keyring:{name:'keyring',add:0},strap:{name:'phone strap',add:2},clip:{name:'bag clip',add:3}};
@@ -384,7 +394,7 @@ const stickersReady=Promise.all(STICKERS.map(rasterSticker)).then(()=>{renderEls
 
 /* ---------- stage: persistent layers, partial updates ---------- */
 const svg=$('#stage');
-svg.innerHTML=`<defs id="sdefs"></defs><g id="baseL"></g><g id="elsL" clip-path="url(#clipOuter)"></g><g id="glossL" pointer-events="none"></g><g id="selL"></g>`;
+svg.innerHTML=`<defs id="sdefs"></defs><g id="baseL"></g><g id="elsL" clip-path="url(#clipPrint)"></g><g id="glossL" pointer-events="none"></g><g id="selL"></g>`;
 const baseL=$('#baseL'),elsL=$('#elsL'),glossL=$('#glossL'),selL=$('#selL');
 const TB={};// text bbox cache
 let baseKey='';
@@ -401,10 +411,10 @@ function renderBase(){
  let h=chain2D(g);
  h+=`<path d="${g.outerD}" transform="translate(8 10)" fill="${INK}" opacity=".14"/>`;
  h+=`<path d="${g.outerD} ${g.holeD}" fill-rule="evenodd" fill="url(#acry)" stroke="#a7bde0" stroke-width="2.5"/>`;
- h+=`<g clip-path="url(#clipOuter)">`;
+ h+=`<g clip-path="url(#clipPrint)">`;
  if(S.fill!=='none')h+=`<path d="${g.printD}" fill="${S.fill}"/>`;
  if(S.holo)h+=`<g clip-path="url(#clipPrint)"><path d="${g.printD}" fill="url(#holoG)" opacity=".55"/><path d="${g.printD}" fill="url(#glitter)"/></g>`;
- if(S.outline!=='none')h+=`<path d="${g.printD}" fill="none" stroke="${S.outline}" stroke-width="6" stroke-linejoin="round"/>`;
+ h+=`<path d="${g.printD}" fill="none" stroke="${S.outline}" stroke-width="12" stroke-linejoin="round"/>`;// printed border, inside the art edge
  h+=`</g>`;
  baseL.innerHTML=h;
  glossL.innerHTML=`<g clip-path="url(#clipOuter)"><path d="${g.outerD}" fill="none" stroke="#fff" stroke-width="12" opacity=".6"/><ellipse cx="-70" cy="${CY-70}" rx="62" ry="20" transform="rotate(-38 -70 ${CY-70})" fill="#fff" opacity=".42"/><ellipse cx="-104" cy="${CY-14}" rx="9" ry="5" transform="rotate(-50 -104 ${CY-14})" fill="#fff" opacity=".55"/><path d="M60 ${CY+120} q50 -20 70 -70" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/></g><circle cx="${g.tab.x}" cy="${g.tab.y}" r="${HOLE_R}" fill="none" stroke="#a7bde0" stroke-width="2"/>`;
@@ -452,16 +462,16 @@ new ResizeObserver(()=>{fitView();updateSel();}).observe(svg);
 const ptrs=new Map();let drag=null,pinch=null,rafId=0;
 function toSvgXY(cx,cy){const pt=svg.createSVGPoint();pt.x=cx;pt.y=cy;return pt.matrixTransform(svg.getScreenCTM().inverse());}
 const normDeg=r=>((r+540)%360)-180;
-function startPinch(){const e=getSel();if(!e)return;const [a,b]=[...ptrs.values()].map(p=>toSvgXY(p.cx,p.cy));pinch={id:e.id,s0:e.s,r0:e.r,x0:e.x,y0:e.y,d0:Math.hypot(b.x-a.x,b.y-a.y)||1,a0:Math.atan2(b.y-a.y,b.x-a.x),mx:(a.x+b.x)/2,my:(a.y+b.y)/2,moved:false};drag=null;}
+function startPinch(){const e=getSel();if(!e)return;markUsed();const [a,b]=[...ptrs.values()].map(p=>toSvgXY(p.cx,p.cy));pinch={id:e.id,s0:e.s,r0:e.r,x0:e.x,y0:e.y,d0:Math.hypot(b.x-a.x,b.y-a.y)||1,a0:Math.atan2(b.y-a.y,b.x-a.x),mx:(a.x+b.x)/2,my:(a.y+b.y)/2,moved:false};drag=null;}
 svg.addEventListener('pointerdown',ev=>{
  ev.preventDefault();try{svg.setPointerCapture(ev.pointerId);}catch(_){}
  ptrs.set(ev.pointerId,{cx:ev.clientX,cy:ev.clientY});
  if(ptrs.size===2){startPinch();return;}
  if(ptrs.size>2)return;
  const hnd=ev.target.closest('[data-handle]'),elg=ev.target.closest('[data-id]');const p=toSvgXY(ev.clientX,ev.clientY);
- if(hnd){const e=getSel();if(!e)return;const h=hnd.dataset.handle;if(h==='del'){ptrs.clear();delSel();return;}
+ if(hnd){const e=getSel();if(!e)return;markUsed();const h=hnd.dataset.handle;if(h==='del'){ptrs.clear();delSel();return;}
   drag={mode:h,pid:ev.pointerId,id:e.id,s0:e.s,r0:e.r,a0:Math.atan2(p.y-e.y,p.x-e.x),d0:Math.hypot(p.x-e.x,p.y-e.y)||1,sx:ev.clientX,sy:ev.clientY,moved:false};}
- else if(elg){const id=+elg.dataset.id;const e=S.els.find(x=>x.id===id);const changed=sel!==id;sel=id;drag={mode:'move',pid:ev.pointerId,id,dx:p.x-e.x,dy:p.y-e.y,sx:ev.clientX,sy:ev.clientY,moved:false};
+ else if(elg){markUsed();const id=+elg.dataset.id;const e=S.els.find(x=>x.id===id);const changed=sel!==id;sel=id;drag={mode:'move',pid:ev.pointerId,id,dx:p.x-e.x,dy:p.y-e.y,sx:ev.clientX,sy:ev.clientY,moved:false};
   if(changed){if(e.type==='text'&&IS_MOBILE===false)setTab('text');selChanged();}}
  else drag={mode:'empty',pid:ev.pointerId,sx:ev.clientX,sy:ev.clientY,moved:false};
 });
@@ -502,11 +512,11 @@ $('#mq').innerHTML=['charm lab ✦','made in pāʻia','holo glitter','stickers o
 const TILECOLS=['#ffc2e2','#b8ff3c','#8fd8ff','#ffe14a','#c9b2ff','#5cf2c8','#ffc2e2','#ff8a3d'];
 $('#shapes').innerHTML=SHAPES.map((s,i)=>{const g=geo(s.id);const h=g.maxY-g.minY+20;return `<button class="tile" data-shape="${s.id}" aria-label="${s.name}"><svg viewBox="${-Math.max(165,h/2)} ${(g.minY-10).toFixed(0)} ${2*Math.max(165,h/2)} ${h.toFixed(0)}"><path d="${g.outerD} ${g.holeD}" fill-rule="evenodd" fill="${TILECOLS[i]}" stroke="${INK}" stroke-width="14" stroke-linejoin="round"/></svg><span>${s.name}</span></button>`;}).join('');
 $('#shapes').addEventListener('click',ev=>{const b=ev.target.closest('[data-shape]');if(!b)return;S.shape=b.dataset.shape;commit();collapse();});
-function swatches(el,list){el.innerHTML=list.map(c=>`<button class="sw ${c==='none'?'none':''}" data-c="${c}" aria-label="${c==='none'?'none':c}" style="${c!=='none'?`background:${c}`:''}"></button>`).join('')+`<label class="sw custom" aria-label="custom color"><input type="color" value="#ff3ea5"></label>`;}
-swatches($('#fills'),FILLS);swatches($('#outlines'),OUTLINES);swatches($('#tcolors'),TCOLORS);
-function bindSw(el,apply){el.addEventListener('click',ev=>{const b=ev.target.closest('[data-c]');if(b){apply(b.dataset.c,true);collapse();}});const inp=el.querySelector('input[type=color]');inp.addEventListener('input',()=>apply(inp.value,false));inp.addEventListener('change',()=>{apply(inp.value,true);collapse();});}
+function swatches(el,list,custom=true){el.innerHTML=list.map(c=>`<button class="sw ${c==='none'?'none':''}" data-c="${c}" aria-label="${c==='none'?'none':c}" style="${c!=='none'?`background:${c}`:''}"></button>`).join('')+(custom?`<label class="sw custom" aria-label="custom color"><input type="color" value="#ff3ea5"></label>`:'');}
+swatches($('#fills'),FILLS);swatches($('#outlines'),OUTLINES,false);swatches($('#tcolors'),TCOLORS);
+function bindSw(el,apply){el.addEventListener('click',ev=>{const b=ev.target.closest('[data-c]');if(b){apply(b.dataset.c,true);collapse();}});const inp=el.querySelector('input[type=color]');if(inp)inp.addEventListener('input',()=>apply(inp.value,false));if(inp)inp.addEventListener('change',()=>{apply(inp.value,true);collapse();});}
 bindSw($('#fills'),(c,done)=>{S.fill=c;done?commit():(renderBase(),renderPanels());});
-bindSw($('#outlines'),(c,done)=>{S.outline=c;done?commit():(renderBase(),renderPanels());});
+bindSw($('#outlines'),(c,done)=>{S.outline=safeOutline(c);done?commit():(renderBase(),renderPanels());});
 const txtTarget=()=>{const e=getSel();return e&&e.type==='text'?e:null;};
 function refreshText(t){delete TB[t.id];const n=nodeOf(t.id);if(n){n.outerHTML=elMarkup(t);}measureText(t);updateSel();}
 bindSw($('#tcolors'),(c,done)=>{const t=txtTarget();if(t){t.color=c;done?commit():refreshText(t);}else{tdef.color=c;renderPanels();}});
@@ -539,18 +549,49 @@ function collapse(){if(!isDrawer())return;const a=document.activeElement;if(a&&a
 $('#sheet').addEventListener('pointerdown',()=>{sheetTapAt=performance.now();},true);
 function setTab(t){curTab=t;$('#app').classList.remove('collapsed');$$('#tabbar .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));$$('.panel').forEach(p=>p.classList.toggle('on',p.dataset.panel===t));$('#panels').scrollTop=0;}
 $('#tabbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-tab]');if(!b)return;if(b.dataset.tab===curTab&&innerWidth<960){$('#app').classList.toggle('collapsed');}else setTab(b.dataset.tab);});
-$('#grab').addEventListener('click',()=>$('#app').classList.toggle('collapsed'));
+/* swipe-down-to-close: drag from the handle, or from the content when it's scrolled to the top and the gesture is downward */
+let sw=null,swSuppress=0;const sheetEl=$('#sheet'),panelsEl=$('#panels');
+function swStart(x,y,src){if(!isDrawer()||$('#app').classList.contains('collapsed'))return;sw={x0:x,y0:y,src,active:false,d:0,H:sheetEl.offsetHeight,hist:[[performance.now(),y]]};if(src==='grab')swBegin(y);}
+function swBegin(y){sw.active=true;sw.y0=y;sheetEl.style.transition='none';}
+function swMove(x,y,ev){if(!sw)return;const dy=y-sw.y0,dx=x-sw.x0;
+ if(!sw.active){const atTop=panelsEl.scrollTop<=0;
+  if(atTop&&dy>0&&Math.abs(dy)>=Math.abs(dx)&&ev&&ev.cancelable)ev.preventDefault();// keep iOS from committing to a rubber-band scroll
+  if(Math.abs(dy)<8&&Math.abs(dx)<8)return;
+  if(atTop&&dy>0&&Math.abs(dy)>Math.abs(dx))swBegin(y);else{sw=null;return;}}
+ if(ev&&ev.cancelable)ev.preventDefault();
+ sw.d=Math.max(0,y-sw.y0);sheetEl.style.transform=`translateY(${sw.d}px)`;
+ const now=performance.now();sw.hist.push([now,y]);while(sw.hist.length>2&&now-sw.hist[0][0]>100)sw.hist.shift();}
+function swEnd(){if(!sw)return;const s=sw;sw=null;if(!s.active)return;
+ if(s.d<6){sheetEl.style.transition='';sheetEl.style.transform='';return;}
+ swSuppress=performance.now();
+ const [t0,y0]=s.hist[0],[t1,y1]=s.hist[s.hist.length-1];const v=t1>t0?(y1-y0)/(t1-t0):0;// px/ms, + = down
+ const close=s.d>s.H*.3||(v>.45&&s.d>12);
+ sheetEl.style.transition='transform .24s cubic-bezier(.25,.8,.35,1)';
+ const done=()=>{sheetEl.style.transition='none';if(close)$('#app').classList.add('collapsed');sheetEl.style.transform='';void sheetEl.offsetHeight;sheetEl.style.transition='';fitView();updateSel();};
+ if(close)sheetEl.style.transform=`translateY(${Math.max(s.d,s.H-48)}px)`;else sheetEl.style.transform='translateY(0px)';
+ setTimeout(done,250);}
+sheetEl.addEventListener('touchstart',ev=>{if(ev.touches.length!==1){sw=null;return;}const t=ev.touches[0],tg=ev.target;
+ if(tg.closest('input,select,textarea'))return;swStart(t.clientX,t.clientY,tg.closest('#grab')?'grab':'content');},{passive:true});
+sheetEl.addEventListener('touchmove',ev=>{if(!sw)return;if(ev.touches.length!==1){swEnd();return;}const t=ev.touches[0];swMove(t.clientX,t.clientY,ev);},{passive:false});
+sheetEl.addEventListener('touchend',swEnd);sheetEl.addEventListener('touchcancel',swEnd);
+$('#grab').addEventListener('pointerdown',ev=>{if(ev.pointerType==='touch')return;swStart(ev.clientX,ev.clientY,'grab');});
+window.addEventListener('pointermove',ev=>{if(sw&&ev.pointerType!=='touch')swMove(ev.clientX,ev.clientY,null);});
+window.addEventListener('pointerup',ev=>{if(sw&&ev.pointerType!=='touch')swEnd();});
+$('#grab').addEventListener('click',()=>{if(performance.now()-swSuppress<400)return;$('#app').classList.toggle('collapsed');});
 $('#sheet').addEventListener('transitionend',()=>updateSel());
 $('#undoB').onclick=undo;$('#redoB').onclick=redo;
 $('#clearB').onclick=()=>{if(!S.els.length)return;S.els=[];sel=null;commit();toast('fresh start ✿ undo brings it back');};
 // floating selection bar
 const SB={up:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="13" height="13" rx="3" fill="#ffe14a"/><path d="M3 9v10a2 2 0 0 0 2 2h10"/></svg>`,dn:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="13" height="13" rx="3"/><path d="M8 21h11a2 2 0 0 0 2-2V8" /><rect x="8" y="8" width="13" height="13" rx="3" fill="#c9b2ff" opacity=".9"/></svg>`,dup:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="3" fill="#b8ff3c"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>`,del:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>`};
+// gesture hint: hide for good once they've manipulated anything (remembered across reloads)
+const HINT_KEY='charmlab.gestureHintSeen';let hintSeen=false;try{hintSeen=localStorage.getItem(HINT_KEY)==='1';}catch(_){}
+function markUsed(){if(hintSeen)return;hintSeen=true;try{localStorage.setItem(HINT_KEY,'1');}catch(_){}const h=$('#selbar .hint[data-gesture]');if(h){h.classList.add('fade');setTimeout(()=>{if(h.isConnected)h.remove();},380);}}
 function renderSelbar(){
  const e=getSel();const bar=$('#selbar');
- if(!e){bar.innerHTML=S.els.length?`<div class="hint">tap to edit ✦ pinch to size + spin</div>`:`<div class="hint">add stickers or text below ↓</div>`;return;}
+ if(!e){bar.innerHTML=S.els.length?(hintSeen?'':`<div class="hint" data-gesture>tap to edit ✦ pinch to size + spin</div>`):`<div class="hint">add stickers or text below ↓</div>`;return;}
  bar.innerHTML=`<button class="ibtn" data-act="up" aria-label="bring forward">${SB.up}</button><button class="ibtn" data-act="dn" aria-label="send back">${SB.dn}</button><button class="ibtn" data-act="dup" aria-label="duplicate">${SB.dup}</button><button class="ibtn del" data-act="del" aria-label="delete">${SB.del}</button>`;
 }
-$('#selbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;const i=S.els.findIndex(x=>x.id===sel);if(i<0)return;
+$('#selbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');if(!b)return;markUsed();const a=b.dataset.act;const i=S.els.findIndex(x=>x.id===sel);if(i<0)return;
  if(a==='up'&&i<S.els.length-1){const[x]=S.els.splice(i,1);S.els.splice(i+1,0,x);commit();}
  else if(a==='dn'&&i>0){const[x]=S.els.splice(i,1);S.els.splice(i-1,0,x);commit();}
  else if(a==='dup'){const x=clone(S.els[i]);x.id=uid();x.x+=20;x.y+=20;S.els.push(x);sel=x.id;commit();}
@@ -598,7 +639,8 @@ function renderPanels(){
  $('#undoB').disabled=H.i<=0;$('#redoB').disabled=H.i>=H.stack.length-1;$('#clearB').disabled=!S.els.length;
 }
 function selChanged(){updateSel();renderSelbar();renderPanels();}
-function renderAll(){renderBase();renderEls();updateSel();renderSelbar();renderPanels();renderOrder();}
+function sanitize(st){st.outline=safeOutline(st.outline);return st;}
+function renderAll(){sanitize(S);renderBase();renderEls();updateSel();renderSelbar();renderPanels();renderOrder();}
 window.addEventListener('keydown',ev=>{
  if($('#modal').classList.contains('open')){if(ev.key==='Escape')close3D();return;}
  const tg=ev.target,tag=(tg.tagName||'').toLowerCase();
@@ -619,11 +661,11 @@ async function renderPrintCanvas(){
  const SZ=330,PX=1024,P=PX/SZ,X0=-165,Y0=CY-170;
  const cv=document.createElement('canvas');cv.width=cv.height=PX;const ctx=cv.getContext('2d');
  ctx.setTransform(P,0,0,P,-X0*P,-Y0*P);
- const g=geo(S.shape);const outer=new Path2D(g.outerD),pr=new Path2D(g.printD);
- ctx.save();ctx.clip(outer);
+ const g=geo(S.shape);const pr=new Path2D(g.printD);
+ ctx.save();ctx.clip(pr);
  if(S.fill!=='none'){ctx.fillStyle=S.fill;ctx.fill(pr);}
  if(S.holo){ctx.save();ctx.clip(pr);const gr=ctx.createLinearGradient(-140,CY-140,140,CY+140);HOLO_STOPS.forEach(([o,c])=>gr.addColorStop(o,c));ctx.globalAlpha=.55;ctx.fillStyle=gr;ctx.fillRect(-170,CY-180,340,360);ctx.globalAlpha=1;const r=seeded(7);const cs=['#fff','#fff6b0','#c8f6ff','#ffd6f0'];for(let i=0;i<600;i++){ctx.fillStyle=cs[i%4];ctx.beginPath();ctx.arc(-160+r()*320,CY-170+r()*340,.5+r()*1.4,0,Math.PI*2);ctx.fill();}ctx.restore();}
- if(S.outline!=='none'){ctx.lineWidth=6;ctx.lineJoin='round';ctx.strokeStyle=S.outline;ctx.stroke(pr);}
+ ctx.lineWidth=12;ctx.lineJoin='round';ctx.strokeStyle=S.outline;ctx.stroke(pr);
  for(const e of S.els){ctx.save();ctx.translate(e.x,e.y);ctx.rotate(e.r*Math.PI/180);ctx.scale(e.s,e.s);
   if(e.type==='sticker'){const im=stickerImgs[e.sid];if(im)ctx.drawImage(im,-58,-58,116,116);}
   else{ctx.font=`${e.size}px "${e.font}"`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';if(e.outline){ctx.strokeStyle=INK;ctx.lineWidth=e.size*0.34;ctx.strokeText(e.text,0,0);ctx.strokeStyle='#fff';ctx.lineWidth=e.size*0.2;ctx.strokeText(e.text,0,0);}ctx.fillStyle=e.color;ctx.fillText(e.text,0,0);}
