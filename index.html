@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
-<script>(function(){var t=null;try{t=localStorage.getItem('charmlab.theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;document.querySelector('meta[name=theme-color]').setAttribute('content',t==='dark'?'#0f0b1f':'#ffffff');})();</script>
+<script>(function(){var t=null;try{t=localStorage.getItem('charmlab.theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;document.querySelector('meta[name=theme-color]').setAttribute('content',t==='dark'?'#272042':'#ffffff');})();</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>charm lab ✦ design your acrylic charm (mockup)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,11 +19,10 @@
  --stage:linear-gradient(150deg,#fff0f8 0%,#f3f8ff 55%,#f7ffe6 100%);--tgl:linear-gradient(110deg,#ffe3f4,#e8fbff,#f2ffd9,#efe6ff);
  --three:radial-gradient(circle at 18% 22%,rgba(255,62,165,.26),transparent 42%),radial-gradient(circle at 84% 76%,rgba(184,255,60,.32),transparent 44%),radial-gradient(circle at 80% 16%,rgba(46,91,255,.2),transparent 40%),radial-gradient(circle at 20% 86%,rgba(255,225,74,.3),transparent 40%),linear-gradient(180deg,#fff1f9,#f1ecff 50%,#eafaff);color-scheme:light}
 /* dark mode: UI only. the charm artwork + print/3D texture colors never change */
-html[data-theme=dark]{--ink:#f4ecff;--shd:#000000;--bg:#0f0b1f;--dot:#2b2050;--card:#1c1636;--card2:#221b40;--dash:#4a3f7a;--muted:#5a4d8f;--hintbg:rgba(28,22,54,.92);--focus:#2a2150;
- --stage:linear-gradient(150deg,#2a1440 0%,#161a3c 55%,#132a26 100%);--tgl:linear-gradient(110deg,#3a1a44,#16304a,#22381c,#2c2150);
- --three:radial-gradient(circle at 18% 22%,rgba(255,62,165,.32),transparent 42%),radial-gradient(circle at 84% 76%,rgba(184,255,60,.18),transparent 44%),radial-gradient(circle at 80% 16%,rgba(46,91,255,.34),transparent 40%),radial-gradient(circle at 20% 86%,rgba(255,225,74,.14),transparent 40%),linear-gradient(180deg,#1d1036,#120f2b 50%,#0b1a26);color-scheme:dark}
-html[data-theme=dark] .logo h1,html[data-theme=dark] .price .big{text-shadow:3px 3px 0 #7b3cff}
-html[data-theme=dark] #stageWrap{box-shadow:5px 5px 0 #7b3cff}
+html[data-theme=dark]{--bg:#272042;--dot:#3f3566;--card:#9488c4;--card2:#a497d0;--dash:#5f5394;--muted:#5f5394;--hintbg:rgba(164,151,208,.94);--focus:#cbbff0;
+ --stage:linear-gradient(150deg,#b597c4 0%,#97a3d4 55%,#a2bb93 100%);--tgl:linear-gradient(110deg,#c99bc0,#93b4cf,#a7c08f,#ad9bd6);
+ --three:radial-gradient(circle at 18% 22%,rgba(255,62,165,.30),transparent 42%),radial-gradient(circle at 84% 76%,rgba(184,255,60,.20),transparent 44%),radial-gradient(circle at 80% 16%,rgba(46,91,255,.26),transparent 40%),radial-gradient(circle at 20% 86%,rgba(255,225,74,.16),transparent 40%),linear-gradient(180deg,#7a6aa6,#66689e 50%,#587c86);color-scheme:dark}
+/* dark mode = same sticker look, just dimmer: black outlines, black text and black hard shadows stay */
 html.theming *{transition:background-color .35s,border-color .35s,color .25s!important}
 .b3d,.ph,.ex,.toast,.tab.on,.tile.on,.fonts .pbtn.on,.seg button.on,.att.on,.pbtn.on,.marquee{color:var(--dark)}
 .hbtns{display:flex;align-items:center;gap:10px;flex:none}
@@ -94,6 +93,7 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 .tile svg{width:46px;height:46px}
 .tile span{font-size:15px;font-weight:600}
 .tile.on{background:#fff4b8;outline:3px solid var(--pink);outline-offset:3px}
+.pnote{font-size:15px;font-weight:600;margin:-6px 2px 14px;padding:8px 12px;border:2.5px dashed var(--dash);border-radius:16px;background:var(--card2);color:var(--ink)}
 .sws{display:flex;flex-wrap:wrap;gap:14px}
 .sw{width:56px;height:56px;border-radius:50%;border:3px solid var(--ink);box-shadow:2px 2px 0 var(--shd);cursor:pointer;position:relative;padding:0}
 .sw.on{outline:4px solid var(--blue);outline-offset:3px}
@@ -125,7 +125,7 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .stk img,.stk svg{width:100%;height:100%;pointer-events:none;-webkit-user-drag:none}
 .ghost{position:fixed;width:90px;height:90px;pointer-events:none;z-index:80;transform:translate(-50%,-50%) rotate(-8deg) scale(1.1)}
 .ghost img{width:100%;height:100%}
-.atts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.atts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .att{min-height:118px;border:3px solid var(--ink);border-radius:22px;background:var(--card);box-shadow:3px 3px 0 var(--shd);padding:8px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:700 16px 'Fredoka';transition:transform .08s}
 .att svg{width:48px;height:48px}
 .att em{font-style:normal;font-size:15px;font-weight:600;opacity:.7}
@@ -223,10 +223,11 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
    <div class="panel" data-panel="color">
     <div class="ptitle">colors</div>
     <div class="sub">print color</div>
+    <div class="pnote">✦ colors print slightly softer than they look on screen</div>
     <div class="sws" id="fills"></div>
     <div class="sub">outline</div>
     <div class="sws" id="outlines"></div>
-    <button class="toggle" id="holoT"><span class="t1">holo glitter ✦<small>rainbow shimmer + sparkle flakes</small></span><span class="sw2"></span></button>
+    <button class="toggle" id="holoT"><span class="t1">holo stars ✦<small>holographic star film on the front</small></span><span class="sw2"></span></button>
    </div>
    <div class="panel" data-panel="text">
     <div class="ptitle" id="txtMode">add text</div>
@@ -279,10 +280,17 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 </div>
 <script type="module">
 const INK='#17142e';
-const CY=20, HALF=140, TAB_R=24, HOLE_R=10;
-// laser-cut model: art is printed on clear acrylic, the laser cuts a clean contour offset CUT_M outside the art
-// (~2mm on a 2" charm), plus a tab around the keyring hole. ART_HALF keeps the overall cut size at 2*HALF.
-const CUT_M=12, ART_HALF=HALF-CUT_M, HOLE_CLEAR=5;
+const CY=20, HALF=140;
+/* Vograce-fit cut model (see /workspace/vograce-compat.md):
+   - the charm's longest side, INCLUDING the clear border and hole tab, equals the size picked (2*HALF units)
+   - clear border is exactly 2mm all around the printed art; hole is a fixed 3mm (Vograce default ~2.8mm),
+     sitting in the clear acrylic above the art with a 2.2mm ring of acrylic around it */
+const BORDER_MM=2, HOLE_D_MM=3, TAB_RING_MM=2.2, HOLE_CLEAR_MM=.6;
+const upmFor=size=>2*HALF/(parseFloat(size)*25.4);// charm units per mm at a given size
+const UPM_MAX=upmFor('1.5');
+// the 4 neons (hot pink, lime, electric blue, mint) are outside the CMYK print gamut: use softer printable versions
+const SOFT={'#ff3ea5':'#ef4f9d','#b8ff3c':'#a9dc4e','#2e5bff':'#3c5fd4','#5cf2c8':'#5fd4b5'};
+const soften=c=>SOFT[c]||c;// smallest charm = most units per mm (worst case for minimum line widths)
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -315,12 +323,18 @@ const STICKERS=[
  {id:'hibiscus',name:'hibiscus',svg:[0,1,2,3,4].map(i=>`<circle cx="50" cy="27" r="21" transform="rotate(${i*72} 50 52)" fill="#ff4f7b" ${K}/>`).join('')+`<circle cx="50" cy="52" r="10" fill="#c2185b"/><path d="M50 52 L72 22" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><path d="M50 52 L72 22" stroke="#ffe14a" stroke-width="3" stroke-linecap="round"/><g fill="#ffe14a" stroke="${INK}" stroke-width="2.5"><circle cx="74" cy="19" r="4.5"/><circle cx="66" cy="18" r="3.5"/><circle cx="77" cy="27" r="3.5"/></g>`},
  {id:'boba',name:'boba',svg:`<rect x="53" y="2" width="10" height="36" rx="5" transform="rotate(12 58 20)" fill="#2e5bff" ${K} stroke-width="3.5"/><path d="M28 32 L72 32 L66 92 L34 92Z" fill="#ffe2c4" ${K}/><path d="M22 32 C22 16 78 16 78 32Z" fill="#fff" ${K}/><rect x="24" y="31" width="52" height="7" rx="3.5" fill="#ff3ea5" ${K} stroke-width="3"/><g fill="${INK}"><circle cx="40" cy="84" r="4.6"/><circle cx="50" cy="86" r="4.6"/><circle cx="60" cy="84" r="4.6"/><circle cx="45" cy="76" r="4.6"/><circle cx="56" cy="76" r="4.6"/></g>${face(50,56,.85)}`},
 ];
+STICKERS.forEach(st=>{st.svg=st.svg.replace(/#(ff3ea5|b8ff3c|2e5bff|5cf2c8)/gi,m=>SOFT[m.toLowerCase()]);});// stickers print too
 const STK=Object.fromEntries(STICKERS.map(s=>[s.id,s]));
 const DIECUT=`<filter id="diecut" x="-25%" y="-25%" width="150%" height="150%"><feMorphology in="SourceAlpha" operator="dilate" radius="4.5" result="d"/><feFlood flood-color="#ffffff"/><feComposite in2="d" operator="in" result="w"/><feOffset in="d" dx="2.5" dy="3.5" result="o"/><feFlood flood-color="#17142e" flood-opacity=".22"/><feComposite in2="o" operator="in" result="sh"/><feMerge><feMergeNode in="sh"/><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+const star4=(x,y,r,c,o=1)=>`<path d="M${x} ${y-r} Q${x} ${y} ${x+r} ${y} Q${x} ${y} ${x} ${y+r} Q${x} ${y} ${x-r} ${y} Q${x} ${y} ${x} ${y-r}Z" fill="${c}" opacity="${o}"/>`;
+const star5=(x,y,r,c,o=1)=>`<polygon points="${[0,1,2,3,4,5,6,7,8,9].map(i=>{const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;return (x+rr*Math.cos(a)).toFixed(1)+','+(y+rr*Math.sin(a)).toFixed(1);}).join(' ')}" fill="${c}" opacity="${o}"/>`;
+// Vograce "Holographic (Star)" film: scattered rainbow-foil stars over a faint iridescent sheen
+const HOLO_STAR_TILE=star5(8,9,5.5,'#fff',.95)+star4(30,7,4,'#c8f6ff',.9)+star5(36,30,4.5,'#ffd6f0',.9)+star4(16,32,3.2,'#fff6b0',.95)+star5(25,20,2.6,'#e6d6ff',.9)+star4(4,24,2.2,'#fff',.8)+star4(41,15,1.8,'#fff',.8);
 const HOLO_STOPS=[[0,'#ff9de2'],[.2,'#ffe8a3'],[.4,'#b8ffcf'],[.6,'#9ee7ff'],[.8,'#c8a8ff'],[1,'#ff9de2']];
 $('#defs').innerHTML=`<defs>${DIECUT}
 <linearGradient id="acry" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".97"/><stop offset=".5" stop-color="#eef6ff" stop-opacity=".78"/><stop offset="1" stop-color="#d9e9ff" stop-opacity=".92"/></linearGradient>
 <linearGradient id="holoG" x1="0" y1="0" x2="1" y2="1">${HOLO_STOPS.map(([o,c])=>`<stop offset="${o}" stop-color="${c}"/>`).join('')}</linearGradient>
+<pattern id="holostars" width="44" height="44" patternUnits="userSpaceOnUse" patternTransform="rotate(12)">${HOLO_STAR_TILE}</pattern>
 <pattern id="glitter" width="36" height="36" patternUnits="userSpaceOnUse"><circle cx="5" cy="7" r="1.6" fill="#fff"/><circle cx="22" cy="4" r="1" fill="#fff6b0"/><circle cx="30" cy="19" r="1.8" fill="#fff"/><circle cx="12" cy="24" r="1.2" fill="#c8f6ff"/><circle cx="26" cy="31" r="1" fill="#ffd6f0"/><path d="M17 13 l1 3 3 1 -3 1 -1 3 -1-3 -3-1 3-1z" fill="#fff"/></pattern>
 <linearGradient id="chrome" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#959fb6"/><stop offset=".55" stop-color="#f6f8fc"/><stop offset="1" stop-color="#6c7489"/></linearGradient>
 ${STICKERS.map(s=>`<symbol id="st-${s.id}" viewBox="0 0 100 100" overflow="visible">${s.svg}</symbol>`).join('')}</defs>`;
@@ -329,7 +343,7 @@ function radial(fn,n=240){const p=[];for(let i=0;i<n;i++){const t=i/n*Math.PI*2;
 function circlesUnion(cs,n=320){return radial(t=>{const dx=Math.cos(t),dy=Math.sin(t);let best=0;for(const [cx,cy,R] of cs){const b=dx*cx+dy*cy;const disc=b*b-(cx*cx+cy*cy-R*R);if(disc>=0){const tt=b+Math.sqrt(disc);if(tt>best)best=tt;}}return best;},n);}
 function chaikin(p,it){for(let k=0;k<it;k++){const q=[];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];q.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]);}p=q;}return p;}
 function roundRect(w,h,r,n=40){const p=[];const cs=[[w/2-r,h/2-r,0],[-(w/2-r),h/2-r,Math.PI/2],[-(w/2-r),-(h/2-r),Math.PI],[w/2-r,-(h/2-r),Math.PI*1.5]];for(const [cx,cy,a0] of cs){for(let i=0;i<n;i++){const a=a0+i/n*Math.PI/2;p.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}}return p;}
-function fit(p){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const[x,y]of p){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}const s=2*ART_HALF/Math.max(x1-x0,y1-y0);const cx=(x0+x1)/2,cy=(y0+y1)/2;return p.map(([x,y])=>[(x-cx)*s,(y-cy)*s+CY]);}
+function fit(p,half){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const[x,y]of p){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}const s=2*half/Math.max(x1-x0,y1-y0);const cx=(x0+x1)/2,cy=(y0+y1)/2;return p.map(([x,y])=>[(x-cx)*s,(y-cy)*s+CY]);}
 const SHAPES=[
  {id:'heart',name:'heart',gen:()=>{const p=[];const n=300;for(let i=0;i<n;i++){const t=i/n*Math.PI*2;p.push([16*Math.pow(Math.sin(t),3),-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))]);}return p;}},
  {id:'star',name:'star',gen:()=>{const p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5;const r=i%2?0.52:1;p.push([r*Math.cos(a),r*Math.sin(a)]);}return chaikin(p,4);}},
@@ -341,14 +355,14 @@ const SHAPES=[
  {id:'pill',name:'name tag',gen:()=>roundRect(2,1.05,0.525)},
 ];
 function rayPoly(cx,cy,dx,dy,poly){let best=0;for(let i=0;i<poly.length;i++){const a=poly[i],b=poly[(i+1)%poly.length];const ex=b[0]-a[0],ey=b[1]-a[1];const den=dx*ey-dy*ex;if(Math.abs(den)<1e-12)continue;const ax=a[0]-cx,ay=a[1]-cy;const t=(ax*ey-ay*ex)/den;const u=(ax*dy-ay*dx)/den;if(t>0&&u>=-1e-9&&u<=1+1e-9&&t>best)best=t;}return best;}
-/* cut contour = smooth union of (art offset by CUT_M) + hanging tab, traced from a distance field (no radial ray-casting, so
+/* cut contour = smooth union of (art offset by the 2mm border) + hanging tab, traced from a distance field (no radial ray-casting, so
    notched shapes like plumeria/heart get a clean filleted tab instead of straight chords across the notch) */
 function sdPoly(px,py,P){let d=1e18,sg=1;for(let i=0,j=P.length-1;i<P.length;j=i++){const ax=P[j][0],ay=P[j][1],bx=P[i][0],by=P[i][1];const ex=bx-ax,ey=by-ay,wx=px-ax,wy=py-ay;const t=clamp((wx*ex+wy*ey)/(ex*ex+ey*ey),0,1);const dx=wx-ex*t,dy=wy-ey*t;const dd=dx*dx+dy*dy;if(dd<d)d=dd;const c1=py>=ay,c2=py<by,c3=ex*wy>ey*wx;if((c1&&c2&&c3)||(!c1&&!c2&&!c3))sg=-sg;}return sg*Math.sqrt(d);}
-function unionOutline(body,tab,k=22,st=3){
+function unionOutline(body,tab,M,TR,k=22,st=3){
  const P=body.filter((_,i)=>i%3===0);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const[x,y]of body){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
- y0=Math.min(y0,tab.y-TAB_R);const pad=CUT_M+10;x0-=pad;x1+=pad;y0-=pad;y1+=pad;const nx=Math.ceil((x1-x0)/st)+1,ny=Math.ceil((y1-y0)/st)+1;
+ y0=Math.min(y0,tab.y-TR);const pad=M+10;x0-=pad;x1+=pad;y0-=pad;y1+=pad;const nx=Math.ceil((x1-x0)/st)+1,ny=Math.ceil((y1-y0)/st)+1;
  const F=new Float32Array(nx*ny);
- for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const x=x0+i*st,y=y0+j*st;const a=sdPoly(x,y,P)-CUT_M,b=Math.hypot(x-tab.x,y-tab.y)-TAB_R;const h=Math.max(k-Math.abs(a-b),0)/k;F[j*nx+i]=Math.min(a,b)-h*h*k/4;}
+ for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const x=x0+i*st,y=y0+j*st;const a=sdPoly(x,y,P)-M,b=Math.hypot(x-tab.x,y-tab.y)-TR;const h=Math.max(k-Math.abs(a-b),0)/k;F[j*nx+i]=Math.min(a,b)-h*h*k/4;}
  const v=(i,j)=>F[j*nx+i],pt=(i,j)=>[x0+i*st,y0+j*st];const lerp=(p,q,a,b)=>{const t=a/(a-b);return [p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];};
  const pos={},adj={};const link=(a,b)=>{(adj[a]=adj[a]||[]).push(b);(adj[b]=adj[b]||[]).push(a);};
  for(let j=0;j<ny-1;j++)for(let i=0;i<nx-1;i++){const a=v(i,j),b=v(i+1,j),c=v(i+1,j+1),d=v(i,j+1);const E=[];
@@ -368,41 +382,54 @@ function unionOutline(body,tab,k=22,st=3){
 }
 const pd=p=>'M'+p.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join('L')+'Z';
 const GEO={};
-function geo(id){
- if(GEO[id])return GEO[id];
- const body=fit(SHAPES.find(s=>s.id===id).gen());
+const bboxOf=p=>{let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const[x,y]of p){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}return {x0,x1,y0,y1,w:x1-x0,h:y1-y0};};
+function nearestOn(px,py,P){let best={d:1e9,x:0,y:0};for(let i=0,j=P.length-1;i<P.length;j=i++){const ax=P[j][0],ay=P[j][1],ex=P[i][0]-ax,ey=P[i][1]-ay;const t=clamp(((px-ax)*ex+(py-ay)*ey)/(ex*ex+ey*ey||1),0,1);const x=ax+ex*t,y=ay+ey*t,d=Math.hypot(px-x,py-y);if(d<best.d)best={d,x,y};}return best;}
+function cutFor(raw,half,upm,st){
+ const body=fit(raw,half);const M=BORDER_MM*upm,HR=HOLE_D_MM/2*upm,TR=HR+TAB_RING_MM*upm;
  const top=CY-rayPoly(0,CY,0,-1,body);
- // keyring hole sits fully in the clear margin: walk up from the art's top until it clears the art by HOLE_CLEAR
- let hy=top;while(sdPoly(0,hy,body)<HOLE_R+HOLE_CLEAR&&hy>top-80)hy-=1;
- const tab={x:0,y:hy};
- const outer=unionOutline(body,tab);
- const print=body;// printed art area = the shape itself; the clear border comes from the offset cut
- const hr=HOLE_R;
- return GEO[id]={body,outer,print,tab,bodyD:pd(body),outerD:pd(outer),printD:pd(print),holeD:`M${tab.x-hr},${tab.y}a${hr},${hr} 0 1,0 ${2*hr},0a${hr},${hr} 0 1,0 ${-2*hr},0Z`,minY:Math.min(...outer.map(p=>p[1])),maxY:Math.max(...outer.map(p=>p[1]))};
+ // hole sits fully in the clear acrylic above the art
+ let hy=top;while(sdPoly(0,hy,body)<HR+HOLE_CLEAR_MM*upm&&hy>top-80)hy-=.5;
+ const tab={x:0,y:hy};let outer=unionOutline(body,tab,M,TR,22*upm/5.5,st);
+ // exact border: nudge any cut point that sits closer than 2mm to the art straight out to 2mm (grid/smoothing error)
+ outer=outer.map(pt=>{const n=nearestOn(pt[0],pt[1],body);return n.d<M?[n.x+(pt[0]-n.x)/(n.d||1)*M,n.y+(pt[1]-n.y)/(n.d||1)*M]:pt;});
+ const bb=bboxOf(outer);
+ return {body,tab,outer,bb,L:Math.max(bb.w,bb.h),M,HR};
+}
+function geo(id,size=order.size){
+ const key=id+'|'+size;if(GEO[key])return GEO[key];
+ const upm=upmFor(size);const raw=SHAPES.find(s=>s.id===id).gen();const T=2*HALF;
+ // size by the FULL cut outline (border + tab included): one coarse pass, a secant correction, then an exact touch-up
+ const a0=HALF-BORDER_MM*upm;const c0=cutFor(raw,a0,upm,4.5);
+ const bodyBB=bboxOf(c0.body);const along=c0.bb.w>=c0.bb.h?bodyBB.w:bodyBB.h;const slope=Math.max(.5,along/a0);
+ const a1=a0+(T-c0.L)/slope;const c=cutFor(raw,a1,upm,3);
+ const f=T/c.L;const sc=([x,y])=>[x*f,(y-CY)*f+CY];// <1% touch-up so the longest side is exactly the size picked
+ const body=c.body.map(sc),outer=c.outer.map(sc),tab={x:0,y:(c.tab.y-CY)*f+CY},hr=c.HR*f;
+ const print=body;// printed art area = the shape itself; the 2mm clear border comes from the offset cut
+ return GEO[key]={body,outer,print,tab,holeR:hr,upm,borderMM:BORDER_MM*f,bodyD:pd(body),outerD:pd(outer),printD:pd(print),holeD:`M${tab.x-hr},${tab.y}a${hr},${hr} 0 1,0 ${2*hr},0a${hr},${hr} 0 1,0 ${-2*hr},0Z`,minY:Math.min(...outer.map(p=>p[1])),maxY:Math.max(...outer.map(p=>p[1])),bb:bboxOf(outer)};
 }
 /* ---------- state + history ---------- */
 const FONTS=[{id:'Bagel Fat One',label:'bubble'},{id:'Pacifico',label:'script'},{id:'Press Start 2P',label:'pixel'},{id:'Rubik Bubbles',label:'puffy'}];
-const FILLS=['#ffc2e2','#ff3ea5','#b8ff3c','#2e5bff','#ffe14a','#c9b2ff','#8fd8ff','#5cf2c8','#ff8a3d','#ffffff','#17142e','none'];
-const OUTLINES=['#ff3ea5','#17142e','#2e5bff','#b8ff3c','#ffe14a','#ffffff'];// solid printable colors only
+const FILLS=['#ffc2e2','#ef4f9d','#a9dc4e','#3c5fd4','#ffe14a','#c9b2ff','#8fd8ff','#5fd4b5','#ff8a3d','#ffffff','#17142e','none'];
+const OUTLINES=['#ef4f9d','#17142e','#3c5fd4','#a9dc4e','#ffe14a','#ffffff'];// solid printable colors only
 const OUTLINE_FALLBACK='#ffffff';
 const safeOutline=c=>OUTLINES.includes(c)?c:OUTLINE_FALLBACK;
-const TCOLORS=['#17142e','#ff3ea5','#2e5bff','#b8ff3c','#ffe14a','#ffffff','#c9b2ff','#ff8a3d'];
+const TCOLORS=['#17142e','#ef4f9d','#3c5fd4','#a9dc4e','#ffe14a','#ffffff','#c9b2ff','#ff8a3d'];
 const SIZE_PRICE={'1.5':12,'2':14,'2.5':16};
-const ATT={keyring:{name:'keyring',add:0},strap:{name:'phone strap',add:2},clip:{name:'bag clip',add:3}};
+const ATT={keyring:{name:'keyring',add:0},clip:{name:'bag clip',add:3}};// Vograce: lobster clasp + split ring + chain / D hook clasp
 let uidN=10;const uid=()=>++uidN;
-let S={shape:'cloud',fill:'#ffc2e2',outline:'#ff3ea5',holo:true,els:[
+let S={shape:'cloud',fill:'#ffc2e2',outline:'#ef4f9d',holo:true,els:[
  {id:1,type:'sticker',sid:'plumeria',x:-86,y:CY-22,s:.62,r:-14},
- {id:2,type:'text',text:'aloha bb',font:'Bagel Fat One',color:'#ff3ea5',size:40,outline:true,x:6,y:CY+18,s:1,r:-6},
+ {id:2,type:'text',text:'aloha bb',font:'Bagel Fat One',color:'#ef4f9d',size:40,outline:true,x:6,y:CY+18,s:1,r:-6},
  {id:3,type:'sticker',sid:'sparkle',x:84,y:CY-40,s:.4,r:10},
  {id:4,type:'sticker',sid:'cherry',x:92,y:CY+40,s:.42,r:14},
 ]};
 let order={att:'keyring',size:'2',qty:1};
-let tdef={text:'shaka',font:'Bagel Fat One',color:'#2e5bff',size:38,outline:true};
+let tdef={text:'shaka',font:'Bagel Fat One',color:'#3c5fd4',size:38,outline:true};
 let sel=null,bag=0;
 const clone=o=>JSON.parse(JSON.stringify(o));
 const H={stack:[clone(S)],i:0};
-function commit(){H.stack=H.stack.slice(0,H.i+1);H.stack.push(clone(S));if(H.stack.length>120)H.stack.shift();H.i=H.stack.length-1;renderAll();}
-function restore(){S=clone(H.stack[H.i]);if(sel&&!S.els.find(e=>e.id===sel))sel=null;renderAll();}
+function commit(){enforceMins();H.stack=H.stack.slice(0,H.i+1);H.stack.push(clone(S));if(H.stack.length>120)H.stack.shift();H.i=H.stack.length-1;renderAll();}
+function restore(){S=clone(H.stack[H.i]);enforceMins();if(sel&&!S.els.find(e=>e.id===sel))sel=null;renderAll();}
 function undo(){if(H.i>0){H.i--;restore();}}
 function redo(){if(H.i<H.stack.length-1){H.i++;restore();}}
 const getSel=()=>S.els.find(e=>e.id===sel)||null;
@@ -411,31 +438,41 @@ function delSel(){if(!sel)return;S.els=S.els.filter(e=>e.id!==sel);sel=null;comm
    every piece of art gets the same dark ink line and the same white sticker border no matter how it's scaled:
    strokes are rebuilt per scale (stroke = weight / scale), scaling only changes the size of the art */
 const INK_W=2.6,WHITE_W=4.2,SH_DX=1.4,SH_DY=2,S_MIN=.25,S_MAX=3;
+// Vograce minimum line widths: colored lines >= 0.3mm, white lines >= 0.5mm (checked at the smallest 1.5" size)
+const MIN_COLOR_U=.3*UPM_MAX,MIN_WHITE_U=.5*UPM_MAX;
+// minimum printable sizes: stickers >= ~6mm across, text >= ~2.5mm tall
+const MIN_STICKER_MM=6,MIN_TEXT_MM=2.5;
+function minScale(e){const upm=upmFor(order.size);if(e.type==='sticker')return Math.max(S_MIN,MIN_STICKER_MM*upm/100);return Math.max(.2,MIN_TEXT_MM*upm/(e.size*.7));}
+function enforceMins(){for(const e of S.els){const m=minScale(e);if(e.s<m)e.s=m;}}
 const ART_INK=4;// sticker art is drawn with 4-unit ink lines at its native 100-unit size
 const qScale=v=>Math.round(clamp(v,S_MIN,S_MAX)*20)/20;// bake in 0.05 steps
 const stickerURL={},stickerImgs={};// default-scale bake, for the tray + drag ghost
 const BAKE={};// `${sid}@${q}` -> {url,img,pad} | Promise
-function stickerXML(st,q){
+function stickerXML(st,q,shadow=true){
  const f=INK_W/(ART_INK*q);// art-space multiplier that makes the ink line INK_W charm units at this scale
  const host=document.createElement('div');host.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg">${st.svg}</svg>`;const root=host.firstChild;
  root.querySelectorAll('[stroke-width]').forEach(n=>{const w=parseFloat(n.getAttribute('stroke-width'));if(!(w>0))return;
   // thin lines scale with the ink line; thick bands (double-stroked outlines, rainbow) just gain the same absolute delta
-  n.setAttribute('stroke-width',(w<=ART_INK?w*f:w+ART_INK*(f-1)).toFixed(2));});
+  let nw=w<=ART_INK?w*f:w+ART_INK*(f-1);
+  // never below the printer's minimum line width (white lines need more)
+  const sc=(n.closest('[stroke]')||n).getAttribute('stroke')||'';const white=/^#f{3}(f{3})?$/i.test(sc)||sc==='white';
+  nw=Math.max(nw,(white?MIN_WHITE_U:MIN_COLOR_U)/q);
+  n.setAttribute('stroke-width',nw.toFixed(2));});
  const wb=WHITE_W/q,sx=SH_DX/q,sy=SH_DY/q,pad=Math.ceil(wb+Math.max(sx,sy)+ART_INK*f/2+3);
- const filt=`<filter id="dc" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB"><feMorphology in="SourceAlpha" operator="dilate" radius="${wb.toFixed(2)}" result="d"/><feFlood flood-color="#ffffff"/><feComposite in2="d" operator="in" result="w"/><feOffset in="d" dx="${sx.toFixed(2)}" dy="${sy.toFixed(2)}" result="o"/><feFlood flood-color="#17142e" flood-opacity=".22"/><feComposite in2="o" operator="in" result="sh"/><feMerge><feMergeNode in="sh"/><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+ const filt=`<filter id="dc" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB"><feMorphology in="SourceAlpha" operator="dilate" radius="${wb.toFixed(2)}" result="d"/><feFlood flood-color="#ffffff"/><feComposite in2="d" operator="in" result="w"/><feOffset in="d" dx="${sx.toFixed(2)}" dy="${sy.toFixed(2)}" result="o"/><feFlood flood-color="#17142e" flood-opacity=".22"/><feComposite in2="o" operator="in" result="sh"/><feMerge>${shadow?'<feMergeNode in="sh"/>':''}<feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
  const span=100+2*pad,px=clamp(Math.round(span*q*4.2),128,1100);
  const inner=[...root.childNodes].map(n=>new XMLSerializer().serializeToString(n)).join('');
  return {pad,px,xml:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-pad} ${-pad} ${span} ${span}" width="${px}" height="${px}"><defs>${filt}</defs><g filter="url(#dc)">${inner}</g></svg>`};
 }
-function bake(sid,q){q=qScale(q);const key=sid+'@'+q;const b=BAKE[key];if(b)return b.then?b:Promise.resolve(b);
- const st=STK[sid];const {pad,px,xml}=stickerXML(st,q);
+function bake(sid,q,shadow=true){q=qScale(q);const key=sid+'@'+q+(shadow?'':'p');const b=BAKE[key];if(b)return b.then?b:Promise.resolve(b);
+ const st=STK[sid];const {pad,px,xml}=stickerXML(st,q,shadow);
  return BAKE[key]=new Promise(res=>{const img=new Image();img.decoding='async';
   const done=(im,url)=>{const r={url,img:im,pad,q};BAKE[key]=r;res(r);};
   img.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=px;c.getContext('2d').drawImage(img,0,0,px,px);c.toBlob(bl=>{if(!bl){done(img,img.src);return;}const u=URL.createObjectURL(bl);const im2=new Image();im2.onload=()=>done(im2,u);im2.onerror=()=>done(img,img.src);im2.src=u;},'image/png');}catch(_){done(img,img.src);}};
   img.onerror=()=>{console.warn('sticker bake failed',key);delete BAKE[key];res(null);};
   img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(xml);});}
 const bakedNow=(sid,s)=>{const b=BAKE[sid+'@'+qScale(s)];return b&&!b.then?b:null;};
-function anyBaked(sid,s){const exact=bakedNow(sid,s);if(exact)return exact;let best=null,bd=1e9;for(const k in BAKE){if(!k.startsWith(sid+'@'))continue;const b=BAKE[k];if(b.then)continue;const d=Math.abs(b.q-s);if(d<bd){bd=d;best=b;}}return best;}
+function anyBaked(sid,s){const exact=bakedNow(sid,s);if(exact)return exact;let best=null,bd=1e9;for(const k in BAKE){if(!k.startsWith(sid+'@')||k.endsWith('p'))continue;const b=BAKE[k];if(b.then)continue;const d=Math.abs(b.q-s);if(d<bd){bd=d;best=b;}}return best;}
 // re-bake any sticker whose scale changed, then swap its image in place
 function ensureBakes(){for(const e of S.els){if(e.type!=='sticker'||bakedNow(e.sid,e.s))continue;bake(e.sid,e.s).then(b=>{if(!b)return;const cur=S.els.find(x=>x.id===e.id);if(cur&&qScale(cur.s)===b.q){const n=nodeOf(cur.id);if(n)n.outerHTML=elMarkup(cur);if(sel===cur.id)updateSel();}});}}
 const stickersReady=Promise.all(STICKERS.map(st=>bake(st.id,.62).then(b=>{if(b){stickerURL[st.id]=b.url;stickerImgs[st.id]=b.img;}}))).then(()=>{renderEls();updateSel();renderTray();});
@@ -453,7 +490,7 @@ function chain2D(g){
  return m;
 }
 function renderBase(){
- const key=[S.shape,S.fill,S.outline,S.holo].join('|');if(key===baseKey)return;baseKey=key;
+ const key=[S.shape,S.fill,S.outline,S.holo,order.size].join('|');if(key===baseKey)return;baseKey=key;
  const g=geo(S.shape);
  $('#sdefs').innerHTML=`<clipPath id="clipOuter"><path d="${g.outerD}"/></clipPath><clipPath id="clipPrint"><path d="${g.printD}"/></clipPath>`;
  let h=chain2D(g);
@@ -461,11 +498,11 @@ function renderBase(){
  h+=`<path d="${g.outerD} ${g.holeD}" fill-rule="evenodd" fill="url(#acry)" stroke="#a7bde0" stroke-width="2.5"/>`;
  h+=`<g clip-path="url(#clipPrint)">`;
  if(S.fill!=='none')h+=`<path d="${g.printD}" fill="${S.fill}"/>`;
- if(S.holo)h+=`<g clip-path="url(#clipPrint)"><path d="${g.printD}" fill="url(#holoG)" opacity=".55"/><path d="${g.printD}" fill="url(#glitter)"/></g>`;
+ if(S.holo)h+=`<g clip-path="url(#clipPrint)" pointer-events="none"><path d="${g.printD}" fill="url(#holoG)" opacity=".3"/><path d="${g.printD}" fill="url(#holostars)"/></g>`;// holo film = preview only, never in the print file
  h+=`<path d="${g.printD}" fill="none" stroke="${S.outline}" stroke-width="12" stroke-linejoin="round"/>`;// printed border, inside the art edge
  h+=`</g>`;
  baseL.innerHTML=h;
- glossL.innerHTML=`<g clip-path="url(#clipOuter)"><path d="${g.outerD}" fill="none" stroke="#fff" stroke-width="12" opacity=".6"/><ellipse cx="-70" cy="${CY-70}" rx="62" ry="20" transform="rotate(-38 -70 ${CY-70})" fill="#fff" opacity=".42"/><ellipse cx="-104" cy="${CY-14}" rx="9" ry="5" transform="rotate(-50 -104 ${CY-14})" fill="#fff" opacity=".55"/><path d="M60 ${CY+120} q50 -20 70 -70" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/></g><circle cx="${g.tab.x}" cy="${g.tab.y}" r="${HOLE_R}" fill="none" stroke="#a7bde0" stroke-width="2"/>`;
+ glossL.innerHTML=`<g clip-path="url(#clipOuter)"><path d="${g.outerD}" fill="none" stroke="#fff" stroke-width="12" opacity=".6"/><ellipse cx="-70" cy="${CY-70}" rx="62" ry="20" transform="rotate(-38 -70 ${CY-70})" fill="#fff" opacity=".42"/><ellipse cx="-104" cy="${CY-14}" rx="9" ry="5" transform="rotate(-50 -104 ${CY-14})" fill="#fff" opacity=".55"/><path d="M60 ${CY+120} q50 -20 70 -70" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/></g><circle cx="${g.tab.x}" cy="${g.tab.y}" r="${g.holeR.toFixed(2)}" fill="none" stroke="#a7bde0" stroke-width="2"/>`;
  // viewBox hugs the charm, with room for the floating bars
  fitView();
 }
@@ -531,7 +568,7 @@ function frame(){
  rafId=0;
  if(pinch&&ptrs.size>=2){const e=S.els.find(x=>x.id===pinch.id);if(!e)return;const [a,b]=[...ptrs.values()].slice(0,2).map(p=>toSvgXY(p.cx,p.cy));
   const d=Math.hypot(b.x-a.x,b.y-a.y),ang=Math.atan2(b.y-a.y,b.x-a.x);
-  e.s=clamp(pinch.s0*d/pinch.d0,S_MIN,S_MAX);e.r=normDeg(pinch.r0+(ang-pinch.a0)*180/Math.PI);
+  e.s=clamp(pinch.s0*d/pinch.d0,minScale(e),S_MAX);e.r=normDeg(pinch.r0+(ang-pinch.a0)*180/Math.PI);
   e.x=clamp(pinch.x0+(a.x+b.x)/2-pinch.mx,-185,185);e.y=clamp(pinch.y0+(a.y+b.y)/2-pinch.my,-220,200);
   pinch.moved=true;updateEl(e);updateSel();return;}
  if(!drag)return;const q=ptrs.get(drag.pid);if(!q)return;
@@ -539,7 +576,7 @@ function frame(){
  if(drag.mode==='empty')return;
  const e=S.els.find(x=>x.id===drag.id);if(!e)return;const p=toSvgXY(q.cx,q.cy);
  if(drag.mode==='move'){e.x=clamp(p.x-drag.dx,-185,185);e.y=clamp(p.y-drag.dy,-220,200);}
- else if(drag.mode==='scl'){e.s=clamp(drag.s0*Math.hypot(p.x-e.x,p.y-e.y)/drag.d0,S_MIN,S_MAX);}
+ else if(drag.mode==='scl'){e.s=clamp(drag.s0*Math.hypot(p.x-e.x,p.y-e.y)/drag.d0,minScale(e),S_MAX);}
  else if(drag.mode==='rot'){let r=normDeg(drag.r0+(Math.atan2(p.y-e.y,p.x-e.x)-drag.a0)*180/Math.PI);const sn=Math.round(r/45)*45;if(Math.abs(r-sn)<4)r=sn;e.r=r;}
  updateEl(e);updateSel();
 }
@@ -559,7 +596,7 @@ function addSticker(sid,x,y){const e={id:uid(),type:'sticker',sid,x:x??rand(-60,
 function addText(){const e={id:uid(),type:'text',text:($('#txtIn').value.trim()||'aloha'),font:tdef.font,color:tdef.color,size:tdef.size,outline:tdef.outline,x:rand(-30,30),y:CY+rand(-30,40),s:1,r:rand(-8,8)};S.els.push(e);sel=e.id;commit();$('#txtIn').blur();collapse();}
 function pulseStage(){const w=$('#stageWrap');w.animate([{transform:'scale(1)'},{transform:'scale(1.015)'},{transform:'scale(1)'}],{duration:260,easing:'ease-out'});}
 /* ---------- UI ---------- */
-$('#mq').innerHTML=['charm lab ✦','made in pāʻia','holo glitter','stickers on stickers','acrylic but make it cute','shaka bb','custom everything','✿ ✿ ✿'].map(s=>`<span>${s}</span>`).join('').repeat(4);
+$('#mq').innerHTML=['charm lab ✦','made in pāʻia','holo stars','stickers on stickers','acrylic but make it cute','shaka bb','custom everything','✿ ✿ ✿'].map(s=>`<span>${s}</span>`).join('').repeat(4);
 const TILECOLS=['#ffc2e2','#b8ff3c','#8fd8ff','#ffe14a','#c9b2ff','#5cf2c8','#ffc2e2','#ff8a3d'];
 $('#shapes').innerHTML=SHAPES.map((s,i)=>{const g=geo(s.id);const h=g.maxY-g.minY+20;return `<button class="tile" data-shape="${s.id}" aria-label="${s.name}"><svg viewBox="${-Math.max(165,h/2)} ${(g.minY-10).toFixed(0)} ${2*Math.max(165,h/2)} ${h.toFixed(0)}"><path d="${g.outerD} ${g.holeD}" fill-rule="evenodd" fill="${TILECOLS[i]}" stroke="currentColor" stroke-width="14" stroke-linejoin="round"/></svg><span>${s.name}</span></button>`;}).join('');
 $('#shapes').addEventListener('click',ev=>{const b=ev.target.closest('[data-shape]');if(!b)return;S.shape=b.dataset.shape;commit();collapse();});
@@ -569,7 +606,7 @@ function bindSw(el,apply){el.addEventListener('click',ev=>{const b=ev.target.clo
 bindSw($('#fills'),(c,done)=>{S.fill=c;done?commit():(renderBase(),renderPanels());});
 bindSw($('#outlines'),(c,done)=>{S.outline=safeOutline(c);done?commit():(renderBase(),renderPanels());});
 const txtTarget=()=>{const e=getSel();return e&&e.type==='text'?e:null;};
-function refreshText(t){delete TB[t.id];const n=nodeOf(t.id);if(n){n.outerHTML=elMarkup(t);}measureText(t);updateSel();}
+function refreshText(t){const m=minScale(t);if(t.s<m){t.s=m;updateEl(t);}delete TB[t.id];const n=nodeOf(t.id);if(n){n.outerHTML=elMarkup(t);}measureText(t);updateSel();}
 bindSw($('#tcolors'),(c,done)=>{const t=txtTarget();if(t){t.color=c;done?commit():refreshText(t);}else{tdef.color=c;renderPanels();}});
 $('#holoT').addEventListener('click',()=>{S.holo=!S.holo;commit();collapse();});
 $('#fonts').innerHTML=FONTS.map(f=>`<button class="pbtn" data-font="${f.id}" style="font-family:'${f.id}'">${f.id==='Press Start 2P'?'<span style="font-size:15px;line-height:1.8">Abc</span>':'Abc'}<small>${f.label}</small></button>`).join('');
@@ -650,12 +687,11 @@ $('#selbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-act]
 // order
 const attIcon={
  keyring:`<svg viewBox="0 0 48 48"><circle cx="24" cy="17" r="11" fill="none" stroke="currentColor" stroke-width="7"/><circle cx="24" cy="17" r="11" fill="none" stroke="url(#chrome)" stroke-width="3.5"/><path d="M24 28 l-9 9 9 9 9-9z" fill="#ffc2e2" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>`,
- strap:`<svg viewBox="0 0 48 48"><path d="M24 30 C12 22 12 6 24 4 C36 6 36 22 24 30Z" fill="none" stroke="currentColor" stroke-width="6"/><path d="M24 30 C12 22 12 6 24 4 C36 6 36 22 24 30Z" fill="none" stroke="#ff3ea5" stroke-width="3"/><circle cx="16" cy="16" r="3.5" fill="#b8ff3c" stroke="currentColor" stroke-width="1.8"/><circle cx="32" cy="18" r="3.5" fill="#ffe14a" stroke="currentColor" stroke-width="1.8"/><path d="M24 32 c0 4 -6 4 -6 9 a6 6 0 0 0 12 0 c0-5-6-5-6-9z" fill="#8fd8ff" stroke="currentColor" stroke-width="2.4"/></svg>`,
  clip:`<svg viewBox="0 0 48 48"><path d="M24 4 C14 6 12 20 16 28 C18 32 30 32 32 28 C35 22 33 12 28 7" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><path d="M24 4 C14 6 12 20 16 28 C18 32 30 32 32 28 C35 22 33 12 28 7" fill="none" stroke="url(#chrome)" stroke-width="3.5" stroke-linecap="round"/><circle cx="24" cy="38" r="6" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="24" cy="38" r="6" fill="none" stroke="url(#chrome)" stroke-width="2.4"/></svg>`};
 $('#atts').innerHTML=Object.entries(ATT).map(([k,a])=>`<button class="att" data-att="${k}">${attIcon[k]}${a.name}<em>${a.add?'+$'+a.add:'included'}</em></button>`).join('');
 $('#atts').addEventListener('click',ev=>{const b=ev.target.closest('[data-att]');if(b){order.att=b.dataset.att;renderOrder();}});
 $('#sizes').innerHTML=Object.keys(SIZE_PRICE).map(s=>`<button data-size="${s}">${s}"</button>`).join('');
-$('#sizes').addEventListener('click',ev=>{const b=ev.target.closest('[data-size]');if(b){order.size=b.dataset.size;renderOrder();}});
+$('#sizes').addEventListener('click',ev=>{const b=ev.target.closest('[data-size]');if(b){order.size=b.dataset.size;commit();}});// geometry (2mm border, 3mm hole) + minimum sizes depend on the real size
 $('#qm').onclick=()=>{order.qty=Math.max(1,order.qty-1);renderOrder();};
 $('#qp').onclick=()=>{order.qty=Math.min(20,order.qty+1);renderOrder();};
 const priceEach=()=>SIZE_PRICE[order.size]+ATT[order.att].add+(S.holo?2:0);
@@ -664,7 +700,7 @@ function renderOrder(){
  $$('#sizes button').forEach(b=>b.classList.toggle('on',b.dataset.size===order.size));
  $('#qn').textContent=order.qty;const each=priceEach(),tot=each*order.qty;
  $('#price').textContent='$'+tot;$('#tabPrice').textContent='$'+tot;
- $('#lines').innerHTML=`<div><span>${order.size}" acrylic charm</span><span>$${SIZE_PRICE[order.size]}</span></div><div><span>${ATT[order.att].name}</span><span>${ATT[order.att].add?'+$'+ATT[order.att].add:'included'}</span></div>${S.holo?'<div><span>holo glitter</span><span>+$2</span></div>':''}${order.qty>1?`<div><span>× ${order.qty}</span><span>$${each} each</span></div>`:''}`;
+ $('#lines').innerHTML=`<div><span>${order.size}" clear acrylic, printed both sides</span><span>$${SIZE_PRICE[order.size]}</span></div><div><span>${ATT[order.att].name}</span><span>${ATT[order.att].add?'+$'+ATT[order.att].add:'included'}</span></div>${S.holo?'<div><span>holo stars film</span><span>+$2</span></div>':''}${order.qty>1?`<div><span>× ${order.qty}</span><span>$${each} each</span></div>`:''}`;
 }
 function addToBag(origin){bag+=order.qty;for(const n of [$('#bagN'),$('#bagN3d')]){n.textContent=bag;n.classList.add('pop');setTimeout(()=>n.classList.remove('pop'),300);}
  const g=geo(S.shape);const mini=`<svg viewBox="-165 ${(g.minY-10).toFixed(0)} 330 ${(g.maxY-g.minY+20).toFixed(0)}"><path d="${g.outerD} ${g.holeD}" fill-rule="evenodd" fill="${S.fill==='none'?'#eef6ff':S.fill}" stroke="${INK}" stroke-width="14"/></svg>`;
@@ -690,7 +726,7 @@ function renderPanels(){
  $('#undoB').disabled=H.i<=0;$('#redoB').disabled=H.i>=H.stack.length-1;$('#clearB').disabled=!S.els.length;
 }
 function selChanged(){updateSel();renderSelbar();renderPanels();}
-function sanitize(st){st.outline=safeOutline(st.outline);return st;}
+function sanitize(st){st.fill=soften(st.fill);st.outline=safeOutline(soften(st.outline));for(const e of st.els)if(e.type==='text')e.color=soften(e.color);if(!ATT[order.att])order.att='keyring';return st;}
 function renderAll(){sanitize(S);renderBase();renderEls();updateSel();renderSelbar();renderPanels();renderOrder();}
 window.addEventListener('keydown',ev=>{
  if($('#modal').classList.contains('open')){if(ev.key==='Escape')close3D();return;}
@@ -706,23 +742,48 @@ window.addEventListener('keydown',ev=>{
 });
 /* ---------- print texture (2D design -> 1024px canvas) ---------- */
 function seeded(seed){return()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646;};}
-async function renderPrintCanvas(){
+// draw ONLY printable art (fill, outline, stickers, text): no drop shadows, gloss or holo film (those are preview-only).
+// side 'back' = what gets printed on the back so it reads correctly from behind: the layout is mirrored to match the cut,
+// but every sticker and word is drawn the right way round.
+async function drawPrintArt(ctx,side='front'){
  try{await document.fonts.ready;await Promise.all(FONTS.map(f=>document.fonts.load(`40px "${f.id}"`)));}catch(_){}
  await stickersReady;
- const SZ=330,PX=1024,P=PX/SZ,X0=-165,Y0=CY-170;
- const cv=document.createElement('canvas');cv.width=cv.height=PX;const ctx=cv.getContext('2d');
- ctx.setTransform(P,0,0,P,-X0*P,-Y0*P);
- const g=geo(S.shape);const pr=new Path2D(g.printD);
+ const back=side==='back';const g=geo(S.shape);
+ const prD=new Path2D(g.printD),pr=new Path2D();pr.addPath(prD,back?new DOMMatrix([-1,0,0,1,0,0]):new DOMMatrix());
+ const bakes=await Promise.all(S.els.map(e=>e.type==='sticker'?bake(e.sid,e.s,false):null));
  ctx.save();ctx.clip(pr);
  if(S.fill!=='none'){ctx.fillStyle=S.fill;ctx.fill(pr);}
- if(S.holo){ctx.save();ctx.clip(pr);const gr=ctx.createLinearGradient(-140,CY-140,140,CY+140);HOLO_STOPS.forEach(([o,c])=>gr.addColorStop(o,c));ctx.globalAlpha=.55;ctx.fillStyle=gr;ctx.fillRect(-170,CY-180,340,360);ctx.globalAlpha=1;const r=seeded(7);const cs=['#fff','#fff6b0','#c8f6ff','#ffd6f0'];for(let i=0;i<600;i++){ctx.fillStyle=cs[i%4];ctx.beginPath();ctx.arc(-160+r()*320,CY-170+r()*340,.5+r()*1.4,0,Math.PI*2);ctx.fill();}ctx.restore();}
  ctx.lineWidth=12;ctx.lineJoin='round';ctx.strokeStyle=S.outline;ctx.stroke(pr);
- for(const e of S.els){ctx.save();ctx.translate(e.x,e.y);ctx.rotate(e.r*Math.PI/180);ctx.scale(e.s,e.s);
-  if(e.type==='sticker'){const b=await bake(e.sid,e.s)||anyBaked(e.sid,e.s);if(b)ctx.drawImage(b.img,-50-b.pad,-50-b.pad,100+2*b.pad,100+2*b.pad);}
-  else{ctx.font=`${e.size}px "${e.font}"`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';if(e.outline){const w=txtW(e);ctx.save();ctx.globalAlpha=.22;ctx.translate(+w.sx,+w.sy);ctx.strokeStyle=INK;ctx.fillStyle=INK;ctx.lineWidth=+w.white;ctx.strokeText(e.text,0,0);ctx.fillText(e.text,0,0);ctx.restore();ctx.strokeStyle='#fff';ctx.lineWidth=+w.white;ctx.strokeText(e.text,0,0);ctx.strokeStyle=INK;ctx.lineWidth=+w.ink;ctx.strokeText(e.text,0,0);}ctx.fillStyle=e.color;ctx.fillText(e.text,0,0);}
-  ctx.restore();}
+ S.els.forEach((e,i)=>{ctx.save();ctx.translate(back?-e.x:e.x,e.y);ctx.rotate((back?-e.r:e.r)*Math.PI/180);ctx.scale(e.s,e.s);
+  if(e.type==='sticker'){const b=bakes[i];if(b)ctx.drawImage(b.img,-50-b.pad,-50-b.pad,100+2*b.pad,100+2*b.pad);}
+  else{ctx.font=`${e.size}px "${e.font}"`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';if(e.outline){const w=txtW(e);ctx.strokeStyle='#fff';ctx.lineWidth=+w.white;ctx.strokeText(e.text,0,0);ctx.strokeStyle=INK;ctx.lineWidth=+w.ink;ctx.strokeText(e.text,0,0);}ctx.fillStyle=e.color;ctx.fillText(e.text,0,0);}
+  ctx.restore();});
  ctx.restore();
+}
+// 3D textures: a 330-unit square around the charm
+async function renderPrintCanvas(side='front'){
+ const SZ=330,PX=1024,P=PX/SZ,X0=-165,Y0=CY-170;
+ const cv=document.createElement('canvas');cv.width=cv.height=PX;const ctx=cv.getContext('2d');
+ ctx.setTransform(P,0,0,P,-X0*P,-Y0*P);await drawPrintArt(ctx,side);return cv;
+}
+// holo star film overlay for the 3D front (preview only, clipped to the printed area)
+function holoStarCanvas(){
+ const SZ=330,PX=1024,P=PX/SZ,X0=-165,Y0=CY-170;const cv=document.createElement('canvas');cv.width=cv.height=PX;const ctx=cv.getContext('2d');
+ ctx.setTransform(P,0,0,P,-X0*P,-Y0*P);ctx.clip(new Path2D(geo(S.shape).printD));
+ const gr=ctx.createLinearGradient(-140,CY-140,140,CY+140);HOLO_STOPS.forEach(([o,c])=>gr.addColorStop(o,c));ctx.globalAlpha=.05;ctx.fillStyle=gr;ctx.fillRect(-170,CY-180,340,360);ctx.globalAlpha=1;
+ const r=seeded(11);const cs=['#ffffff','#c8f6ff','#ffd6f0','#fff6b0','#e6d6ff'];
+ const st=(x,y,R,pts)=>{ctx.beginPath();for(let i=0;i<pts*2;i++){const a=-Math.PI/2+i*Math.PI/pts,rr=i%2?R*(pts===4?.28:.45):R;ctx.lineTo(x+rr*Math.cos(a),y+rr*Math.sin(a));}ctx.closePath();ctx.fill();};
+ for(let i=0;i<170;i++){ctx.fillStyle=cs[i%5];ctx.globalAlpha=.55+r()*.45;st(-160+r()*320,CY-170+r()*340,1.2+r()*r()*5.5,r()<.5?4:5);}
  return cv;
+}
+// print files for the printer: front.png + back.png at 600 DPI (transparent, cropped to the cut outline) + cutline.svg in mm
+async function exportPrintFiles(dpi=600){
+ const g=geo(S.shape);const bb=g.bb;const inch=parseFloat(order.size);const pxPerUnit=dpi*inch/(2*HALF);
+ const W=Math.round(bb.w*pxPerUnit),Hh=Math.round(bb.h*pxPerUnit);
+ const mk=async side=>{const cv=document.createElement('canvas');cv.width=W;cv.height=Hh;const ctx=cv.getContext('2d');const x0=side==='back'?-bb.x1:bb.x0;ctx.setTransform(pxPerUnit,0,0,pxPerUnit,-x0*pxPerUnit,-bb.y0*pxPerUnit);await drawPrintArt(ctx,side);return cv.toDataURL('image/png');};
+ const mm=1/g.upm,f=v=>(v*mm).toFixed(3);
+ const cut=`<svg xmlns="http://www.w3.org/2000/svg" width="${f(bb.w)}mm" height="${f(bb.h)}mm" viewBox="0 0 ${f(bb.w)} ${f(bb.h)}"><path d="M${g.outer.map(([x,y])=>f(x-bb.x0)+','+f(y-bb.y0)).join('L')}Z" fill="none" stroke="#ff0000" stroke-width="0.1"/><circle cx="${f(g.tab.x-bb.x0)}" cy="${f(g.tab.y-bb.y0)}" r="${f(g.holeR)}" fill="none" stroke="#ff0000" stroke-width="0.1"/></svg>`;
+ return {front:await mk('front'),back:await mk('back'),cutline:cut,px:[W,Hh],mm:[+f(bb.w),+f(bb.h)],holeMM:+(2*g.holeR*mm).toFixed(2),borderMM:+g.borderMM.toFixed(2)};
 }
 /* ---------- 3D viewer: mobile-tuned (no transmission, no shadows, render on demand) ---------- */
 const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -777,7 +838,7 @@ async function build3D(){
  const hang=new T.Group(),pivot=new T.Group();
  // acrylic slab (decimated outline, light bevel)
  const pts=g.outer.filter((_,i)=>i%2===0);
- const shape=new T.Shape(pts.map(([x,y])=>W(x,y)));const tc=W(g.tab.x,g.tab.y);const hr=HOLE_R*k;
+ const shape=new T.Shape(pts.map(([x,y])=>W(x,y)));const tc=W(g.tab.x,g.tab.y);const hr=g.holeR*k;
  const hole=new T.Path();hole.absarc(tc.x,tc.y,hr,0,Math.PI*2,true);shape.holes.push(hole);
  const D=3.6,bt=.6;
  let geom=new T.ExtrudeGeometry(shape,{depth:D-2*bt,bevelEnabled:true,bevelThickness:bt,bevelSize:.6,bevelOffset:-.6,bevelSegments:IS_MOBILE?2:3,curveSegments:10});
@@ -786,11 +847,14 @@ async function build3D(){
  keep(geom);
  const acrylic=keep(acrylicMaterial(T,S.holo));
  const slab=new T.Mesh(geom,acrylic);slab.renderOrder=2;hang.add(slab);
- // printed design sealed inside (opaque cut-out, drawn before the clear slab)
- const cv=await renderPrintCanvas();
- const tex=keep(new T.CanvasTexture(cv));tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=Math.min(4,V.renderer.capabilities.getMaxAnisotropy());tex.generateMipmaps=true;
- const pm=keep(new T.MeshBasicMaterial({map:tex,alphaTest:.5,side:T.DoubleSide,toneMapped:false}));
- const pg=keep(new T.PlaneGeometry(330*k,330*k));const plane=new T.Mesh(pg,pm);plane.position.set(0,5*k,0);plane.renderOrder=1;hang.add(plane);
+ // printed art sealed inside: front print faces front, the correct-reading back print faces back (Vograce "double sided different design")
+ const [cvF,cvB]=await Promise.all([renderPrintCanvas('front'),renderPrintCanvas('back')]);
+ const mkTex=cv=>{const t=keep(new T.CanvasTexture(cv));t.colorSpace=T.SRGBColorSpace;t.anisotropy=Math.min(4,V.renderer.capabilities.getMaxAnisotropy());t.generateMipmaps=true;return t;};
+ const pg=keep(new T.PlaneGeometry(330*k,330*k));
+ const front=new T.Mesh(pg,keep(new T.MeshBasicMaterial({map:mkTex(cvF),alphaTest:.5,side:T.FrontSide,toneMapped:false})));front.position.set(0,5*k,.06);front.renderOrder=1;hang.add(front);
+ const backP=new T.Mesh(pg,keep(new T.MeshBasicMaterial({map:mkTex(cvB),alphaTest:.5,side:T.FrontSide,toneMapped:false})));backP.position.set(0,5*k,-.06);backP.rotation.y=Math.PI;backP.renderOrder=1;hang.add(backP);
+ if(S.holo){const hs=new T.Mesh(pg,keep(new T.MeshBasicMaterial({map:mkTex(holoStarCanvas()),transparent:true,depthWrite:false,side:T.FrontSide,toneMapped:false})));hs.position.set(0,5*k,.14);hs.renderOrder=3;hang.add(hs);}
+ V.planes={front,back:backP};
  // chrome hardware: shared geometry + one material
  const chrome=keep(new T.MeshStandardMaterial({color:0xeef1f8,metalness:1,roughness:.12,envMapIntensity:1.5}));
  const add=(geo,mat=chrome)=>{const m=new T.Mesh(geo,mat);hang.add(m);return m;};
@@ -809,20 +873,12 @@ async function build3D(){
   const gate=add(keep(new T.CylinderGeometry(.55,.55,p1.distanceTo(p2),10)));gate.position.copy(p1).add(p2).multiplyScalar(.5);gate.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),p2.clone().sub(p1).normalize());
   add(keep(new T.BoxGeometry(1.2,2.4,1.6))).position.set(bodyR+1.2,bc-1,0);
   const tr=add(keep(new T.TorusGeometry(1.6,.5,8,20)));tr.rotation.y=Math.PI/2;const tcy=bc+bodyR*sy+2.3;tr.position.y=tcy;P=tcy+2.1;
- } else {
-  const B=top-1.6;const cp=[[0,B],[-1.9,B+1.6],[-.7,B+5],[-3.2,B+12],[-5.2,B+24],[-3.8,B+32.5],[0,B+35],[3.8,B+32.5],[5.2,B+24],[3.2,B+12],[.7,B+5],[1.9,B+1.6]].map(([x,y])=>new T.Vector3(x,y,0));
-  const curve=new T.CatmullRomCurve3(cp,true,'catmullrom',.5);
-  add(keep(new T.TubeGeometry(curve,96,.85,8,true)),keep(new T.MeshStandardMaterial({color:0xff3ea5,roughness:.5})));
-  add(keep(new T.CylinderGeometry(1.5,1.5,3,14))).position.set(0,B+5,0);
-  const bg=keep(new T.SphereGeometry(1.8,16,12));
-  [[.31,'#b8ff3c'],[.4,'#ffe14a'],[.6,'#8fd8ff'],[.69,'#c9b2ff']].forEach(([u,col])=>{add(bg,keep(new T.MeshStandardMaterial({color:col,roughness:.18}))).position.copy(curve.getPointAt(u));});
-  P=B+35.85;
  }
  const bottom=Math.min(...g.outer.map(([,y])=>-(y-CY)*k));
  hang.position.y=-P;pivot.position.y=P;pivot.add(hang);
  const mid=(P+bottom)/2;V.root.position.y=-mid;V.root.add(pivot);
  V.pivot=pivot;V.hang=hang;V.fitH=P-bottom;V.fitW=2*HALF*k;
- $('#mtag').innerHTML=`<b>${order.size}"</b> clear acrylic · ${SHAPES.find(s=>s.id===S.shape).name}${S.holo?' · holo':''}<br>with ${ATT[order.att].name}`;
+ $('#mtag').innerHTML=`<b>${order.size}"</b> clear acrylic · ${SHAPES.find(s=>s.id===S.shape).name}${S.holo?' · holo stars':''}<br>with ${ATT[order.att].name} · printed both sides`;
 }
 function resetView(){if(!V)return;const a=V.camera.aspect||1;const tf=Math.tan(V.camera.fov*Math.PI/360);const d=Math.max((V.fitH/2)/tf*1.25,(V.fitW/2)/(tf*a)*1.5);const ty=-V.fitH*.04;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.controls.minDistance=d*.35;V.controls.maxDistance=d*2.4;V.controls.update();kick();}
 // render loop runs only while something moves
@@ -859,10 +915,10 @@ const setMotion=m=>{motion=m;clearTimeout(idleT);if(V){V.controls.autoRotate=m;k
 
 /* light / dark mode (UI only) */
 const THEME_KEY='charmlab.theme';
-function applyTheme(t,save){const h=document.documentElement;h.classList.add('theming');h.dataset.theme=t;$('meta[name=theme-color]').setAttribute('content',t==='dark'?'#0f0b1f':'#ffffff');if(save){try{localStorage.setItem(THEME_KEY,t);}catch(_){}}setTimeout(()=>h.classList.remove('theming'),450);}
+function applyTheme(t,save){const h=document.documentElement;h.classList.add('theming');h.dataset.theme=t;$('meta[name=theme-color]').setAttribute('content',t==='dark'?'#272042':'#ffffff');if(save){try{localStorage.setItem(THEME_KEY,t);}catch(_){}}setTimeout(()=>h.classList.remove('theming'),450);}
 $('#themeBtn').addEventListener('click',()=>{const b=$('#themeBtn');b.classList.remove('boop');void b.offsetWidth;b.classList.add('boop');applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true);});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',ev=>{let saved=null;try{saved=localStorage.getItem(THEME_KEY);}catch(_){}if(!saved)applyTheme(ev.matches?'dark':'light',false);});
-window.__charm={applyTheme,get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
+window.__charm={applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
 renderAll();
 document.fonts&&document.fonts.ready.then(()=>{renderEls();updateSel();});
 </script>
