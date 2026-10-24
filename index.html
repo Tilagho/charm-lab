@@ -441,6 +441,8 @@ const OUTLINE_FALLBACK='#ffffff';
 const safeOutline=c=>OUTLINES.includes(c)?c:OUTLINE_FALLBACK;
 const TCOLORS=['#17142e','#ef4f9d','#3c5fd4','#a9dc4e','#ffe14a','#ffffff','#c9b2ff','#ff8a3d'];
 const SIZE_PRICE={'1.5':12,'2':14,'2.5':16};
+const SIZES=['1.5','2','2.5'];/* explicit order: Object.keys puts the integer-like '2' first */
+const SIZE_MAX=2.5;const sizeF=()=>parseFloat(order.size)/SIZE_MAX;// on-screen scale vs the biggest size: 1.5"=.6, 2"=.8, 2.5"=1 (true proportions)
 const ATT={keyring:{name:'keyring',add:0},clip:{name:'bag clip',add:3}};// Vograce: lobster clasp + split ring + chain / D hook clasp
 let uidN=10;const uid=()=>++uidN;
 let S={shape:'cloud',fill:'#ffc2e2',outline:'#ef4f9d',holo:true,els:[
@@ -543,8 +545,9 @@ function renderBase(){
 }
 const BAND_T=76,BAND_B=76;let VIEW={band:0,bandB:0};
 function fitView(){const r=svg.getBoundingClientRect();if(!r.width||!r.height)return;const g=geo(S.shape);
- const top=g.minY-40,bot=g.maxY+16,cw=330,ch=bot-top;const avH=Math.max(120,r.height-BAND_T-BAND_B);
- const sc=Math.min(r.width/cw,avH/ch);const vw=r.width/sc,vh=r.height/sc;const y0=top-BAND_T/sc-(avH/sc-ch)/2;
+ const top=g.minY-40,bot=g.maxY+16,cw=310,ch=bot-top;const avH=Math.max(120,r.height-BAND_T-BAND_B);
+ /* the frame fits the biggest (2.5") charm; smaller sizes draw proportionally smaller so the size jump reads true */
+ const gr=geo(S.shape,String(SIZE_MAX)),chR=gr.maxY+16-(gr.minY-40);const sc=Math.min(r.width/cw,avH/chR)*sizeF();const vw=r.width/sc,vh=r.height/sc;const y0=top-BAND_T/sc-(avH/sc-ch)/2;
  svg.setAttribute('viewBox',`${(-vw/2).toFixed(1)} ${y0.toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);VIEW={band:BAND_T/sc,bandB:BAND_B/sc};}
 // text strokes in element space so they land at the universal charm-space weights (stroke is centered, fill covers the inner half)
 function txtW(e){const s=e.s||1;return {ink:(2*INK_W/s).toFixed(2),white:(2*(INK_W+WHITE_W)/s).toFixed(2),sx:(SH_DX/s).toFixed(2),sy:(SH_DY/s).toFixed(2)};}
@@ -748,7 +751,7 @@ const attIcon={
  clip:`<svg viewBox="0 0 48 48"><path d="M24 4 C14 6 12 20 16 28 C18 32 30 32 32 28 C35 22 33 12 28 7" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><path d="M24 4 C14 6 12 20 16 28 C18 32 30 32 32 28 C35 22 33 12 28 7" fill="none" stroke="url(#chrome)" stroke-width="3.5" stroke-linecap="round"/><circle cx="24" cy="38" r="6" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="24" cy="38" r="6" fill="none" stroke="url(#chrome)" stroke-width="2.4"/></svg>`};
 $('#atts').innerHTML=Object.entries(ATT).map(([k,a])=>`<button class="att" data-att="${k}">${attIcon[k]}${a.name}<em>${a.add?'+$'+a.add:'included'}</em></button>`).join('');
 $('#atts').addEventListener('click',ev=>{const b=ev.target.closest('[data-att]');if(b){order.att=b.dataset.att;renderOrder();}});
-$('#sizes').innerHTML=Object.keys(SIZE_PRICE).map(s=>`<button data-size="${s}">${s}"</button>`).join('');
+$('#sizes').innerHTML=SIZES.map(s=>`<button data-size="${s}">${s}"</button>`).join('');
 $('#sizes').addEventListener('click',ev=>{const b=ev.target.closest('[data-size]');if(b){order.size=b.dataset.size;commit();}});// geometry (2mm border, 3mm hole) + minimum sizes depend on the real size
 $('#qm').onclick=()=>{order.qty=Math.max(1,order.qty-1);renderOrder();};
 $('#qp').onclick=()=>{order.qty=Math.min(20,order.qty+1);renderOrder();};
@@ -939,7 +942,11 @@ async function build3D(){
  const bottom=Math.min(...g.outer.map(([,y])=>-(y-CY)*k));
  hang.position.y=-P;pivot.position.y=P;pivot.add(hang);
  const mid=(P+bottom)/2;V.root.position.y=-mid;V.root.add(pivot);
- V.pivot=pivot;V.hang=hang;V.fitH=P-bottom;V.fitW=2*HALF*k;
+ V.pivot=pivot;V.hang=hang;
+ /* frame the camera for the biggest size: the charm part scales up to 2.5", the hardware stays its real size,
+    so a 1.5" charm really looks 60% as wide as a 2.5" one next to the same keyring */
+ const Rk=SIZE_MAX/parseFloat(order.size),ctop=Math.max(...g.outer.map(([,y])=>-(y-CY)*k));
+ V.fitH=P-bottom+(ctop-bottom)*(Rk-1);V.fitW=2*HALF*k*Rk;
  $('#mtag').innerHTML=`<span class="spc" aria-hidden="true"><svg class="spk b" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="7" stroke-linejoin="round"/></svg><svg class="spk s" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="10" stroke-linejoin="round"/></svg></span><span class="tx"><b>${order.size}"</b> clear acrylic · ${SHAPES.find(s=>s.id===S.shape).name}${S.holo?' · holo stars':''}<br>with ${ATT[order.att].name} · printed both sides</span><span class="spc r" aria-hidden="true"><svg class="spk b" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="7" stroke-linejoin="round"/></svg><svg class="spk s" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="10" stroke-linejoin="round"/></svg></span>`;
 }
 /* zoom is a rubber band, not a setting (feels like iOS overscroll). The raw pinch scale (finger distance ratio, or the
