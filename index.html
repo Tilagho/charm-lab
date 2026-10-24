@@ -628,42 +628,42 @@ document.addEventListener('dblclick',ev=>ev.preventDefault(),{passive:false});
 $('#stageWrap').addEventListener('touchmove',ev=>ev.preventDefault(),{passive:false});
 
 function addSticker(sid,x,y){const e={id:uid(),type:'sticker',sid,x:x??rand(-60,60),y:y??CY+rand(-40,40),s:.62,r:rand(-14,14)};S.els.push(e);sel=e.id;commit();if(IS_MOBILE)pulseStage();}
-function addText(){const e={id:uid(),type:'text',text:($('#txtIn').value.trim()||'aloha'),font:tdef.font,color:tdef.color,size:tdef.size,outline:tdef.outline,x:rand(-30,30),y:CY+rand(-30,40),s:1,r:rand(-8,8)};S.els.push(e);sel=e.id;commit();$('#txtIn').blur();collapse();}
+function addText(){const e={id:uid(),type:'text',text:($('#txtIn').value.trim()||'aloha'),font:tdef.font,color:tdef.color,size:tdef.size,outline:tdef.outline,x:rand(-30,30),y:CY+rand(-30,40),s:1,r:rand(-8,8)};S.els.push(e);sel=e.id;commit();$('#txtIn').blur();}
 function pulseStage(){const w=$('#stageWrap');w.animate([{transform:'scale(1)'},{transform:'scale(1.015)'},{transform:'scale(1)'}],{duration:260,easing:'ease-out'});}
 /* ---------- UI ---------- */
 $('#mq').innerHTML=['charm lab ✦','made in pāʻia','holo stars','stickers on stickers','acrylic but make it cute','shaka bb','custom everything','✿ ✿ ✿'].map(s=>`<span>${s}</span>`).join('').repeat(4);
 const TILECOLS=['#ffc2e2','#b8ff3c','#8fd8ff','#ffe14a','#c9b2ff','#5cf2c8','#ffc2e2','#ff8a3d'];
 $('#shapes').innerHTML=SHAPES.map((s,i)=>{const g=geo(s.id);const h=g.maxY-g.minY+20;return `<button class="tile" data-shape="${s.id}" aria-label="${s.name}"><svg viewBox="${-Math.max(165,h/2)} ${(g.minY-10).toFixed(0)} ${2*Math.max(165,h/2)} ${h.toFixed(0)}"><path d="${g.outerD} ${g.holeD}" fill-rule="evenodd" fill="${TILECOLS[i]}" stroke="currentColor" stroke-width="14" stroke-linejoin="round"/></svg><span>${s.name}</span></button>`;}).join('');
-$('#shapes').addEventListener('click',ev=>{const b=ev.target.closest('[data-shape]');if(!b)return;S.shape=b.dataset.shape;commit();collapse();});
+$('#shapes').addEventListener('click',ev=>{const b=ev.target.closest('[data-shape]');if(!b)return;S.shape=b.dataset.shape;commit();});
 function swatches(el,list,custom=true){el.innerHTML=list.map(c=>`<button class="sw ${c==='none'?'none':''}" data-c="${c}" aria-label="${c==='none'?'none':c}" style="${c!=='none'?`background:${c}`:''}"></button>`).join('')+(custom?`<label class="sw custom" aria-label="custom color"><input type="color" value="#ff3ea5"></label>`:'');}
 swatches($('#fills'),FILLS);swatches($('#outlines'),OUTLINES,false);swatches($('#tcolors'),TCOLORS);
-function bindSw(el,apply){el.addEventListener('click',ev=>{const b=ev.target.closest('[data-c]');if(b){apply(b.dataset.c,true);collapse();}});const inp=el.querySelector('input[type=color]');if(inp)inp.addEventListener('input',()=>apply(inp.value,false));if(inp)inp.addEventListener('change',()=>{apply(inp.value,true);collapse();});}
+function bindSw(el,apply){el.addEventListener('click',ev=>{const b=ev.target.closest('[data-c]');if(b){apply(b.dataset.c,true);}});const inp=el.querySelector('input[type=color]');if(inp)inp.addEventListener('input',()=>apply(inp.value,false));if(inp)inp.addEventListener('change',()=>{apply(inp.value,true);});}
 bindSw($('#fills'),(c,done)=>{S.fill=c;done?commit():(renderBase(),renderPanels());});
 bindSw($('#outlines'),(c,done)=>{S.outline=safeOutline(c);done?commit():(renderBase(),renderPanels());});
 const txtTarget=()=>{const e=getSel();return e&&e.type==='text'?e:null;};
 function refreshText(t){const m=minScale(t);if(t.s<m){t.s=m;updateEl(t);}delete TB[t.id];const n=nodeOf(t.id);if(n){n.outerHTML=elMarkup(t);}measureText(t);updateSel();}
 bindSw($('#tcolors'),(c,done)=>{const t=txtTarget();if(t){t.color=c;done?commit():refreshText(t);}else{tdef.color=c;renderPanels();}});
-$('#holoT').addEventListener('click',()=>{S.holo=!S.holo;commit();collapse();});
+$('#holoT').addEventListener('click',()=>{S.holo=!S.holo;commit();});
 $('#fonts').innerHTML=FONTS.map(f=>`<button class="pbtn" data-font="${f.id}" style="font-family:'${f.id}'">${f.id==='Press Start 2P'?'<span style="font-size:15px;line-height:1.8">Abc</span>':'Abc'}<small>${f.label}</small></button>`).join('');
-$('#fonts').addEventListener('click',ev=>{const b=ev.target.closest('[data-font]');if(!b)return;const t=txtTarget();if(t){t.font=b.dataset.font;commit();}else{tdef.font=b.dataset.font;renderPanels();}collapse();});
+$('#fonts').addEventListener('click',ev=>{const b=ev.target.closest('[data-font]');if(!b)return;const t=txtTarget();if(t){t.font=b.dataset.font;commit();}else{tdef.font=b.dataset.font;renderPanels();}});
 $('#txtIn').addEventListener('input',ev=>{const t=txtTarget();if(t){t.text=ev.target.value;refreshText(t);}else tdef.text=ev.target.value;});
 $('#txtIn').addEventListener('change',()=>{if(txtTarget())commit();});
-$('#txtIn').addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();if(txtTarget()){commit();collapse();}else addText();}});
+$('#txtIn').addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();if(txtTarget()){commit();}else addText();}});
 // keyboard 'done' / tapping outside: tuck the drawer away (but not when the blur came from tapping another drawer control)
-$('#txtIn').addEventListener('blur',()=>{setTimeout(()=>{if(performance.now()-sheetTapAt<450)return;if(document.activeElement&&$('#sheet').contains(document.activeElement))return;collapse();},250);});
+$('#txtIn').addEventListener('blur',()=>{setTimeout(()=>{if(performance.now()-sheetTapAt<450)return;if(document.activeElement&&$('#sheet').contains(document.activeElement))return;},250);});
 $('#addTxt').addEventListener('click',addText);
-$('#deselTxt').addEventListener('click',()=>{sel=null;selChanged();collapse();});
+$('#deselTxt').addEventListener('click',()=>{sel=null;selChanged();});
 let sizeRaf=0;
 $('#tsize').addEventListener('input',ev=>{const v=+ev.target.value;$('#tsizeV').textContent=v;const t=txtTarget();if(t){t.size=v;if(!sizeRaf)sizeRaf=requestAnimationFrame(()=>{sizeRaf=0;refreshText(t);});}else tdef.size=v;});
 $('#tsize').addEventListener('change',()=>{if(txtTarget())commit();});
-$('#toutT').addEventListener('click',()=>{const t=txtTarget();if(t){t.outline=!t.outline;commit();}else{tdef.outline=!tdef.outline;renderPanels();}collapse();});
+$('#toutT').addEventListener('click',()=>{const t=txtTarget();if(t){t.outline=!t.outline;commit();}else{tdef.outline=!tdef.outline;renderPanels();}});
 function renderTray(){$('#stickers').innerHTML=STICKERS.map(s=>`<button class="stk" data-sid="${s.id}" aria-label="${s.name}">${stickerURL[s.id]?`<img src="${stickerURL[s.id]}" alt="" draggable="false">`:`<svg viewBox="-10 -10 120 120"><use href="#st-${s.id}" width="100" height="100"/></svg>`}</button>`).join('');}
 renderTray();
 // tray: tap adds (touch + mouse); mouse/pen can also drag onto the charm
 let tray=null,ghost=null;
 $('#stickers').addEventListener('pointerdown',ev=>{const t=ev.target.closest('[data-sid]');if(!t)return;tray={sid:t.dataset.sid,x:ev.clientX,y:ev.clientY,type:ev.pointerType,moved:false};});
 window.addEventListener('pointermove',ev=>{if(!tray)return;if(Math.hypot(ev.clientX-tray.x,ev.clientY-tray.y)>10)tray.moved=true;if(tray.type==='touch')return;if(tray.moved&&!ghost){ghost=document.createElement('div');ghost.className='ghost';ghost.innerHTML=stickerURL[tray.sid]?`<img src="${stickerURL[tray.sid]}" alt="">`:'';document.body.appendChild(ghost);}if(ghost){ghost.style.left=ev.clientX+'px';ghost.style.top=ev.clientY+'px';}});
-window.addEventListener('pointerup',ev=>{if(!tray)return;const t=tray;tray=null;if(ghost){ghost.remove();ghost=null;const r=svg.getBoundingClientRect();if(ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom){const p=toSvgXY(ev.clientX,ev.clientY);addSticker(t.sid,p.x,p.y);collapse();}}else if(!t.moved){addSticker(t.sid);collapse();}});
+window.addEventListener('pointerup',ev=>{if(!tray)return;const t=tray;tray=null;if(ghost){ghost.remove();ghost=null;const r=svg.getBoundingClientRect();if(ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom){const p=toSvgXY(ev.clientX,ev.clientY);addSticker(t.sid,p.x,p.y);}}else if(!t.moved){addSticker(t.sid);}});
 window.addEventListener('pointercancel',()=>{tray=null;if(ghost){ghost.remove();ghost=null;}});
 // sheet + tabs
 let curTab='shape',sheetTapAt=0;
@@ -965,22 +965,32 @@ const wrapA=a=>{a=(a+Math.PI)%(2*Math.PI);if(a<0)a+=2*Math.PI;return a-Math.PI;}
 function camSph(){const o=V.camera.position.clone().sub(V.controls.target);const r=o.length();return {r,az:Math.atan2(o.x,o.z),pol:Math.acos(clamp(o.y/r,-1,1))};}
 function setCamSph(az,pol,r){const t=V.controls.target;V.camera.position.set(t.x+r*Math.sin(pol)*Math.sin(az),t.y+r*Math.cos(pol),t.z+r*Math.sin(pol)*Math.cos(az));V.camera.lookAt(t);}
 function killInertia(){const c=V.controls;const sd=c._sphericalDelta||c.sphericalDelta;if(sd&&sd.set)sd.set(0,0,0);}
-function faceSnap(){if(!V||!V.face)return;const s=camSph();const rel=wrapA(s.az-V.face.az0);const tgt=Math.abs(rel)<=Math.PI/2?0:(rel>0?Math.PI:-Math.PI);
+function faceSnap(){if(V&&V.fs&&V.fs.flip)return;/* a flick-flip in flight owns the spring */if(!V||!V.face)return;const s=camSph();const rel=wrapA(s.az-V.face.az0);const tgt=Math.abs(rel)<=Math.PI/2?0:(rel>0?Math.PI:-Math.PI);
  killInertia();V.fs={az:s.az,vaz:0,tAz:s.az-rel+tgt,pol:s.pol,vpol:0};V.changed=true;kick();}
 function faceStep(dt){const f=V.fs;if(!f||!(dt>0)){if(f)V.changed=true;return;}killInertia();const n=Math.max(1,Math.ceil(dt/.004)),h=dt/n;const p0=V.face.pol0;
  for(let i=0;i<n;i++){f.vaz+=(-FS_K*(f.az-f.tAz)-FS_C*f.vaz)*h;f.az+=f.vaz*h;f.vpol+=(-FS_K*(f.pol-p0)-FS_C*f.vpol)*h;f.pol+=f.vpol*h;}
  const r=V.camera.position.distanceTo(V.controls.target);
  if(Math.abs(f.az-f.tAz)<.002&&Math.abs(f.vaz)<.02&&Math.abs(f.pol-p0)<.002&&Math.abs(f.vpol)<.02){setCamSph(f.tAz,p0,r);V.fs=null;}else{setCamSph(f.az,f.pol,r);V.changed=true;}}
+function flipFace(fromAz,dir,vx){if(!V||!V.face)return;killInertia();const s=camSph();const tAz=fromAz+dir*Math.PI;
+ if(REDUCED){setCamSph(tAz,V.face.pol0,s.r);V.fs=null;V.changed=true;kick();return;}
+ // start with spin velocity in the flick direction so it coasts over, then the face spring settles it
+ V.fs={az:s.az,vaz:dir*clamp(Math.abs(vx)*9,5,11),tAz,pol:s.pol,vpol:0,flip:1};V.changed=true;kick();}
 function setupZoom(v){const cv=v.canvas;const P=new Map();let pinch=null;
  const dist=()=>{const [a,b]=[...P.values()];return Math.hypot(a.x-b.x,a.y-b.y);};
- let snap=null;
+ let snap=null,fl=null;// fl = current one-finger gesture, for flick-to-flip
  cv.addEventListener('pointerdown',ev=>{P.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
-  if(P.size===1&&V){const s=camSph();snap={az:s.az,pol:s.pol,t:performance.now()};}
+  if(P.size===1&&V){const s=camSph();snap={az:s.az,pol:s.pol,t:performance.now()};
+   const rel=V.face?wrapA(s.az-V.face.az0):0;const f=Math.abs(rel)<=Math.PI/2?0:(rel>0?Math.PI:-Math.PI);fl={id:ev.pointerId,x0:ev.clientX,y0:ev.clientY,faceAz:s.az-rel+f,hist:[[ev.timeStamp,ev.clientX,ev.clientY]]};}
+  if(P.size===2&&fl)fl.multi=true;
   if(P.size===2){clearTimeout(v.zbT);pinch={d:dist()};zStretch(1);
    // freeze rotation for the rest of this gesture, and undo whatever the first finger turned before the second landed
    v.controls.enableRotate=false;V.fs=null;if(snap&&V&&performance.now()-snap.t<450){const r=V.camera.position.distanceTo(V.controls.target);killInertia();setCamSph(snap.az,snap.pol,r);V.changed=true;kick();}}});
- cv.addEventListener('pointermove',ev=>{if(!P.has(ev.pointerId))return;P.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(pinch&&P.size===2){const d=dist();if(d>4&&pinch.d>4){zStretch(d/pinch.d);pinch.d=d;}}});
- const up=ev=>{P.delete(ev.pointerId);if(pinch&&P.size<2){pinch=null;clearTimeout(v.zbT);zoomHome();}if(P.size===0){snap=null;if(!v.controls.enableRotate){v.controls.enableRotate=true;faceSnap();}}};
+ cv.addEventListener('pointermove',ev=>{if(!P.has(ev.pointerId))return;if(fl&&ev.pointerId===fl.id){const now=ev.timeStamp;fl.hist.push([now,ev.clientX,ev.clientY]);while(fl.hist.length>2&&now-fl.hist[0][0]>90)fl.hist.shift();}P.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(pinch&&P.size===2){const d=dist();if(d>4&&pinch.d>4){zStretch(d/pinch.d);pinch.d=d;}}});
+ const up=ev=>{P.delete(ev.pointerId);if(pinch&&P.size<2){pinch=null;clearTimeout(v.zbT);zoomHome();}if(P.size===0){snap=null;if(!v.controls.enableRotate){v.controls.enableRotate=true;faceSnap();}
+   const g=fl;fl=null;if(g&&!g.multi&&ev.type==='pointerup'&&V&&V.face){g.hist.push([ev.timeStamp,ev.clientX,ev.clientY]);while(g.hist.length>2&&ev.timeStamp-g.hist[0][0]>90)g.hist.shift();
+    const [t0,x0]=g.hist[0],[t1,x1]=g.hist[g.hist.length-1];const vx=t1>t0?(x1-x0)/(t1-t0):0;const dx=ev.clientX-g.x0,dy=ev.clientY-g.y0;
+    // a quick sideways flick (small travel, clear horizontal speed) spins it over to the other face
+    if(Math.abs(vx)>.45&&Math.abs(dx)>=24&&Math.abs(dx)<170&&Math.abs(dx)>1.4*Math.abs(dy)&&Math.sign(vx)===Math.sign(dx))flipFace(g.faceAz,-Math.sign(dx),vx);}}};
  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
  cv.addEventListener('wheel',ev=>{ev.preventDefault();const dy=ev.deltaMode===1?ev.deltaY*16:ev.deltaY;zStretch(Math.exp(-clamp(dy,-120,120)*(ev.ctrlKey?.01:.0025)));clearTimeout(v.zbT);v.zbT=setTimeout(zoomHome,150);},{passive:false});}
 function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=Math.max(.3,(B.bot-B.top-24)/B.H)||1;/* keep ~12px clear above and below the keychain */const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*FRAME_H,(V.fitW/2)/(tf*a)*FRAME_W);const ty=0;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.homeD=d;V.zb=null;V.zRaw=1;V.zDisp=1;V.controls.enableZoom=false;{const o=V.camera.position.clone().sub(V.controls.target);const r=o.length();V.face={az0:Math.atan2(o.x,o.z),pol0:Math.acos(o.y/r)};V.fs=null;V.controls.minPolarAngle=V.face.pol0-.32;V.controls.maxPolarAngle=V.face.pol0+.32;}V.controls.minDistance=d*.5;V.controls.maxDistance=d*1.6;V.controls.update();kick();}
@@ -1053,7 +1063,7 @@ function syncThemeColor(){const h=document.documentElement;const open=h.classLis
 function applyTheme(t,save){const h=document.documentElement;h.classList.add('theming');h.dataset.theme=t;syncThemeColor();if(save){try{localStorage.setItem(THEME_KEY,t);}catch(_){}}setTimeout(()=>h.classList.remove('theming'),450);}
 $('#themeBtn').addEventListener('click',()=>{const b=$('#themeBtn');b.classList.remove('boop');void b.offsetWidth;b.classList.add('boop');applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true);});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',ev=>{let saved=null;try{saved=localStorage.getItem(THEME_KEY);}catch(_){}if(!saved)applyTheme(ev.matches?'dark':'light',false);});
-window.__charm={get yaw(){if(!V||!V.face)return null;return wrapA(camSph().az-V.face.az0)*180/Math.PI;},get tilt(){if(!V||!V.face)return null;return (camSph().pol-V.face.pol0)*180/Math.PI;},zoomTo:s=>{if(V){V.zb=null;V.zRaw=unrubber(s);zApply(s);}},rubber,stretch:f=>zStretch(f),release:()=>zoomHome(),get zoom(){return V?V.zDisp:null},setFrame:(h,w)=>{FRAME_H=h;FRAME_W=w;resetView();},bumpNow:()=>bumpCharm(1,1),applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
+window.__charm={flipFace:d=>{if(V){const s=camSph();const rel=wrapA(s.az-V.face.az0);flipFace(s.az-rel+(Math.abs(rel)<=Math.PI/2?0:Math.sign(rel)*Math.PI),d,1);}},get yaw(){if(!V||!V.face)return null;return wrapA(camSph().az-V.face.az0)*180/Math.PI;},get tilt(){if(!V||!V.face)return null;return (camSph().pol-V.face.pol0)*180/Math.PI;},zoomTo:s=>{if(V){V.zb=null;V.zRaw=unrubber(s);zApply(s);}},rubber,stretch:f=>zStretch(f),release:()=>zoomHome(),get zoom(){return V?V.zDisp:null},setFrame:(h,w)=>{FRAME_H=h;FRAME_W=w;resetView();},bumpNow:()=>bumpCharm(1,1),applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
 renderAll();
 document.fonts&&document.fonts.ready.then(()=>{renderEls();updateSel();});
 </script>
