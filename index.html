@@ -214,6 +214,48 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
  #tabbar{grid-column:2;grid-row:4;margin:0;border:3px solid var(--ink);border-top:0;border-radius:0 0 28px 28px;box-shadow:5px 5px 0 var(--shd)}
 }
 @media (max-width:360px){.tab{font-size:14px}.logo h1{font-size:26px}}
+/* demo checkout + orders (same chunky UI, no text glow) */
+.checkout{width:100%;margin-top:12px;min-height:64px;font-family:'Bagel Fat One';font-size:24px;background:var(--yellow);color:var(--dark);border:3px solid var(--ink);border-radius:24px;box-shadow:5px 5px 0 var(--shd);cursor:pointer}
+.checkout:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shd)}
+.ordersbtn{width:100%;margin-top:10px}
+.flow{position:absolute;inset:0;z-index:70;display:none;flex-direction:column;color:var(--ink);background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
+.flow.open{display:flex}
+.flowhead{flex:none;display:flex;align-items:center;gap:12px;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;max-width:560px;width:100%;margin:0 auto}
+.flowhead h2{font-family:'Bagel Fat One';font-weight:400;font-size:28px;margin:0;line-height:1}
+.flowbody{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:4px 16px calc(28px + env(safe-area-inset-bottom));max-width:560px;width:100%;margin:0 auto}
+.flow input,.flow select,.flow textarea{-webkit-user-select:text;user-select:text}
+.flow a.pbtn{text-decoration:none;color:inherit}
+.steps{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 14px;font-weight:700;font-size:14px}
+.steps span{opacity:.4;border:2.5px solid transparent;border-radius:999px;padding:2px 10px}
+.steps span.on{opacity:1;background:var(--yellow);border-color:var(--ink);color:var(--dark)}
+.fcard{border:3px solid var(--ink);border-radius:22px;background:var(--card);box-shadow:3px 3px 0 var(--shd);padding:12px 14px;margin:0 0 12px}
+.fcard .r{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.chip{white-space:nowrap;flex:none}
+.fcard b{font-weight:700}
+.hintline{font-weight:600;font-size:15px;margin:0 0 12px}
+.stack{display:grid;gap:10px}
+.stack .pbtn,.stack .go{width:100%}
+.go{min-height:60px;font-family:'Bagel Fat One';font-size:22px;background:var(--pink);color:#fff;border-radius:22px}
+.field{display:flex;flex-direction:column;gap:6px;margin:0 0 12px;font-weight:700;font-size:15px}
+.field input,.field select{width:100%;min-height:56px;font:600 18px 'Fredoka';border:3px solid var(--ink);border-radius:18px;padding:8px 14px;background:var(--card);color:var(--ink);box-shadow:3px 3px 0 var(--shd)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ferr{font-weight:700;margin:0 0 12px}
+.pays{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pay{min-height:92px;border-radius:22px;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--yellow);font:700 18px Fredoka,sans-serif;cursor:pointer;padding:8px}
+.pay small{display:block;font-weight:600;font-size:13px;opacity:.85}
+.pay:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--yellow)}
+.chip{display:inline-flex;align-items:center;border:2.5px solid var(--ink);border-radius:999px;padding:2px 10px;font-weight:700;font-size:14px;color:var(--dark);background:var(--yellow)}
+.chip[data-s="exported"]{background:var(--sky)}
+.chip[data-s="received_by_3rd_party"]{background:var(--lilac)}
+.chip[data-s="shipped"]{background:var(--lime)}
+.chip[data-s="cancelled"]{background:var(--muted)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.acts .pbtn{min-height:48px;padding:0 14px;font-size:15px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.filters button{min-height:42px;border-radius:999px;border:2.5px solid var(--ink);background:var(--card);font:700 14px Fredoka,sans-serif;padding:0 12px;cursor:pointer}
+.filters button.on{background:var(--yellow);color:var(--dark)}
+.linkbox{font-weight:600;font-size:14px;word-break:break-all;margin:8px 0}
+.busy{font-family:'Bagel Fat One';font-size:22px;margin:8px 0 12px}
 </style>
 </head>
 <body>
@@ -224,7 +266,7 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
    <svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg>
    <div class="lt"><h1>charm lab</h1><span class="ph">placeholder name</span></div>
   </div>
-  <div class="hbtns"><button class="themebtn" id="themeBtn" aria-label="switch light or dark mode"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><g class="rays"><path d="M12 1.5v2.6M12 19.9v2.6M1.5 12h2.6M19.9 12h2.6M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g><circle cx="12" cy="12" r="5" fill="#ffe14a" stroke="currentColor"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z" fill="#c9b2ff"/><path d="M17 3.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="#ffe14a" stroke-width="1.2"/></svg></button><button class="bagbtn" id="bagBtn" aria-label="bag (mockup)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN">0</span></button></div>
+  <div class="hbtns"><button class="themebtn" id="themeBtn" aria-label="switch light or dark mode"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><g class="rays"><path d="M12 1.5v2.6M12 19.9v2.6M1.5 12h2.6M19.9 12h2.6M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g><circle cx="12" cy="12" r="5" fill="#ffe14a" stroke="currentColor"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z" fill="#c9b2ff"/><path d="M17 3.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="#ffe14a" stroke-width="1.2"/></svg></button><button class="bagbtn" id="bagBtn" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN">0</span></button></div>
  </header>
  <div class="marquee"><div class="track" id="mq"></div></div>
  <section id="stageWrap">
@@ -281,7 +323,9 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
     <div class="price"><div class="big" id="price">$14</div><span class="ex">example prices</span></div>
     <div class="lines" id="lines"></div>
     <button class="addbag" id="addBag">add to bag ♡</button>
-    <div class="fine">design mockup · example prices · no real checkout</div>
+    <button class="checkout" id="checkoutBtn" type="button">checkout →</button>
+    <button class="pbtn ordersbtn" id="ordersBtn" type="button">orders</button>
+    <div class="fine">demo checkout · example prices · no real charges</div>
    </div>
   </div>
  </section>
@@ -294,10 +338,14 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
  </nav>
 </div>
 <div class="toast" id="toast" role="status"></div>
+<div class="flow" id="flow" aria-hidden="true">
+ <div class="flowhead"><button class="ibtn" id="flowBack" type="button" data-act="back" aria-label="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2 id="flowTitle">your bag</h2></div>
+ <div class="flowbody" id="flowBody"></div>
+</div>
 <div class="modal" id="modal">
  
  <div class="mcard">
-  <div class="mhead"><div class="logo"><svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg><h1>charm lab</h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag (mockup)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
+  <div class="mhead"><div class="logo"><svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg><h1>charm lab</h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
   <div class="three-wrap" id="threeWrap">
    <div class="mload" id="mload">polishing the acrylic…</div>
   </div>
@@ -453,7 +501,7 @@ let S={shape:'cloud',fill:'#ffc2e2',outline:'#ef4f9d',holo:true,els:[
 ]};
 let order={att:'keyring',size:'2',qty:1};
 let tdef={text:'shaka',font:'Bagel Fat One',color:'#3c5fd4',size:38,outline:true};
-let sel=null,bag=0;
+let sel=null,cart=[];
 const clone=o=>JSON.parse(JSON.stringify(o));
 const H={stack:[clone(S)],i:0};
 function commit(){enforceMins();H.stack=H.stack.slice(0,H.i+1);H.stack.push(clone(S));if(H.stack.length>120)H.stack.shift();H.i=H.stack.length-1;renderAll();}
@@ -763,13 +811,20 @@ function renderOrder(){
  $('#price').textContent='$'+tot;$('#tabPrice').textContent='$'+tot;
  $('#lines').innerHTML=`<div><span>${order.size}" clear acrylic, printed both sides</span><span>$${SIZE_PRICE[order.size]}</span></div><div><span>${ATT[order.att].name}</span><span>${ATT[order.att].add?'+$'+ATT[order.att].add:'included'}</span></div>${S.holo?'<div><span>holo stars film</span><span>+$2</span></div>':''}${order.qty>1?`<div><span>× ${order.qty}</span><span>$${each} each</span></div>`:''}`;
 }
-function addToBag(origin){bag+=order.qty;for(const n of [$('#bagN'),$('#bagN3d')]){n.textContent=bag;n.classList.add('pop');setTimeout(()=>n.classList.remove('pop'),300);}
+function bagQty(){return cart.reduce((s,it)=>s+((it.line&&it.line.qty)||1),0);}
+function refreshBag(){const n=bagQty();for(const el of [$('#bagN'),$('#bagN3d')])if(el)el.textContent=String(n);}
+function saveCart(){try{localStorage.setItem('charmlab.cart',JSON.stringify(cart));}catch(_){}}
+function loadCart(){try{const a=JSON.parse(localStorage.getItem('charmlab.cart')||'[]');cart=Array.isArray(a)?a.filter(it=>it&&it.id&&it.design&&it.line):[];}catch(_){cart=[];}}
+function pushCart(){cart.push({id:'c'+uid(),design:clone(S),line:{att:order.att,size:order.size,qty:order.qty},added_at:new Date().toISOString()});saveCart();refreshBag();for(const el of [$('#bagN'),$('#bagN3d')])if(el){el.classList.add('pop');setTimeout(()=>el.classList.remove('pop'),300);}}
+function addToBag(origin){pushCart();
  const g=geo(S.shape);const mini=`<svg viewBox="-165 ${(g.minY-10).toFixed(0)} 330 ${(g.maxY-g.minY+20).toFixed(0)}"><path d="${g.outerD} ${g.holeD}" fill-rule="evenodd" fill="${S.fill==='none'?'#eef6ff':S.fill}" stroke="${INK}" stroke-width="14"/></svg>`;
- toast(`${mini}<span>yay! ${order.qty>1?order.qty+' charms':'your charm'} went in the bag ♡<br><small>mockup only, nothing was charged</small></span>`);confetti(origin);}
+ toast(`${mini}<span>yay! ${order.qty>1?order.qty+' charms':'your charm'} went in the bag ♡<br><small>tap the bag to check out · nothing is charged</small></span>`);confetti(origin);}
 $('#addBag').onclick=()=>addToBag($('#addBag'));
-const bagMsg=()=>toast(bag?`${bag} charm${bag>1?'s':''} in your bag ✦<br><small>checkout isn't part of this mockup</small>`:'your bag is empty, go make something cute ✿');
+function openBag(){openFlow('cart');}
+$('#bagBtn').onclick=openBag;$('#bagBtn3d').onclick=openBag;
+$('#checkoutBtn').onclick=()=>{if(!cart.length){pushCart();openFlow('contact');}else openFlow('cart');};
+$('#ordersBtn').onclick=()=>openFlow('orders');
 let toastT;function toast(html){const t=$('#toast');t.innerHTML=html.startsWith('<svg')?html:`<span>${html}</span>`;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800);}
-$('#bagBtn').onclick=()=>bagMsg();$('#bagBtn3d').onclick=()=>bagMsg();
 function confetti(origin){const cols=['#ff3ea5','#b8ff3c','#2e5bff','#ffe14a','#c9b2ff'];const b=(origin||$('#addBag')).getBoundingClientRect();const ox=b.left+b.width/2,oy=b.top;for(let i=0;i<28;i++){const d=document.createElement('div');d.className='conf';d.style.background=cols[i%5];d.style.borderRadius=i%3?'50%':'3px';d.style.left=ox+'px';d.style.top=oy+'px';document.body.appendChild(d);const a=rand(-Math.PI*.95,-Math.PI*.05),v=rand(160,320);d.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${Math.cos(a)*v}px,${Math.sin(a)*v+260}px) rotate(${rand(-540,540)}deg)`,opacity:0}],{duration:rand(900,1300),easing:'cubic-bezier(.2,.7,.4,1)'}).onfinish=()=>d.remove();}}
 function renderPanels(){
  $$('#shapes .tile').forEach(b=>b.classList.toggle('on',b.dataset.shape===S.shape));
@@ -790,6 +845,7 @@ function selChanged(){updateSel();renderSelbar();renderPanels();}
 function sanitize(st){st.fill=soften(st.fill);st.outline=safeOutline(soften(st.outline));for(const e of st.els)if(e.type==='text')e.color=soften(e.color);if(!ATT[order.att])order.att='keyring';return st;}
 function renderAll(){sanitize(S);renderBase();renderEls();updateSel();renderSelbar();renderPanels();renderOrder();}
 window.addEventListener('keydown',ev=>{
+ if($('#flow').classList.contains('open')){if(ev.key==='Escape'){ev.preventDefault();closeFlow();}return;}
  if($('#modal').classList.contains('open')){if(ev.key==='Escape')close3D();return;}
  const tg=ev.target,tag=(tg.tagName||'').toLowerCase();
  const typing=(tag==='input'&&!['range','color','checkbox','button'].includes(tg.type))||tag==='textarea';
@@ -806,18 +862,21 @@ function seeded(seed){return()=>{seed=(seed*16807)%2147483647;return(seed-1)/214
 // draw ONLY printable art (fill, outline, stickers, text): no drop shadows, gloss or holo film (those are preview-only).
 // side 'back' = what gets printed on the back so it reads correctly from behind: the layout is mirrored to match the cut,
 // but every sticker and word is drawn the right way round.
-async function drawPrintArt(ctx,side='front'){
+async function drawPrintArt(ctx,side='front',preview=false,st=null,line=null){
+ const D=st||S;const size=(line&&line.size)||order.size;
  try{await document.fonts.ready;await Promise.all(FONTS.map(f=>document.fonts.load(`40px "${f.id}"`)));}catch(_){}
  await stickersReady;
- const back=side==='back';const g=geo(S.shape);
+ const back=side==='back';const g=geo(D.shape,size);
  const prD=new Path2D(g.printD),pr=new Path2D();pr.addPath(prD,back?new DOMMatrix([-1,0,0,1,0,0]):new DOMMatrix());
- const bakes=await Promise.all(S.els.map(e=>e.type==='sticker'?bake(e.sid,e.s,false):null));
+ const bakes=await Promise.all((D.els||[]).map(e=>e.type==='sticker'?bake(e.sid,e.s,!!preview):null));
  ctx.save();ctx.clip(pr);
- if(S.fill!=='none'){ctx.fillStyle=S.fill;ctx.fill(pr);}
- ctx.lineWidth=12;ctx.lineJoin='round';ctx.strokeStyle=S.outline;ctx.stroke(pr);
- S.els.forEach((e,i)=>{ctx.save();ctx.translate(back?-e.x:e.x,e.y);ctx.rotate((back?-e.r:e.r)*Math.PI/180);ctx.scale(e.s,e.s);
+ if(D.fill!=='none'){ctx.fillStyle=D.fill;ctx.fill(pr);}
+ ctx.lineWidth=12;ctx.lineJoin='round';ctx.strokeStyle=D.outline;ctx.stroke(pr);
+ (D.els||[]).forEach((e,i)=>{ctx.save();ctx.translate(back?-e.x:e.x,e.y);ctx.rotate((back?-e.r:e.r)*Math.PI/180);ctx.scale(e.s,e.s);
   if(e.type==='sticker'){const b=bakes[i];if(b)ctx.drawImage(b.img,-50-b.pad,-50-b.pad,100+2*b.pad,100+2*b.pad);}
-  else{ctx.font=`${e.size}px "${e.font}"`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';if(e.outline){const w=txtW(e);ctx.strokeStyle='#fff';ctx.lineWidth=+w.white;ctx.strokeText(e.text,0,0);ctx.strokeStyle=INK;ctx.lineWidth=+w.ink;ctx.strokeText(e.text,0,0);}ctx.fillStyle=e.color;ctx.fillText(e.text,0,0);}
+  else{ctx.font=`${e.size}px "${e.font}"`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
+   if(preview&&e.outline){const w=txtW(e);ctx.save();ctx.translate(+w.sx,+w.sy);ctx.globalAlpha=.22;ctx.strokeStyle=INK;ctx.lineWidth=+w.white;ctx.strokeText(e.text,0,0);ctx.fillStyle=INK;ctx.fillText(e.text,0,0);ctx.restore();}
+   if(e.outline){const w=txtW(e);ctx.globalAlpha=1;ctx.strokeStyle='#fff';ctx.lineWidth=+w.white;ctx.strokeText(e.text,0,0);ctx.strokeStyle=INK;ctx.lineWidth=+w.ink;ctx.strokeText(e.text,0,0);}ctx.fillStyle=e.color;ctx.fillText(e.text,0,0);}
   ctx.restore();});
  ctx.restore();
 }
@@ -837,14 +896,10 @@ function holoStarCanvas(){
  for(let i=0;i<170;i++){ctx.fillStyle=cs[i%5];ctx.globalAlpha=.55+r()*.45;st(-160+r()*320,CY-170+r()*340,1.2+r()*r()*5.5,r()<.5?4:5);}
  return cv;
 }
-// print files for the printer: front.png + back.png at 600 DPI (transparent, cropped to the cut outline) + cutline.svg in mm
+// print files for the printer. buildPrintPack (below) draws front/back at 600 DPI, raised if needed so the long side is at least 1000 px.
 async function exportPrintFiles(dpi=600){
- const g=geo(S.shape);const bb=g.bb;const inch=parseFloat(order.size);const pxPerUnit=dpi*inch/(2*HALF);
- const W=Math.round(bb.w*pxPerUnit),Hh=Math.round(bb.h*pxPerUnit);
- const mk=async side=>{const cv=document.createElement('canvas');cv.width=W;cv.height=Hh;const ctx=cv.getContext('2d');const x0=side==='back'?-bb.x1:bb.x0;ctx.setTransform(pxPerUnit,0,0,pxPerUnit,-x0*pxPerUnit,-bb.y0*pxPerUnit);await drawPrintArt(ctx,side);return cv.toDataURL('image/png');};
- const mm=1/g.upm,f=v=>(v*mm).toFixed(3);
- const cut=`<svg xmlns="http://www.w3.org/2000/svg" width="${f(bb.w)}mm" height="${f(bb.h)}mm" viewBox="0 0 ${f(bb.w)} ${f(bb.h)}"><path d="M${g.outer.map(([x,y])=>f(x-bb.x0)+','+f(y-bb.y0)).join('L')}Z" fill="none" stroke="#ff0000" stroke-width="0.1"/><circle cx="${f(g.tab.x-bb.x0)}" cy="${f(g.tab.y-bb.y0)}" r="${f(g.holeR)}" fill="none" stroke="#ff0000" stroke-width="0.1"/></svg>`;
- return {front:await mk('front'),back:await mk('back'),cutline:cut,px:[W,Hh],mm:[+f(bb.w),+f(bb.h)],holeMM:+(2*g.holeR*mm).toFixed(2),borderMM:+g.borderMM.toFixed(2)};
+ const pack=await buildPrintPack(S,{att:order.att,size:order.size,qty:order.qty},dpi);
+ return {front:pack.front.toDataURL('image/png'),back:pack.back.toDataURL('image/png'),cutline:pack.cutline,px:pack.px,mm:pack.mm,holeMM:pack.holeMM,borderMM:pack.borderMM};
 }
 /* ---------- 3D viewer: mobile-tuned (no transmission, no shadows, render on demand) ---------- */
 const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1070,8 +1125,311 @@ function syncThemeColor(){const h=document.documentElement;const open=h.classLis
 function applyTheme(t,save){const h=document.documentElement;h.classList.add('theming');h.dataset.theme=t;syncThemeColor();if(save){try{localStorage.setItem(THEME_KEY,t);}catch(_){}}setTimeout(()=>h.classList.remove('theming'),450);}
 $('#themeBtn').addEventListener('click',()=>{const b=$('#themeBtn');b.classList.remove('boop');void b.offsetWidth;b.classList.add('boop');applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true);});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',ev=>{let saved=null;try{saved=localStorage.getItem(THEME_KEY);}catch(_){}if(!saved)applyTheme(ev.matches?'dark':'light',false);});
-window.__charm={flipFace:d=>{if(V){const s=camSph();const rel=wrapA(s.az-V.face.az0);flipFace(s.az-rel+(Math.abs(rel)<=Math.PI/2?0:Math.sign(rel)*Math.PI),d,1);}},get yaw(){if(!V||!V.face)return null;return wrapA(camSph().az-V.face.az0)*180/Math.PI;},get tilt(){if(!V||!V.face)return null;return (camSph().pol-V.face.pol0)*180/Math.PI;},zoomTo:s=>{if(V){V.zb=null;V.zRaw=unrubber(s);zApply(s);}},rubber,stretch:f=>zStretch(f),release:()=>zoomHome(),get zoom(){return V?V.zDisp:null},setFrame:(h,w)=>{FRAME_H=h;FRAME_W=w;resetView();},bumpNow:()=>bumpCharm(1,1),applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
+/* ---------- demo checkout, orders, Vograce ZIP ----------
+   CSV header (must match ORDERS.md and Tiago's Google Sheet, in this order):
+   order_id,created_at,status,customer_name,customer_email,customer_phone,ship_line1,ship_line2,ship_city,ship_state,ship_zip,ship_country,payment_method,payment_demo,amount_usd,quantity,shape,size_in,print_color,outline_color,holo,attachment,attachment_vograce,hardware_color,text_content,text_font,text_color,text_size,stickers_json,vograce_product,vograce_sides,vograce_finish,vograce_size,vograce_accessory,vograce_accessory_color,vograce_qty,vograce_unit_cost_est,notes,export_zip_filename,exported_at,received_by_3rd_party_at,shipped_at,tracking_number
+   Accessory numbers in the ZIP name are charm lab codes. Vograce does not publish numeric accessory ids.
+   1 = Lobster Hook Clasp + Circle Split Ring + Chain (keyring)
+   2 = D Hook Clasp (bag clip)
+   3 = Phone Strap (not offered here; Vograce only allows it at 1.5" and under)
+*/
+const CSV_COLS=['order_id','created_at','status','customer_name','customer_email','customer_phone','ship_line1','ship_line2','ship_city','ship_state','ship_zip','ship_country','payment_method','payment_demo','amount_usd','quantity','shape','size_in','print_color','outline_color','holo','attachment','attachment_vograce','hardware_color','text_content','text_font','text_color','text_size','stickers_json','vograce_product','vograce_sides','vograce_finish','vograce_size','vograce_accessory','vograce_accessory_color','vograce_qty','vograce_unit_cost_est','notes','export_zip_filename','exported_at','received_by_3rd_party_at','shipped_at','tracking_number'];
+const ORDERS_KEY='charmlab.orders',PENDING_KEY='charmlab.pending',PROFILE_KEY='charmlab.profile';
+const ACCESSORY={
+ keyring:{attachment:'keyring',name:'Lobster Hook Clasp + Circle Split Ring + Chain',no:'1',color:'silver'},
+ clip:{attachment:'bag_clip',name:'D Hook Clasp',no:'2',color:'silver'},
+ bag_clip:{attachment:'bag_clip',name:'D Hook Clasp',no:'2',color:'silver'},
+ phone_strap:{attachment:'phone_strap',name:'Phone Strap',no:'3',color:'silver'}
+};
+const UNIT_COST={'1.5':{none:2.97,holo:3.62},'2':{none:2.97,holo:3.79},'2.5':{none:2.99,holo:4.32}};
+const PAYS=[{id:'venmo',name:'Venmo',bg:'#008cff',fg:'#fff'},{id:'cashapp',name:'Cash App',bg:'#00d632',fg:'#17142e'},{id:'shop_pay',name:'Shop Pay',bg:'#5a31f4',fg:'#fff'},{id:'apple_pay',name:'Apple Pay',bg:'#111111',fg:'#fff'}];
+const NEXT_STATUS={ordered:'exported',exported:'received_by_3rd_party',received_by_3rd_party:'shipped'};
+const NEXT_LABEL={ordered:'mark exported',exported:'mark received',received_by_3rd_party:'mark shipped'};
+const STATUSES=['ordered','exported','received_by_3rd_party','shipped','cancelled'];
+let orders=[];
+const flow={step:null,customer:{name:'',email:'',phone:''},ship:{line1:'',line2:'',city:'',state:'',zip:'',country:'US'},method:null,checkoutCart:null,placed:[],link:null,err:'',filter:'all',busy:false};
+let flowStepShown=null;
+const shapeName=id=>((SHAPES.find(s=>s.id===id)||{}).name)||id||'';
+function lineAmount(design,line){const each=(SIZE_PRICE[line.size]||0)+(ATT[line.att]?ATT[line.att].add:0)+(design&&design.holo?2:0);return {each,total:each*(line.qty||1)};}
+function itemsTotal(items){return (items||[]).reduce((s,it)=>s+lineAmount(it.design,it.line).total,0);}
+const money=n=>{const x=Math.round(Number(n)*100)/100;return '$'+(Number.isInteger(x)?String(x):x.toFixed(2));};
+function lineLabel(it){const d=it.design,l=it.line;const bits=[shapeName(d.shape),l.size+'"',ATT[l.att]?ATT[l.att].name:(l.att||'')];if(d.holo)bits.push('holo stars');bits.push('×'+l.qty);return bits.join(' · ');}
+function hstISO(d=new Date()){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'Pacific/Honolulu',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(d);const g=t=>parts.find(p=>p.type===t).value;let hh=g('hour');if(hh==='24')hh='00';return `${g('year')}-${g('month')}-${g('day')}T${hh}:${g('minute')}:${g('second')}-10:00`;}
+function prettyWhen(iso){if(!iso)return '';const d=new Date(iso);if(Number.isNaN(d.getTime()))return iso;return new Intl.DateTimeFormat('en-US',{timeZone:'Pacific/Honolulu',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(d)+' HST';}
+function saveOrders(){try{localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));}catch(_){toast('could not save orders on this browser');}}
+function loadOrders(){try{const a=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');orders=Array.isArray(a)?a.filter(o=>o&&o.order_id):[];}catch(_){orders=[];}}
+function loadPending(){try{return JSON.parse(localStorage.getItem(PENDING_KEY)||'null');}catch(_){return null;}}
+function savePending(p){try{if(p)localStorage.setItem(PENDING_KEY,JSON.stringify(p));else localStorage.removeItem(PENDING_KEY);}catch(_){}}
+function loadProfile(){try{const p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'null');if(!p)return;if(p.customer)Object.assign(flow.customer,p.customer);if(p.ship)Object.assign(flow.ship,p.ship);}catch(_){}}
+function saveProfile(){try{localStorage.setItem(PROFILE_KEY,JSON.stringify({customer:flow.customer,ship:flow.ship}));}catch(_){}}
+function makeId(prefix,n){const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s=prefix;for(let i=0;i<n;i++)s+=alphabet[Math.floor(Math.random()*alphabet.length)];return s;}
+function freshOrderId(taken){let id;do{id=makeId('CL',6);}while(orders.some(o=>o.order_id===id)||(taken&&taken.has(id)));return id;}
+function vogFor(att){return ACCESSORY[att]||ACCESSORY.keyring;}
+function buildRow(item,customer,ship,method,taken){
+ const d=item.design,line=item.line,vog=vogFor(line.att);
+ const texts=(d.els||[]).filter(e=>e.type==='text');
+ const stickers=(d.els||[]).filter(e=>e.type==='sticker').map(e=>({id:e.sid,x:+(+e.x).toFixed(1),y:+(+e.y).toFixed(1),s:+(+e.s).toFixed(3),r:+(+e.r).toFixed(1)}));
+ const price=lineAmount(d,line);
+ const cost=(UNIT_COST[line.size]||{})[d.holo?'holo':'none'];
+ const id=freshOrderId(taken);if(taken)taken.add(id);
+ const qty=line.qty||1;
+ const notes=['Follow cutline.svg (outline + 3mm hole). Please send a proof before production. Colors may print slightly softer than on screen.','back.png is the readable back: the layout is mirrored left-to-right and the stickers and words are not mirrored. Print PNGs omit shadows, gloss, and the holo film.'];
+ if(d.holo)notes.push('Front finish is Holographic(Star). The rainbow in the preview is not printed.');
+ if(vog.attachment==='phone_strap')notes.push('Phone strap is only valid at 1.5" or smaller.');
+ return {
+  order_id:id,created_at:hstISO(),status:'ordered',
+  customer_name:(customer.name||'').trim(),customer_email:(customer.email||'').trim(),customer_phone:(customer.phone||'').trim(),
+  ship_line1:(ship.line1||'').trim(),ship_line2:(ship.line2||'').trim(),ship_city:(ship.city||'').trim(),ship_state:(ship.state||'').trim(),ship_zip:(ship.zip||'').trim(),ship_country:(ship.country||'US').trim()||'US',
+  payment_method:method,payment_demo:'true',amount_usd:price.total.toFixed(2),
+  quantity:String(qty),
+  shape:d.shape,size_in:String(line.size),print_color:d.fill,outline_color:d.outline,holo:d.holo?'yes':'no',
+  attachment:vog.attachment,attachment_vograce:vog.name,hardware_color:vog.color,
+  text_content:texts.map(e=>e.text||'').join(' | '),
+  text_font:[...new Set(texts.map(e=>e.font))].join(' | '),
+  text_color:[...new Set(texts.map(e=>e.color))].join(' | '),
+  text_size:texts.map(e=>String(e.size)).join(' | '),
+  stickers_json:JSON.stringify(stickers),
+  vograce_product:'Custom Clear Acrylic Keychains',
+  vograce_sides:'Double sided different design',
+  vograce_finish:d.holo?'Holographic(Star) front':'none',
+  vograce_size:line.size+'"',
+  vograce_accessory:vog.name,
+  vograce_accessory_color:vog.color,
+  vograce_qty:String(qty),
+  vograce_unit_cost_est:cost!=null?Number(cost).toFixed(2):'',
+  notes:notes.join(' '),
+  export_zip_filename:`${id}-${d.shape}_${qty}_#${vog.no}.zip`,
+  exported_at:'',received_by_3rd_party_at:'',shipped_at:'',tracking_number:'',
+  design:clone(d),line:clone(line)
+ };
+}
+function csvCell(v){const s=v==null?'':String(v);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function ordersCsv(bom=false){const lines=[CSV_COLS.join(',')];for(const o of orders)lines.push(CSV_COLS.map(k=>csvCell(o[k])).join(','));const text=lines.join('\r\n')+'\r\n';return bom?'\uFEFF'+text:text;}
+function downloadBlob(name,blob){const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);}
+function downloadOrdersCsv(){downloadBlob('charm-lab-orders.csv',new Blob([ordersCsv(true)],{type:'text/csv;charset=utf-8'}));}
+async function copyOrdersCsv(){const text=ordersCsv(false);try{await navigator.clipboard.writeText(text);toast('CSV copied for Sheets ✦');}catch(_){const ta=document.createElement('textarea');ta.value=text;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('CSV copied for Sheets ✦');}catch(e){toast('copy failed — use download instead');}ta.remove();}}
+async function copyText(s){try{await navigator.clipboard.writeText(s);toast('link copied ✦');}catch(_){toast('copy failed');}}
+function printMetrics(design,line,dpi=600){
+ const g=geo(design.shape,line.size);const bb=g.bb;const inch=parseFloat(line.size);const longU=Math.max(bb.w,bb.h)||1;
+ let p=dpi*inch/(2*HALF);if(longU*p<1000)p=1000/longU;
+ const W=Math.max(1,Math.ceil(bb.w*p-1e-9)),H=Math.max(1,Math.ceil(bb.h*p-1e-9));
+ const mm=1/g.upm,f=v=>+(v*mm).toFixed(3);
+ return {g,bb,p,W,H,mmPerUnit:mm,f,dpi:Math.round(p*(2*HALF)/inch),holeMM:+(2*g.holeR*mm).toFixed(2),borderMM:+g.borderMM.toFixed(2),sizeMM:[f(bb.w),f(bb.h)]};
+}
+async function sideCanvas(design,line,side,met){
+ const {bb,p,W,H}=met;const cv=document.createElement('canvas');cv.width=W;cv.height=H;const ctx=cv.getContext('2d');
+ const x0=side==='back'?-bb.x1:bb.x0;ctx.setTransform(p,0,0,p,-x0*p,-bb.y0*p);
+ await drawPrintArt(ctx,side,false,design,line);return cv;
+}
+function cutlineSvg(met){
+ const {g,bb,f}=met;
+ const d='M'+g.outer.map(([x,y])=>f(x-bb.x0)+','+f(y-bb.y0)).join('L')+'Z';
+ return `<svg xmlns="http://www.w3.org/2000/svg" width="${f(bb.w)}mm" height="${f(bb.h)}mm" viewBox="0 0 ${f(bb.w)} ${f(bb.h)}"><path d="${d}" fill="none" stroke="#ff0000" stroke-width="0.1"/><circle cx="${f(g.tab.x-bb.x0)}" cy="${f(g.tab.y-bb.y0)}" r="${f(g.holeR)}" fill="none" stroke="#ff0000" stroke-width="0.1"/></svg>`;
+}
+async function mockupCanvas(design,line){
+ const g=geo(design.shape,line.size);const bb=g.bb;const pad=36;const ppu=900/(bb.w+pad*2);
+ const W=900,H=Math.max(1,Math.round((bb.h+pad*2)*ppu));
+ const cv=document.createElement('canvas');cv.width=W;cv.height=H;const ctx=cv.getContext('2d');
+ const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#fff0f8');bg.addColorStop(.55,'#f3f8ff');bg.addColorStop(1,'#f7ffe6');
+ ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ ctx.setTransform(ppu,0,0,ppu,-(bb.x0-pad)*ppu,-(bb.y0-pad)*ppu);
+ ctx.save();ctx.translate(8,10);ctx.fillStyle='rgba(23,20,46,.14)';ctx.fill(new Path2D(g.outerD));ctx.restore();
+ ctx.fillStyle='rgba(255,255,255,.55)';ctx.fill(new Path2D(g.outerD+' '+g.holeD),'evenodd');
+ await drawPrintArt(ctx,'front',true,design,line);
+ if(design.holo){ctx.save();ctx.clip(new Path2D(g.printD));const hg=ctx.createLinearGradient(bb.x0,bb.y0,bb.x1,bb.y1);HOLO_STOPS.forEach(([o,c])=>hg.addColorStop(+o,c));ctx.globalAlpha=.28;ctx.fillStyle=hg;ctx.fillRect(bb.x0,bb.y0,bb.w,bb.h);ctx.restore();}
+ ctx.save();ctx.clip(new Path2D(g.outerD));ctx.globalAlpha=1;ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=10;ctx.stroke(new Path2D(g.outerD));ctx.restore();
+ return cv;
+}
+async function buildPrintPack(design,line,dpi=600){
+ const met=printMetrics(design,line,dpi);
+ const [front,back,mockup]=await Promise.all([sideCanvas(design,line,'front',met),sideCanvas(design,line,'back',met),mockupCanvas(design,line)]);
+ return {front,back,mockup,cutline:cutlineSvg(met),px:[met.W,met.H],mm:met.sizeMM,dpi:met.dpi,holeMM:met.holeMM,borderMM:met.borderMM,W:met.W,H:met.H};
+}
+function crc32(u8){let c=~0;for(let i=0;i<u8.length;i++){c^=u8[i];for(let k=0;k<8;k++)c=(c>>>1)^(0xedb88320&-(c&1));}return ~c>>>0;}
+const u16=n=>[n&255,(n>>>8)&255],u32=n=>[n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255];
+function zipStore(files){
+ const enc=new TextEncoder();const locals=[];const centrals=[];let offset=0;
+ for(const f of files){
+  const name=enc.encode(f.name),data=f.data,crc=crc32(data);
+  const local=[...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0)];
+  const lb=new Uint8Array(local.length+name.length+data.length);lb.set(local,0);lb.set(name,local.length);lb.set(data,local.length+name.length);locals.push(lb);
+  const central=[...u32(0x02014b50),...u16(20),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset)];
+  const cb=new Uint8Array(central.length+name.length);cb.set(central,0);cb.set(name,central.length);centrals.push(cb);offset+=lb.length;
+ }
+ const centralSize=centrals.reduce((s,c)=>s+c.length,0);
+ const eocd=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(centralSize),...u32(offset),...u16(0)]);
+ const out=new Uint8Array(offset+centralSize+eocd.length);let p=0;
+ for(const b of locals){out.set(b,p);p+=b.length;}for(const b of centrals){out.set(b,p);p+=b.length;}out.set(eocd,p);return out;
+}
+function canvasToU8(cv){return new Promise((res,rej)=>cv.toBlob(async b=>{if(!b){rej(new Error('png'));return;}res(new Uint8Array(await b.arrayBuffer()));},'image/png'));}
+function orderJson(row,pack){const o={};for(const k of CSV_COLS)o[k]=row[k]??'';o.design=row.design;o.line=row.line;o.export={dpi:pack.dpi,px:pack.px,mm:pack.mm,hole_mm:pack.holeMM,border_mm:pack.borderMM,back:true,mockup:'flat preview (art, clear border, gloss, holo wash). No chrome chain.'};return o;}
+async function buildVograceZip(id){
+ const row=orders.find(o=>o.order_id===id);if(!row||!row.design)throw new Error('this order has no saved design');
+ const pack=await buildPrintPack(row.design,row.line);
+ const enc=new TextEncoder();
+ const files=[
+  {name:'front.png',data:await canvasToU8(pack.front)},
+  {name:'back.png',data:await canvasToU8(pack.back)},
+  {name:'cutline.svg',data:enc.encode(pack.cutline)},
+  {name:'mockup.png',data:await canvasToU8(pack.mockup)},
+  {name:'order.json',data:enc.encode(JSON.stringify(orderJson(row,pack),null,2))}
+ ];
+ return {name:row.export_zip_filename,bytes:zipStore(files),pack};
+}
+function noteExport(row){if(!row.exported_at)row.exported_at=hstISO();if(row.status==='ordered')row.status='exported';saveOrders();}
+async function downloadZip(id){
+ if(flow.busy)return;flow.busy=true;flow.err='';renderFlow();
+ try{
+  const z=await buildVograceZip(id);
+  downloadBlob(z.name,new Blob([z.bytes],{type:'application/zip'}));
+  const row=orders.find(o=>o.order_id===id);if(row)noteExport(row);
+  toast('Vograce ZIP downloaded ✦');
+ }catch(err){console.error(err);flow.err='could not build the print files. try again in a moment.';toast('ZIP failed');}
+ flow.busy=false;renderFlow();
+}
+function setStatus(id,status,tracking){
+ const o=orders.find(x=>x.order_id===id);if(!o||!STATUSES.includes(status))return;
+ const now=hstISO();o.status=status;
+ if((status==='exported'||status==='received_by_3rd_party'||status==='shipped')&&!o.exported_at)o.exported_at=now;
+ if((status==='received_by_3rd_party'||status==='shipped')&&!o.received_by_3rd_party_at)o.received_by_3rd_party_at=now;
+ if(status==='shipped'){if(!o.shipped_at)o.shipped_at=now;if(tracking!=null&&String(tracking).trim())o.tracking_number=String(tracking).trim();}
+ saveOrders();renderFlow();
+}
+function syncFields(){$$('#flow [data-cust]').forEach(el=>{flow.customer[el.dataset.cust]=el.value;});$$('#flow [data-ship]').forEach(el=>{flow.ship[el.dataset.ship]=el.value;});saveProfile();}
+function validContact(kind){
+ syncFields();flow.err='';
+ if(!flow.customer.name.trim()){flow.err='add a name';return false;}
+ const email=flow.customer.email.trim(),phone=flow.customer.phone.trim();
+ if(kind==='sms'&&phone.replace(/\D/g,'').length<7){flow.err='add a mobile number for the text';return false;}
+ if(kind==='email'&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){flow.err='add an email address';return false;}
+ if(kind==='either'&&!email&&phone.replace(/\D/g,'').length<7){flow.err='add an email or a mobile number';return false;}
+ if(kind==='either'&&email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){flow.err='that email looks off';return false;}
+ return true;
+}
+function validAddress(){
+ syncFields();flow.err='';
+ const s=flow.ship;
+ if(!s.line1.trim()||!s.city.trim()||!s.state.trim()||!s.zip.trim()){flow.err='add street, city, state, and ZIP';return false;}
+ if(!s.country.trim())s.country='US';
+ return true;
+}
+function shipURL(token){const u=new URL(location.href);u.hash='ship/'+token;return u.href;}
+function linkMessage(token){return `charm lab: tap to add your shipping address so we can send your charm\n${shipURL(token)}`;}
+function smsHref(phone,body){const num=phone.replace(/[^\d+]/g,'');const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);return `sms:${num}${ios?'&':'?'}body=${encodeURIComponent(body)}`;}
+function mailHref(email,body){return `mailto:${email}?subject=${encodeURIComponent('your charm lab shipping link')}&body=${encodeURIComponent(body)}`;}
+function ensureCartSnapshot(){if(!flow.checkoutCart||!flow.checkoutCart.length)flow.checkoutCart=clone(cart);}
+function sendLink(kind){
+ if(!cart.length){flow.err='your bag is empty';renderFlow();return;}
+ if(!validContact(kind==='sms'?'sms':'email')){renderFlow();return;}
+ const token=makeId('',6).toLowerCase();
+ flow.checkoutCart=clone(cart);
+ const pending={token,customer:clone(flow.customer),ship:clone(flow.ship),cart:flow.checkoutCart,created_at:hstISO()};
+ savePending(pending);
+ flow.link={kind,token,url:shipURL(token),message:linkMessage(token)};
+ flow.err='';renderFlow();
+}
+function openShip(token){
+ const p=loadPending();
+ if(!p||p.token!==token){flow.err='that shipping link is not on this browser. send it again from checkout, or type the address here.';flow.link=null;openFlow('contact');return;}
+ Object.assign(flow.customer,p.customer||{});Object.assign(flow.ship,p.ship||{});
+ flow.checkoutCart=p.cart||[];flow.link={kind:'tap',token,url:shipURL(token),message:linkMessage(token)};flow.err='';
+ if(!flow.checkoutCart.length){flow.err='that link has no charms in it';openFlow('cart');return;}
+ openFlow('address');
+}
+function placeOrders(){
+ if(flow.busy)return;
+ const items=flow.checkoutCart||[];
+ if(!items.length){flow.err='your bag is empty';openFlow('cart');return;}
+ if(!validAddress()){openFlow('address');return;}
+ if(!flow.method){flow.err='pick how you would pay';openFlow('pay');return;}
+ const taken=new Set();const made=items.map(it=>buildRow(it,flow.customer,flow.ship,flow.method,taken));
+ orders=made.concat(orders);saveOrders();
+ if(location.hash.startsWith('#ship/'))history.replaceState(null,'',location.pathname+location.search);
+ const ids=new Set(items.map(it=>it.id));cart=cart.filter(it=>!ids.has(it.id));saveCart();refreshBag();
+ savePending(null);flow.placed=made.map(o=>o.order_id);flow.busy=false;flow.err='';
+ openFlow('done');
+}
+function openFlow(step){if(modalOpen)close3D();flow.step=step;$('#flow').classList.add('open');$('#flow').setAttribute('aria-hidden','false');renderFlow();}
+function closeFlow(){$('#flow').classList.remove('open');$('#flow').setAttribute('aria-hidden','true');flow.busy=false;if(/^#(ship\/|orders$|checkout$)/.test(location.hash))history.replaceState(null,'',location.pathname+location.search);}
+function goBack(){const s=flow.step;flow.err='';if(s==='contact')openFlow('cart');else if(s==='address')openFlow('contact');else if(s==='pay'||s==='confirm')openFlow(s==='confirm'?'pay':'address');else if(s==='done')openFlow('orders');else closeFlow();}
+function stepsHtml(n){return `<div class="steps">${['contact','address','pay'].map((l,i)=>`<span class="${i===n?'on':''}">${i+1} ${l}</span>`).join('')}</div>`;}
+function errHtml(){return flow.err?`<p class="ferr">${esc(flow.err)}</p>`:'';}
+function contactFields(){const c=flow.customer;return `<label class="field">name<input data-cust="name" autocomplete="name" value="${esc(c.name)}"></label><label class="field">email<input data-cust="email" type="email" autocomplete="email" inputmode="email" value="${esc(c.email)}"></label><label class="field">mobile<input data-cust="phone" type="tel" autocomplete="tel" inputmode="tel" value="${esc(c.phone)}"></label>`;}
+function addressFields(){const s=flow.ship;return `<label class="field">street<input data-ship="line1" autocomplete="address-line1" value="${esc(s.line1)}"></label><label class="field">apt, suite <span style="font-weight:600;opacity:.7">(optional)</span><input data-ship="line2" autocomplete="address-line2" value="${esc(s.line2)}"></label><div class="grid2"><label class="field">city<input data-ship="city" autocomplete="address-level2" value="${esc(s.city)}"></label><label class="field">state<input data-ship="state" autocomplete="address-level1" value="${esc(s.state)}"></label></div><div class="grid2"><label class="field">ZIP<input data-ship="zip" autocomplete="postal-code" inputmode="text" value="${esc(s.zip)}"></label><label class="field">country<input data-ship="country" autocomplete="country" value="${esc(s.country||'US')}"></label></div>`;}
+function linkPanel(){if(!flow.link)return '';const L=flow.link,phone=flow.customer.phone.trim(),email=flow.customer.email.trim();
+ return `<div class="fcard"><b>link ready</b><p class="hintline">demo only — nothing was actually sent. open the composer, or pretend the customer tapped the link on this browser.</p><p class="linkbox">${esc(L.url)}</p><div class="stack">${phone?`<a class="pbtn" href="${esc(smsHref(phone,L.message))}">open in messages</a>`:''}${email?`<a class="pbtn" href="${esc(mailHref(email,L.message))}">open in mail</a>`:''}<button class="pbtn" type="button" data-act="copylink">copy link</button><button class="pbtn go" type="button" data-act="tapped">customer tapped the link →</button></div></div>`;}
+function summaryHtml(items){return (items||[]).map(it=>`<div class="r"><span>${esc(lineLabel(it))}</span><b>${money(lineAmount(it.design,it.line).total)}</b></div>`).join('');}
+function renderCart(){
+ if(!cart.length)return `<p class="hintline">your bag is empty. design a charm, then add it.</p><button class="pbtn go" type="button" data-act="close">back to the studio</button>`;
+ return cart.map(it=>`<div class="fcard"><div class="r"><b>${esc(shapeName(it.design.shape))} · ${esc(it.line.size)}"</b><span>${money(lineAmount(it.design,it.line).total)}</span></div><p class="hintline" style="margin:8px 0 0">${esc(ATT[it.line.att]?ATT[it.line.att].name:it.line.att)}${it.design.holo?' · holo stars':''}</p><div class="acts"><button class="ibtn" type="button" data-act="qty" data-id="${esc(it.id)}" data-d="-1" aria-label="one less">–</button><b style="font-size:22px">${esc(it.line.qty)}</b><button class="ibtn" type="button" data-act="qty" data-id="${esc(it.id)}" data-d="1" aria-label="one more">+</button><button class="pbtn" type="button" data-act="remove" data-id="${esc(it.id)}">remove</button></div></div>`).join('')+`<div class="fcard"><div class="r"><span>example total</span><b style="font-family:'Bagel Fat One';font-size:28px">${money(itemsTotal(cart))}</b></div></div><div class="stack"><button class="pbtn go" type="button" data-act="tocheckout">checkout →</button><button class="pbtn" type="button" data-act="orders">orders</button></div>`;
+}
+function renderOrders(){
+ const list=flow.filter==='all'?orders:orders.filter(o=>o.status===flow.filter);
+ const filters=[['all','all'],['ordered','ordered'],['exported','exported'],['received_by_3rd_party','at the printer'],['shipped','shipped'],['cancelled','cancelled']];
+ let h=`<div class="filters">${filters.map(([id,label])=>`<button type="button" class="${flow.filter===id?'on':''}" data-act="filter" data-id="${id}">${label}</button>`).join('')}</div><div class="stack" style="margin-bottom:12px"><button class="pbtn go" type="button" data-act="csv">download orders CSV</button><button class="pbtn" type="button" data-act="copy">copy CSV for Sheets</button></div>`;
+ if(!list.length)h+=`<p class="hintline">${orders.length?'nothing in this filter.':'no orders yet. checkout a charm to make one.'}</p>`;
+ h+=list.map(o=>{const adv=NEXT_STATUS[o.status];return `<div class="fcard"><div class="r"><b>${esc(o.order_id)}</b><span class="chip" data-s="${esc(o.status)}">${esc(o.status)}</span></div><p class="hintline" style="margin:8px 0 0">${esc(prettyWhen(o.created_at))} · ${money(o.amount_usd)} · ${esc(o.payment_method)}</p><p class="hintline" style="margin:4px 0 0">${esc(shapeName(o.shape))} · ${esc(o.size_in)}" · ${esc(o.attachment)} · ${o.holo==='yes'?'holo · ':''}×${esc(o.quantity)}</p><p class="hintline" style="margin:4px 0 0">${esc(o.customer_name)} · ${esc([o.ship_city,o.ship_state].filter(Boolean).join(', '))}</p><label class="field" style="margin-top:10px">tracking<input data-track="${esc(o.order_id)}" value="${esc(o.tracking_number||'')}" placeholder="after it ships"></label><label class="field">status<select data-status="${esc(o.order_id)}">${STATUSES.map(s=>`<option value="${s}"${s===o.status?' selected':''}>${s}</option>`).join('')}</select></label><div class="acts"><button class="pbtn" type="button" data-act="zip" data-id="${esc(o.order_id)}">vograce ZIP</button>${adv?`<button class="pbtn" type="button" data-act="advance" data-id="${esc(o.order_id)}">${NEXT_LABEL[o.status]}</button>`:''}</div></div>`;}).join('');
+ return h;
+}
+function renderFlow(){
+ const title={cart:'your bag',contact:'checkout',address:'shipping',pay:'how to pay',confirm:'confirm pay',done:'order placed',orders:'orders'}[flow.step]||'charm lab';
+ $('#flowTitle').textContent=flow.busy?'one moment…':title;
+ const changed=flowStepShown!==flow.step;flowStepShown=flow.step;
+ let html='';
+ if(flow.busy)html+=`<p class="busy">packing the print files…</p>`;
+ html+=errHtml();
+ const items=flow.checkoutCart&&flow.checkoutCart.length?flow.checkoutCart:cart;
+ if(flow.step==='cart')html+=renderCart();
+ else if(flow.step==='contact'){
+  html+=stepsHtml(0)+`<p class="hintline">${items.length?esc(items.length===1?lineLabel(items[0]):items.length+' charms'):'bag is empty'} · example total ${money(itemsTotal(items))}. demo checkout, nothing is charged.</p>`+contactFields()+`<p class="hintline">text or email a link to collect the shipping address. the link opens on this browser. you can also type the address yourself.</p><div class="stack"><button class="pbtn" type="button" data-act="send" data-kind="sms">text me a link</button><button class="pbtn" type="button" data-act="send" data-kind="email">email me a link</button><button class="pbtn go" type="button" data-act="typeaddr">I'll type the address</button></div>`+linkPanel();
+ }
+ else if(flow.step==='address')html+=stepsHtml(1)+`<p class="hintline">where should this charm go?</p>`+addressFields()+`<button class="pbtn go" type="button" data-act="topay">continue to pay</button>`;
+ else if(flow.step==='pay'){
+  const ship=flow.ship;html+=stepsHtml(2)+`<div class="fcard">${summaryHtml(flow.checkoutCart)}<div class="r" style="margin-top:8px"><span>example total</span><b>${money(itemsTotal(flow.checkoutCart))}</b></div><p class="hintline" style="margin:8px 0 0">${esc(ship.line1)}, ${esc(ship.city)} ${esc(ship.state)} ${esc(ship.zip)}</p></div><p class="hintline">pick a demo payment. no app opens and nothing is charged.</p><div class="pays">${PAYS.map(p=>`<button class="pay" type="button" data-act="method" data-id="${p.id}" style="background:${p.bg};color:${p.fg}">${esc(p.name)}<small>demo</small></button>`).join('')}</div>`;
+ }
+ else if(flow.step==='confirm'){
+  const p=PAYS.find(x=>x.id===flow.method)||{name:flow.method};html+=`<div class="fcard"><p class="busy">pay ${money(itemsTotal(flow.checkoutCart))} with ${esc(p.name)}?</p><p class="hintline">demo only. no charge, no account, no app.</p></div><div class="stack"><button class="pbtn go" type="button" data-act="paid">payment received</button><button class="pbtn" type="button" data-act="backpay">not now</button></div>`;
+ }
+ else if(flow.step==='done'){
+  const rows=flow.placed.map(id=>orders.find(o=>o.order_id===id)).filter(Boolean);
+  html+=rows.map(o=>`<div class="fcard"><div class="r"><b style="font-family:'Bagel Fat One';font-size:26px">${esc(o.order_id)}</b><span class="chip" data-s="${esc(o.status)}">${esc(o.status)}</span></div><p class="hintline" style="margin:8px 0 0">${esc(lineLabel({design:o.design,line:o.line}))}</p><p class="hintline">payment received · ${esc(o.payment_method)} · ${money(o.amount_usd)} · nothing was charged</p><button class="pbtn" type="button" data-act="zip" data-id="${esc(o.order_id)}">download vograce ZIP</button></div>`).join('')+`<div class="stack"><button class="pbtn go" type="button" data-act="csv">download orders CSV</button><button class="pbtn" type="button" data-act="copy">copy CSV for Sheets</button><button class="pbtn" type="button" data-act="orders">view orders</button></div>`;
+ }
+ else if(flow.step==='orders')html+=renderOrders();
+ $('#flowBody').innerHTML=html;
+ if(changed)$('#flowBody').scrollTop=0;
+}
+function routeHash(){const h=location.hash.replace(/^#/,'');if(h.startsWith('ship/'))openShip(decodeURIComponent(h.slice(5)));else if(h==='orders')openFlow('orders');else if(h==='checkout')openFlow(cart.length?'contact':'cart');}
+window.addEventListener('hashchange',routeHash);
+$('#flow').addEventListener('input',ev=>{const t=ev.target;if(t.dataset.cust){flow.customer[t.dataset.cust]=t.value;saveProfile();}if(t.dataset.ship){flow.ship[t.dataset.ship]=t.value;saveProfile();}if(t.dataset.track){const o=orders.find(x=>x.order_id===t.dataset.track);if(o){o.tracking_number=t.value.trim();saveOrders();}}});
+$('#flow').addEventListener('change',ev=>{const t=ev.target;if(!t.dataset.status||flow.busy)return;const tr=$(`#flow [data-track="${t.dataset.status}"]`);setStatus(t.dataset.status,t.value,tr?tr.value:'');});
+$('#flow').addEventListener('focusin',ev=>{const el=ev.target;if(el.matches&&el.matches('input,select,textarea'))setTimeout(()=>{try{el.scrollIntoView({block:'center'});}catch(_){}},280);});
+$('#flow').addEventListener('click',ev=>{
+ const b=ev.target.closest('[data-act]');if(!b||flow.busy)return;const act=b.dataset.act,id=b.dataset.id;
+ if(act==='back'){goBack();return;}
+ if(act==='close'){closeFlow();return;}
+ if(act==='orders'){flow.err='';openFlow('orders');return;}
+ if(act==='remove'){cart=cart.filter(it=>it.id!==id);saveCart();refreshBag();renderFlow();return;}
+ if(act==='qty'){const it=cart.find(x=>x.id===id);if(!it)return;it.line.qty=clamp((it.line.qty||1)+(+b.dataset.d||0),1,20);saveCart();refreshBag();renderFlow();return;}
+ if(act==='tocheckout'){if(!cart.length){flow.err='your bag is empty';renderFlow();return;}flow.err='';flow.checkoutCart=null;openFlow('contact');return;}
+ if(act==='send'){sendLink(b.dataset.kind);return;}
+ if(act==='typeaddr'){if(!cart.length){flow.err='your bag is empty';renderFlow();return;}if(!validContact('either')){renderFlow();return;}flow.checkoutCart=clone(cart);flow.err='';openFlow('address');return;}
+ if(act==='copylink'){if(flow.link)copyText(flow.link.url);return;}
+ if(act==='tapped'){if(flow.link)openShip(flow.link.token);return;}
+ if(act==='topay'){if(!validAddress()){renderFlow();return;}ensureCartSnapshot();flow.err='';openFlow('pay');return;}
+ if(act==='method'){flow.method=id;flow.err='';openFlow('confirm');return;}
+ if(act==='backpay'){openFlow('pay');return;}
+ if(act==='paid'){placeOrders();return;}
+ if(act==='csv'){downloadOrdersCsv();return;}
+ if(act==='copy'){copyOrdersCsv();return;}
+ if(act==='zip'){downloadZip(id);return;}
+ if(act==='advance'){const o=orders.find(x=>x.order_id===id);if(!o)return;const n=NEXT_STATUS[o.status];if(!n)return;const tr=$(`#flow [data-track="${id}"]`);setStatus(id,n,tr?tr.value:'');return;}
+ if(act==='filter'){flow.filter=id;renderFlow();}
+});
+
+window.__charm={flipFace:d=>{if(V){const s=camSph();const rel=wrapA(s.az-V.face.az0);flipFace(s.az-rel+(Math.abs(rel)<=Math.PI/2?0:Math.sign(rel)*Math.PI),d,1);}},get yaw(){if(!V||!V.face)return null;return wrapA(camSph().az-V.face.az0)*180/Math.PI;},get tilt(){if(!V||!V.face)return null;return (camSph().pol-V.face.pol0)*180/Math.PI;},zoomTo:s=>{if(V){V.zb=null;V.zRaw=unrubber(s);zApply(s);}},rubber,stretch:f=>zStretch(f),release:()=>zoomHome(),get zoom(){return V?V.zDisp:null},setFrame:(h,w)=>{FRAME_H=h;FRAME_W=w;resetView();},bumpNow:()=>bumpCharm(1,1),applyTheme,exportPrintFiles,buildPrintPack,buildVograceZip,ordersCsv,csvHeader:CSV_COLS.join(','),getOrders:()=>orders,getCart:()=>cart,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
+loadCart();loadOrders();loadProfile();refreshBag();
 renderAll();
+routeHash();
 document.fonts&&document.fonts.ready.then(()=>{renderEls();updateSel();});
 </script>
 </body>
