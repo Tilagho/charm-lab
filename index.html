@@ -85,7 +85,8 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 #sheet{flex:none;height:clamp(240px,36dvh,420px);margin:14px 12px 0;background:var(--card);border:3px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden}
 #app.collapsed #sheet{height:48px}
 #sheet{position:relative;z-index:2;will-change:transform}
-#tabbar{position:relative;z-index:3}
+#tabbar{position:relative;z-index:3;touch-action:none}
+#app.collapsed #sheet{touch-action:none}
 .grab{flex:none;height:48px;display:grid;place-items:center;cursor:pointer;touch-action:none;border:0;background:none;width:100%}
 .grab::before{content:'';width:56px;height:6px;border-radius:9px;background:var(--muted)}
 .panels{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:0 16px 24px}
@@ -670,7 +671,7 @@ const isDrawer=()=>innerWidth<960;
 function collapse(){if(!isDrawer())return;const a=document.activeElement;if(a&&a.id==='txtIn')a.blur();$('#app').classList.add('collapsed');}
 $('#sheet').addEventListener('pointerdown',()=>{sheetTapAt=performance.now();},true);
 function setTab(t){curTab=t;$('#app').classList.remove('collapsed');$$('#tabbar .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));$$('.panel').forEach(p=>p.classList.toggle('on',p.dataset.panel===t));$('#panels').scrollTop=0;}
-$('#tabbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-tab]');if(!b)return;if(b.dataset.tab===curTab&&innerWidth<960){$('#app').classList.toggle('collapsed');}else setTab(b.dataset.tab);});
+$('#tabbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-tab]');if(!b)return;if(performance.now()-swSuppress<400)return;if(b.dataset.tab===curTab&&innerWidth<960){$('#app').classList.toggle('collapsed');}else setTab(b.dataset.tab);});
 /* swipe-down-to-close: drag from the handle, or from the content when it's scrolled to the top and the gesture is downward */
 let sw=null,swSuppress=0;const sheetEl=$('#sheet'),panelsEl=$('#panels');
 function swStart(x,y,src){if(!isDrawer()||$('#app').classList.contains('collapsed'))return;sw={x0:x,y0:y,src,active:false,d:0,H:sheetEl.offsetHeight,hist:[[performance.now(),y]]};if(src==='grab')swBegin(y);}
@@ -692,10 +693,33 @@ function swEnd(){if(!sw)return;const s=sw;sw=null;if(!s.active)return;
  const done=()=>{sheetEl.style.transition='none';if(close)$('#app').classList.add('collapsed');sheetEl.style.transform='';void sheetEl.offsetHeight;sheetEl.style.transition='';fitView();updateSel();};
  if(close)sheetEl.style.transform=`translateY(${Math.max(s.d,s.H-48)}px)`;else sheetEl.style.transform='translateY(0px)';
  setTimeout(done,250);}
-sheetEl.addEventListener('touchstart',ev=>{if(ev.touches.length!==1){sw=null;return;}const t=ev.touches[0],tg=ev.target;
+sheetEl.addEventListener('touchstart',ev=>{if(ev.touches.length!==1){sw=null;up=null;return;}const t=ev.touches[0],tg=ev.target;
+ if(upStart(t.clientX,t.clientY,null))return;
  if(tg.closest('input,select,textarea'))return;swStart(t.clientX,t.clientY,tg.closest('#grab')?'grab':'content');},{passive:true});
-sheetEl.addEventListener('touchmove',ev=>{if(!sw)return;if(ev.touches.length!==1){swEnd();return;}const t=ev.touches[0];swMove(t.clientX,t.clientY,ev);},{passive:false});
-sheetEl.addEventListener('touchend',swEnd);sheetEl.addEventListener('touchcancel',swEnd);
+sheetEl.addEventListener('touchmove',ev=>{if(up){if(ev.touches.length!==1){upEnd();return;}upMove(ev.touches[0].clientX,ev.touches[0].clientY,ev);return;}if(!sw)return;if(ev.touches.length!==1){swEnd();return;}const t=ev.touches[0];swMove(t.clientX,t.clientY,ev);},{passive:false});
+sheetEl.addEventListener('touchend',()=>{upEnd();swEnd();});sheetEl.addEventListener('touchcancel',()=>{upEnd();swEnd();});
+/* swipe-UP-to-open: from the tab bar or the peeking handle while collapsed. The sheet follows the finger (height), opens
+   past ~30% of its height or on a fast upward flick, otherwise snaps back. Starting on a tab opens that tab. */
+let up=null;const SHEET_MIN=48;
+const sheetOpenH=()=>Math.round(clamp(.36*innerHeight,240,420));
+function upStart(x,y,tab){if(!isDrawer()||!$('#app').classList.contains('collapsed'))return false;up={x0:x,y0:y,prev:curTab,tab:tab||curTab||'shape',active:false,d:0,H:sheetOpenH(),hist:[[performance.now(),y]]};return true;}
+function upMove(x,y,ev){if(!up)return;const dy=up.y0-y,dx=x-up.x0;
+ if(!up.active){if(Math.abs(dy)<8&&Math.abs(dx)<8)return;if(dy>0&&dy>Math.abs(dx)){up.active=true;up.y0=y;sheetEl.style.transition='none';sheetEl.style.height=SHEET_MIN+'px';setTab(up.tab);}else{up=null;return;}}
+ if(ev&&ev.cancelable)ev.preventDefault();
+ const raw=Math.max(0,up.y0-y);up.d=raw<=up.H-SHEET_MIN?raw:(up.H-SHEET_MIN)+Math.sqrt(raw-(up.H-SHEET_MIN))*3;// a little rubber past fully open
+ sheetEl.style.height=(SHEET_MIN+up.d)+'px';
+ const now=performance.now();up.hist.push([now,y]);while(up.hist.length>2&&now-up.hist[0][0]>100)up.hist.shift();}
+function upEnd(){if(!up)return;const s=up;up=null;if(!s.active)return;swSuppress=performance.now();
+ const [t0,y0]=s.hist[0],[t1,y1]=s.hist[s.hist.length-1];const v=t1>t0?(y0-y1)/(t1-t0):0;// px/ms, + = up
+ const open=s.d>(s.H-SHEET_MIN)*.3||(v>.45&&s.d>12);
+ sheetEl.style.transition='height .3s cubic-bezier(.3,1.2,.5,1)';void sheetEl.offsetHeight;
+ sheetEl.style.height=(open?s.H:SHEET_MIN)+'px';
+ setTimeout(()=>{sheetEl.style.transition='none';if(!open){if(s.prev&&s.prev!==curTab)setTab(s.prev);$('#app').classList.add('collapsed');}else $('#app').classList.remove('collapsed');sheetEl.style.height='';void sheetEl.offsetHeight;sheetEl.style.transition='';fitView();updateSel();},310);}
+const tabbarEl=$('#tabbar');
+tabbarEl.addEventListener('touchstart',ev=>{if(ev.touches.length!==1)return;const t=ev.touches[0];const b=ev.target.closest('[data-tab]');upStart(t.clientX,t.clientY,b&&b.dataset.tab);},{passive:true});
+tabbarEl.addEventListener('touchmove',ev=>{if(!up)return;if(ev.touches.length!==1){upEnd();return;}const t=ev.touches[0];upMove(t.clientX,t.clientY,ev);},{passive:false});
+tabbarEl.addEventListener('touchend',upEnd);tabbarEl.addEventListener('touchcancel',upEnd);
+
 $('#grab').addEventListener('pointerdown',ev=>{if(ev.pointerType==='touch')return;swStart(ev.clientX,ev.clientY,'grab');});
 window.addEventListener('pointermove',ev=>{if(sw&&ev.pointerType!=='touch')swMove(ev.clientX,ev.clientY,null);});
 window.addEventListener('pointerup',ev=>{if(sw&&ev.pointerType!=='touch')swEnd();});
