@@ -883,8 +883,8 @@ function createViewer(){
  const root=new T.Group();scene.add(root);
  const v={renderer,scene,camera,controls,root,envRT,canvas,pivot:null,hang:null,raf:0,interacting:false,t0:performance.now(),tSway:0,last:0,disposables:[]};
  setupTap(v);setupZoom(v);v.ro=new ResizeObserver(()=>{resize3D();kick();});v.ro.observe($('#threeWrap'));v.ro.observe($('#mfoot'));
- controls.addEventListener('start',()=>{v.interacting=true;clearTimeout(idleT);kick();});
- controls.addEventListener('end',()=>{v.interacting=false;kick();});
+ controls.addEventListener('start',()=>{v.interacting=true;v.fs=null;clearTimeout(idleT);kick();});
+ controls.addEventListener('end',()=>{v.interacting=false;faceSnap();kick();});
  controls.addEventListener('change',()=>{if(v.inTick)v.changed=true;else kick();});
  return v;
 }
@@ -957,20 +957,39 @@ function zoomHome(){if(!V||!V.homeD)return;V.zRaw=1;const s=V.zDisp||1;if(Math.a
 function zoomStep(now,dt){const z=V.zb;if(!z||!(dt>0)){if(z)V.changed=true;return;}let s=V.zDisp||1;const n=Math.max(1,Math.ceil(dt/.004)),h=dt/n;
  for(let i=0;i<n;i++){z.v+=(-ZS_K*(s-1)-ZS_C*z.v)*h;s+=z.v*h;}
  if(Math.abs(s-1)<.0008&&Math.abs(z.v)<.01){V.zb=null;zApply(1);}else{zApply(s);V.changed=true;}}
+/* face snapping: the charm should never rest edge-on. After any rotate gesture ends, a gentle spring (≈0.5s, slight
+   overshoot) eases the orbit to the nearest face (front, or the back, which is printed too) and the tilt back to the
+   flattering default. Two fingers never rotate (see setupZoom). */
+const FS_K=170,FS_C=2*.68*Math.sqrt(FS_K);
+const wrapA=a=>{a=(a+Math.PI)%(2*Math.PI);if(a<0)a+=2*Math.PI;return a-Math.PI;};
+function camSph(){const o=V.camera.position.clone().sub(V.controls.target);const r=o.length();return {r,az:Math.atan2(o.x,o.z),pol:Math.acos(clamp(o.y/r,-1,1))};}
+function setCamSph(az,pol,r){const t=V.controls.target;V.camera.position.set(t.x+r*Math.sin(pol)*Math.sin(az),t.y+r*Math.cos(pol),t.z+r*Math.sin(pol)*Math.cos(az));V.camera.lookAt(t);}
+function killInertia(){const c=V.controls;const sd=c._sphericalDelta||c.sphericalDelta;if(sd&&sd.set)sd.set(0,0,0);}
+function faceSnap(){if(!V||!V.face)return;const s=camSph();const rel=wrapA(s.az-V.face.az0);const tgt=Math.abs(rel)<=Math.PI/2?0:(rel>0?Math.PI:-Math.PI);
+ killInertia();V.fs={az:s.az,vaz:0,tAz:s.az-rel+tgt,pol:s.pol,vpol:0};V.changed=true;kick();}
+function faceStep(dt){const f=V.fs;if(!f||!(dt>0)){if(f)V.changed=true;return;}killInertia();const n=Math.max(1,Math.ceil(dt/.004)),h=dt/n;const p0=V.face.pol0;
+ for(let i=0;i<n;i++){f.vaz+=(-FS_K*(f.az-f.tAz)-FS_C*f.vaz)*h;f.az+=f.vaz*h;f.vpol+=(-FS_K*(f.pol-p0)-FS_C*f.vpol)*h;f.pol+=f.vpol*h;}
+ const r=V.camera.position.distanceTo(V.controls.target);
+ if(Math.abs(f.az-f.tAz)<.002&&Math.abs(f.vaz)<.02&&Math.abs(f.pol-p0)<.002&&Math.abs(f.vpol)<.02){setCamSph(f.tAz,p0,r);V.fs=null;}else{setCamSph(f.az,f.pol,r);V.changed=true;}}
 function setupZoom(v){const cv=v.canvas;const P=new Map();let pinch=null;
  const dist=()=>{const [a,b]=[...P.values()];return Math.hypot(a.x-b.x,a.y-b.y);};
- cv.addEventListener('pointerdown',ev=>{P.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(P.size===2){clearTimeout(v.zbT);pinch={d:dist()};zStretch(1);}});
+ let snap=null;
+ cv.addEventListener('pointerdown',ev=>{P.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+  if(P.size===1&&V){const s=camSph();snap={az:s.az,pol:s.pol,t:performance.now()};}
+  if(P.size===2){clearTimeout(v.zbT);pinch={d:dist()};zStretch(1);
+   // freeze rotation for the rest of this gesture, and undo whatever the first finger turned before the second landed
+   v.controls.enableRotate=false;V.fs=null;if(snap&&V&&performance.now()-snap.t<450){const r=V.camera.position.distanceTo(V.controls.target);killInertia();setCamSph(snap.az,snap.pol,r);V.changed=true;kick();}}});
  cv.addEventListener('pointermove',ev=>{if(!P.has(ev.pointerId))return;P.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(pinch&&P.size===2){const d=dist();if(d>4&&pinch.d>4){zStretch(d/pinch.d);pinch.d=d;}}});
- const up=ev=>{P.delete(ev.pointerId);if(pinch&&P.size<2){pinch=null;clearTimeout(v.zbT);zoomHome();}};
+ const up=ev=>{P.delete(ev.pointerId);if(pinch&&P.size<2){pinch=null;clearTimeout(v.zbT);zoomHome();}if(P.size===0){snap=null;if(!v.controls.enableRotate){v.controls.enableRotate=true;faceSnap();}}};
  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
  cv.addEventListener('wheel',ev=>{ev.preventDefault();const dy=ev.deltaMode===1?ev.deltaY*16:ev.deltaY;zStretch(Math.exp(-clamp(dy,-120,120)*(ev.ctrlKey?.01:.0025)));clearTimeout(v.zbT);v.zbT=setTimeout(zoomHome,150);},{passive:false});}
-function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=Math.max(.3,(B.bot-B.top-24)/B.H)||1;/* keep ~12px clear above and below the keychain */const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*FRAME_H,(V.fitW/2)/(tf*a)*FRAME_W);const ty=0;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.homeD=d;V.zb=null;V.zRaw=1;V.zDisp=1;V.controls.enableZoom=false;V.controls.minDistance=d*.5;V.controls.maxDistance=d*1.6;V.controls.update();kick();}
+function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=Math.max(.3,(B.bot-B.top-24)/B.H)||1;/* keep ~12px clear above and below the keychain */const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*FRAME_H,(V.fitW/2)/(tf*a)*FRAME_W);const ty=0;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.homeD=d;V.zb=null;V.zRaw=1;V.zDisp=1;V.controls.enableZoom=false;{const o=V.camera.position.clone().sub(V.controls.target);const r=o.length();V.face={az0:Math.atan2(o.x,o.z),pol0:Math.acos(o.y/r)};V.fs=null;V.controls.minPolarAngle=V.face.pol0-.32;V.controls.maxPolarAngle=V.face.pol0+.32;}V.controls.minDistance=d*.5;V.controls.maxDistance=d*1.6;V.controls.update();kick();}
 // render loop runs only while something moves
 function tick(now){
  if(!V)return;V.raf=0;if(!modalOpen||document.hidden)return;
  const dt=Math.min(.05,(now-(V.last||now))/1000);V.last=now;
  bumpStep(now,dt);
- V.inTick=true;V.changed=false;V.controls.update();zoomStep(now,dt);V.inTick=false;
+ V.inTick=true;V.changed=false;V.controls.update();zoomStep(now,dt);faceStep(dt);V.inTick=false;
  V.renderer.render(V.scene,V.camera);
  if(!window.__3dReady)window.__3dReady=true;window.__frames=(window.__frames||0)+1;
  // keep going only while something moves: motion, a finger on it, or damping still settling
@@ -1034,7 +1053,7 @@ function syncThemeColor(){const h=document.documentElement;const open=h.classLis
 function applyTheme(t,save){const h=document.documentElement;h.classList.add('theming');h.dataset.theme=t;syncThemeColor();if(save){try{localStorage.setItem(THEME_KEY,t);}catch(_){}}setTimeout(()=>h.classList.remove('theming'),450);}
 $('#themeBtn').addEventListener('click',()=>{const b=$('#themeBtn');b.classList.remove('boop');void b.offsetWidth;b.classList.add('boop');applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true);});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',ev=>{let saved=null;try{saved=localStorage.getItem(THEME_KEY);}catch(_){}if(!saved)applyTheme(ev.matches?'dark':'light',false);});
-window.__charm={zoomTo:s=>{if(V){V.zb=null;V.zRaw=unrubber(s);zApply(s);}},rubber,stretch:f=>zStretch(f),release:()=>zoomHome(),get zoom(){return V?V.zDisp:null},setFrame:(h,w)=>{FRAME_H=h;FRAME_W=w;resetView();},bumpNow:()=>bumpCharm(1,1),applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
+window.__charm={get yaw(){if(!V||!V.face)return null;return wrapA(camSph().az-V.face.az0)*180/Math.PI;},get tilt(){if(!V||!V.face)return null;return (camSph().pol-V.face.pol0)*180/Math.PI;},zoomTo:s=>{if(V){V.zb=null;V.zRaw=unrubber(s);zApply(s);}},rubber,stretch:f=>zStretch(f),release:()=>zoomHome(),get zoom(){return V?V.zDisp:null},setFrame:(h,w)=>{FRAME_H=h;FRAME_W=w;resetView();},bumpNow:()=>bumpCharm(1,1),applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
 renderAll();
 document.fonts&&document.fonts.ready.then(()=>{renderEls();updateSel();});
 </script>
