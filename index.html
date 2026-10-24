@@ -17,11 +17,11 @@
 :root{--pink:#ff3ea5;--lime:#b8ff3c;--blue:#2e5bff;--yellow:#ffe14a;--ink:#17142e;--lilac:#c9b2ff;--bubble:#ffc2e2;--sky:#8fd8ff;
  --dark:#17142e;--shd:#17142e;--bg:#ffffff;--dot:#ffd3ea;--card:#ffffff;--card2:#fffafd;--dash:#d4c8ee;--muted:#d6cdea;--hintbg:rgba(255,255,255,.92);--focus:#fff9d6;
  --stage:linear-gradient(150deg,#fff0f8 0%,#f3f8ff 55%,#f7ffe6 100%);--tgl:linear-gradient(110deg,#ffe3f4,#e8fbff,#f2ffd9,#efe6ff);
- --three:radial-gradient(circle at 18% 22%,rgba(255,62,165,.26),transparent 42%),radial-gradient(circle at 84% 76%,rgba(184,255,60,.32),transparent 44%),radial-gradient(circle at 80% 16%,rgba(46,91,255,.2),transparent 40%),radial-gradient(circle at 20% 86%,rgba(255,225,74,.3),transparent 40%),linear-gradient(180deg,#fff1f9,#f1ecff 50%,#eafaff);color-scheme:light}
+ --three:radial-gradient(circle at 18% 22%,rgba(255,62,165,.26),transparent 42%),radial-gradient(circle at 84% 76%,rgba(184,255,60,.32),transparent 44%),radial-gradient(circle at 80% 16%,rgba(46,91,255,.2),transparent 40%),radial-gradient(circle at 20% 86%,rgba(255,225,74,.3),transparent 40%),linear-gradient(180deg,#fff1f9,#f1ecff 50%,#eafaff);--three-top:#fbe9f5;--three-bot:#eef7e7;color-scheme:light}
 /* dark mode: UI only. the charm artwork + print/3D texture colors never change */
 html[data-theme=dark]{--bg:#272042;--dot:#3f3566;--card:#9488c4;--card2:#a497d0;--dash:#5f5394;--muted:#5f5394;--hintbg:rgba(164,151,208,.94);--focus:#cbbff0;
  --stage:linear-gradient(150deg,#b597c4 0%,#97a3d4 55%,#a2bb93 100%);--tgl:linear-gradient(110deg,#c99bc0,#93b4cf,#a7c08f,#ad9bd6);
- --three:radial-gradient(circle at 18% 22%,rgba(255,62,165,.30),transparent 42%),radial-gradient(circle at 84% 76%,rgba(184,255,60,.20),transparent 44%),radial-gradient(circle at 80% 16%,rgba(46,91,255,.26),transparent 40%),radial-gradient(circle at 20% 86%,rgba(255,225,74,.16),transparent 40%),linear-gradient(180deg,#7a6aa6,#66689e 50%,#587c86);color-scheme:dark}
+ --three:radial-gradient(circle at 18% 22%,rgba(255,62,165,.30),transparent 42%),radial-gradient(circle at 84% 76%,rgba(184,255,60,.20),transparent 44%),radial-gradient(circle at 80% 16%,rgba(46,91,255,.26),transparent 40%),radial-gradient(circle at 20% 86%,rgba(255,225,74,.16),transparent 40%),linear-gradient(180deg,#7a6aa6,#66689e 50%,#587c86);--three-top:#83699f;--three-bot:#647e82;color-scheme:dark}
 /* dark mode = same sticker look, just dimmer: black outlines, black text and black hard shadows stay */
 html.theming *{transition:background-color .35s,border-color .35s,color .25s!important}
 .b3d,.ph,.ex,.toast,.tab.on,.tile.on,.fonts .pbtn.on,.seg button.on,.att.on,.pbtn.on,.marquee{color:var(--dark)}
@@ -158,27 +158,37 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .toast small{font-weight:500;font-size:15px;opacity:.75}
 .conf{position:fixed;width:14px;height:14px;z-index:85;pointer-events:none;border:2px solid var(--ink)}
 /* 3D modal */
-.modal{position:fixed;inset:0;z-index:60;display:none;background:rgba(23,20,46,.45)}
+.modal{position:fixed;inset:0;z-index:60;display:none;background:transparent}
+/* full-bleed backdrop: a fixed layer sized well past every iOS edge (status bar, floating toolbar, overscroll) */
+.mbg{position:fixed;left:0;right:0;top:-20vh;height:calc(100lvh + 40vh);background:var(--three);background-color:var(--three-bot);pointer-events:none;z-index:0}
+html.m3d,html.m3d body{background:linear-gradient(180deg,var(--three-top),var(--three-bot)) fixed;background-color:var(--three-bot)}
+html.m3d body{background-image:none}
 .modal.open{display:flex;align-items:center;justify-content:center}
-.mcard{position:relative;width:100%;height:100%;background:var(--three);overflow:hidden}
+.mcard{position:relative;z-index:1;width:100%;height:100%;background:transparent;overflow:hidden}
 .mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 10px calc(14px + env(safe-area-inset-left));position:absolute;top:0;left:0;right:0;z-index:2;pointer-events:none}
 .mhead>*{pointer-events:auto}.mhead .logo h1{font-size:32px}
 .mfoot .mback{flex:0 0 38%;max-width:none;min-height:68px;font-size:20px;border-radius:24px;box-shadow:5px 5px 0 var(--shd)}
 .mfoot .madd{flex:1;width:auto;min-height:68px}
-.three-wrap{position:absolute;inset:0;touch-action:none;background:var(--three)}
+.three-wrap{position:absolute;inset:0;touch-action:none;background:transparent}
 .three-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .mload{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bagel Fat One';font-size:24px;text-align:center;padding:24px}
-.mtag{align-self:center;max-width:100%;text-align:center;background:none;border:0;padding:2px 8px;color:var(--ink);font-weight:700;font-size:16px;line-height:1.4;pointer-events:none;text-shadow:0 0 2px #fff,0 0 6px rgba(255,255,255,.95),0 0 14px rgba(255,255,255,.7);animation:chipFloat 3.6s ease-in-out infinite;will-change:transform}
+.mtag{align-self:center;max-width:100%;text-align:center;background:none;border:0;padding:2px 8px;color:var(--ink);font-weight:700;font-size:16px;letter-spacing:.01em;display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.4;pointer-events:none;animation:chipFloat 3.6s ease-in-out infinite;will-change:transform}
 .mtag:empty{visibility:hidden}
 @keyframes chipFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @media (prefers-reduced-motion:reduce){.mtag{animation:none}}
+html[data-theme=dark] .mtag .spk path{fill:var(--lime)}
 .mtag b{color:var(--pink);font-weight:800}
-html[data-theme=dark] .mtag{color:#fff;text-shadow:0 0 2px #17142e,0 1px 6px rgba(23,20,46,.9),0 0 14px rgba(23,20,46,.6)}
+html[data-theme=dark] .mtag{color:#fff}
+.mtag .tx{display:block}
+.mtag .spk{flex:none;width:22px;height:22px;display:block;animation:twinkle 2.8s ease-in-out infinite}
+.mtag .spk:last-child{animation-delay:-1.4s}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0);opacity:1}50%{transform:scale(.78) rotate(18deg);opacity:.75}}
+@media (prefers-reduced-motion:reduce){.mtag .spk{animation:none}}
 html[data-theme=dark] .mtag b{color:var(--lime)}
 .mfoot{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;gap:14px;padding:12px calc(14px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));pointer-events:none}
 .mbtns{display:flex;gap:12px;pointer-events:auto}
 .pbtn.on{background:var(--lime)}
-@media (min-width:700px){.modal{padding:24px}.mcard{max-width:1000px;max-height:820px;border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{padding:12px 16px}.mfoot{padding:12px 16px}}
+@media (min-width:700px){.modal{padding:24px;background:rgba(23,20,46,.45)}.mbg{display:none}html.m3d body{background:var(--bg)}.mcard{background:var(--three);max-width:1000px;max-height:820px;border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{padding:12px 16px}.mfoot{padding:12px 16px}}
 /* desktop adaptation */
 @media (min-width:960px){
  .lt{flex-direction:row;align-items:center;gap:12px}
@@ -274,6 +284,7 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
 </div>
 <div class="toast" id="toast" role="status"></div>
 <div class="modal" id="modal">
+ <div class="mbg" aria-hidden="true"></div>
  <div class="mcard">
   <div class="mhead"><div class="logo"><svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg><h1>charm lab</h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag (mockup)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
   <div class="three-wrap" id="threeWrap">
@@ -895,7 +906,7 @@ async function build3D(){
  hang.position.y=-P;pivot.position.y=P;pivot.add(hang);
  const mid=(P+bottom)/2;V.root.position.y=-mid;V.root.add(pivot);
  V.pivot=pivot;V.hang=hang;V.fitH=P-bottom;V.fitW=2*HALF*k;
- $('#mtag').innerHTML=`<b>${order.size}"</b> clear acrylic · ${SHAPES.find(s=>s.id===S.shape).name}${S.holo?' · holo stars':''}<br>with ${ATT[order.att].name} · printed both sides`;
+ $('#mtag').innerHTML=`<svg class="spk" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="7" stroke-linejoin="round"/></svg><span class="tx"><b>${order.size}"</b> clear acrylic · ${SHAPES.find(s=>s.id===S.shape).name}${S.holo?' · holo stars':''}<br>with ${ATT[order.att].name} · printed both sides</span><svg class="spk" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="7" stroke-linejoin="round"/></svg>`;
 }
 function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=(B.bot-B.top)/B.H||1;const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*1.25,(V.fitW/2)/(tf*a)*1.5);const ty=-V.fitH*.04;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.controls.minDistance=d*.35;V.controls.maxDistance=d*2.4;V.controls.update();kick();}
 // render loop runs only while something moves
@@ -918,21 +929,22 @@ function disposeViewer(){
 }
 async function open3D(){
  sel=null;selChanged();clearTimeout(idleT);motion=!REDUCED;
- $('#modal').classList.add('open');modalOpen=true;$('#mload').style.display='grid';$('#mload').textContent='polishing the acrylic…';$('#mtag').innerHTML='';window.__3dReady=false;
+ $('#modal').classList.add('open');document.documentElement.classList.add('m3d');syncThemeColor();modalOpen=true;$('#mload').style.display='grid';$('#mload').textContent='polishing the acrylic…';$('#mtag').innerHTML='';window.__3dReady=false;
  try{
   await loadThree();if(!modalOpen)return;
   disposeViewer();V=createViewer();resize3D();await build3D();if(!modalOpen){disposeViewer();return;}
   resize3D();resetView();$('#mload').style.display='none';kick();
  }catch(err){console.error(err);$('#mload').innerHTML='hmm, 3D needs WebGL and an internet connection<br><small style="font-family:Fredoka;font-size:17px">(three.js loads from a CDN)</small>';}
 }
-function close3D(){modalOpen=false;clearTimeout(idleT);$('#modal').classList.remove('open');disposeViewer();}
+function close3D(){modalOpen=false;clearTimeout(idleT);$('#modal').classList.remove('open');document.documentElement.classList.remove('m3d');syncThemeColor();disposeViewer();}
 $('#open3d').onclick=open3D;$('#close3d').onclick=close3D;
 $('#add3d').onclick=()=>addToBag($('#add3d'));
 const setMotion=m=>{motion=m;clearTimeout(idleT);if(V){V.controls.autoRotate=m;kick();}};
 
 /* light / dark mode (UI only) */
 const THEME_KEY='charmlab.theme';
-function applyTheme(t,save){const h=document.documentElement;h.classList.add('theming');h.dataset.theme=t;$('meta[name=theme-color]').setAttribute('content',t==='dark'?'#272042':'#ffffff');if(save){try{localStorage.setItem(THEME_KEY,t);}catch(_){}}setTimeout(()=>h.classList.remove('theming'),450);}
+function syncThemeColor(){const h=document.documentElement;const open=h.classList.contains('m3d')&&innerWidth<700;const c=open?getComputedStyle(h).getPropertyValue('--three-top').trim():(h.dataset.theme==='dark'?'#272042':'#ffffff');$('meta[name=theme-color]').setAttribute('content',c);}
+function applyTheme(t,save){const h=document.documentElement;h.classList.add('theming');h.dataset.theme=t;syncThemeColor();if(save){try{localStorage.setItem(THEME_KEY,t);}catch(_){}}setTimeout(()=>h.classList.remove('theming'),450);}
 $('#themeBtn').addEventListener('click',()=>{const b=$('#themeBtn');b.classList.remove('boop');void b.offsetWidth;b.classList.add('boop');applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true);});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',ev=>{let saved=null;try{saved=localStorage.getItem(THEME_KEY);}catch(_){}if(!saved)applyTheme(ev.matches?'dark':'light',false);});
 window.__charm={applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
