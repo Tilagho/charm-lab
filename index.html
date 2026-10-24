@@ -163,6 +163,13 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .mbg{position:fixed;left:0;right:0;top:-20vh;height:calc(100lvh + 40vh);background:var(--three);background-color:var(--three-bot);pointer-events:none;z-index:0}
 html.m3d,html.m3d body{background:linear-gradient(180deg,var(--three-top),var(--three-bot)) fixed;background-color:var(--three-bot)}
 html.m3d body{background-image:none}
+/* iOS 26 Safari ignores theme-color and tints its status bar / floating toolbar from the background-color of a
+   full-width fixed element touching that edge (else body/html). These strips hand it the gradient's edge colours. */
+.medge{position:fixed;left:0;right:0;z-index:3;pointer-events:none}
+.medge.t{top:0;height:max(12px,env(safe-area-inset-top));background-color:var(--three-top)}
+.medge.b{bottom:-8px;height:12px;background-color:var(--three-bot)}
+@media (max-width:699px){html.m3d #app{visibility:hidden}}
+@media (min-width:700px){.medge{display:none}}
 .modal.open{display:flex;align-items:center;justify-content:center}
 .mcard{position:relative;z-index:1;width:100%;height:100%;background:transparent;overflow:hidden}
 .mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 10px calc(14px + env(safe-area-inset-left));position:absolute;top:0;left:0;right:0;z-index:2;pointer-events:none}
@@ -172,7 +179,7 @@ html.m3d body{background-image:none}
 .three-wrap{position:absolute;inset:0;touch-action:none;background:transparent}
 .three-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .mload{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bagel Fat One';font-size:24px;text-align:center;padding:24px}
-.mtag{align-self:center;max-width:100%;text-align:center;background:none;border:0;padding:2px 8px;color:var(--ink);font-weight:700;font-size:16px;letter-spacing:.01em;display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.4;pointer-events:none;animation:chipFloat 3.6s ease-in-out infinite;will-change:transform}
+.mtag{align-self:center;max-width:100%;text-align:center;background:none;border:0;padding:2px 0;color:var(--ink);font-weight:700;font-size:clamp(13px,3.9vw,16px);letter-spacing:.01em;display:flex;align-items:center;justify-content:center;gap:4px;line-height:1.4;pointer-events:none;animation:chipFloat 3.6s ease-in-out infinite;will-change:transform}
 .mtag:empty{visibility:hidden}
 @keyframes chipFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @media (prefers-reduced-motion:reduce){.mtag{animation:none}}
@@ -180,10 +187,18 @@ html[data-theme=dark] .mtag .spk path{fill:var(--lime)}
 .mtag b{color:var(--pink);font-weight:800}
 html[data-theme=dark] .mtag{color:#fff}
 .mtag .tx{display:block}
-.mtag .spk{flex:none;width:22px;height:22px;display:block;animation:twinkle 2.8s ease-in-out infinite}
-.mtag .spk:last-child{animation-delay:-1.4s}
-@keyframes twinkle{0%,100%{transform:scale(1) rotate(0);opacity:1}50%{transform:scale(.78) rotate(18deg);opacity:.75}}
-@media (prefers-reduced-motion:reduce){.mtag .spk{animation:none}}
+.mtag .spc{flex:none;position:relative;width:28px;height:30px;display:block}
+.mtag .spc.r{transform:scaleX(-1)}
+.mtag .spk{position:absolute;display:block;will-change:transform}
+.mtag .spk.b{width:20px;height:20px;left:1px;top:7px;animation:spkB 5.2s ease-in-out infinite}
+.mtag .spk.s{width:11px;height:11px;left:16px;top:0;animation:spkS 3.7s ease-in-out infinite}
+.mtag .spc.r .spk.b{animation-duration:6.1s;animation-delay:-2.3s}
+.mtag .spc.r .spk.s{animation-duration:4.3s;animation-delay:-1.1s}
+.mtag .spk.s path{fill:var(--blue)}
+html[data-theme=dark] .mtag .spk.s path{fill:var(--pink)}
+@keyframes spkB{0%{transform:translate(0,0) rotate(0) scale(1)}25%{transform:translate(1.5px,-2px) rotate(14deg) scale(.88)}50%{transform:translate(-1px,-3px) rotate(28deg) scale(1.06)}75%{transform:translate(-2px,-1px) rotate(12deg) scale(.92)}100%{transform:translate(0,0) rotate(0) scale(1)}}
+@keyframes spkS{0%{transform:translate(0,0) rotate(0) scale(1);opacity:1}30%{transform:translate(-2px,2px) rotate(-30deg) scale(.7);opacity:.7}60%{transform:translate(1px,3px) rotate(-60deg) scale(1.15);opacity:1}100%{transform:translate(0,0) rotate(-90deg) scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.mtag .spk{animation:none!important}}
 html[data-theme=dark] .mtag b{color:var(--lime)}
 .mfoot{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;gap:14px;padding:12px calc(14px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));pointer-events:none}
 .mbtns{display:flex;gap:12px;pointer-events:auto}
@@ -284,7 +299,7 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
 </div>
 <div class="toast" id="toast" role="status"></div>
 <div class="modal" id="modal">
- <div class="mbg" aria-hidden="true"></div>
+ <div class="mbg" aria-hidden="true"></div><div class="medge t" aria-hidden="true"></div><div class="medge b" aria-hidden="true"></div>
  <div class="mcard">
   <div class="mhead"><div class="logo"><svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg><h1>charm lab</h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag (mockup)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
   <div class="three-wrap" id="threeWrap">
@@ -842,15 +857,15 @@ function createViewer(){
  const pmrem=new T.PMREMGenerator(renderer);const room=new RoomEnvironment();
  const envRT=pmrem.fromScene(room,0.04,0.1,100,{size:128});scene.environment=envRT.texture;pmrem.dispose();room.dispose&&room.dispose();
  const camera=new T.PerspectiveCamera(30,1,1,2000);
- const controls=new OrbitControls(camera,canvas);controls.enableDamping=true;controls.dampingFactor=.09;controls.autoRotate=motion;controls.autoRotateSpeed=1.5;controls.enablePan=false;controls.minPolarAngle=.35;controls.maxPolarAngle=Math.PI-.5;
+ const controls=new OrbitControls(camera,canvas);controls.enableDamping=true;controls.dampingFactor=.09;controls.autoRotate=false;controls.enablePan=false;controls.minPolarAngle=.35;controls.maxPolarAngle=Math.PI-.5;
  scene.add(new T.HemisphereLight(0xffffff,0xffd6ec,.8));
  const key=new T.DirectionalLight(0xffffff,1.6);key.position.set(35,110,80);scene.add(key);
  const rim=new T.DirectionalLight(0xff8fd0,1.0);rim.position.set(-90,20,-60);scene.add(rim);
  const root=new T.Group();scene.add(root);
  const v={renderer,scene,camera,controls,root,envRT,canvas,pivot:null,hang:null,raf:0,interacting:false,t0:performance.now(),tSway:0,last:0,disposables:[]};
  v.ro=new ResizeObserver(()=>{resize3D();kick();});v.ro.observe($('#threeWrap'));v.ro.observe($('#mfoot'));
- controls.addEventListener('start',()=>{v.interacting=true;clearTimeout(idleT);motion=false;controls.autoRotate=false;kick();});
- controls.addEventListener('end',()=>{v.interacting=false;kick();clearTimeout(idleT);if(!REDUCED)idleT=setTimeout(()=>{if(!V||V.interacting)return;motion=true;V.controls.autoRotate=true;kick();},2500);});
+ controls.addEventListener('start',()=>{v.interacting=true;clearTimeout(v.zbT);v.zb=null;clearTimeout(idleT);cancelBump();kick();});
+ controls.addEventListener('end',()=>{v.interacting=false;clearTimeout(v.zbT);v.zbT=setTimeout(zoomHome,140);kick();scheduleBump();});
  controls.addEventListener('change',()=>{if(v.inTick)v.changed=true;else kick();});
  return v;
 }
@@ -888,7 +903,7 @@ async function build3D(){
  const add=(geo,mat=chrome)=>{const m=new T.Mesh(geo,mat);hang.add(m);return m;};
  const ringR=3.3;const ring=add(keep(new T.TorusGeometry(ringR,.58,10,32)));ring.rotation.y=Math.PI/2;const ringCY=tc.y+ringR-hr*.45;ring.position.y=ringCY;
  const linkGeo=keep(new T.TorusGeometry(1.5,.42,8,20));let c=ringCY+ringR-.84+2.25;const NL=6;
- for(let i=0;i<NL;i++){const m=add(linkGeo);m.scale.set(1,1.5,1);m.rotation.y=i%2?Math.PI/2:0;m.position.y=c;if(i<NL-1)c+=3.6;}
+ for(let i=0;i<NL;i++){const m=add(linkGeo);m.scale.set(1,1.5,1);m.rotation.y=i%2?Math.PI/2:0;m.userData.link=NL-i;m.position.y=c;if(i<NL-1)c+=3.6;}
  const top=c+2.25;let P;
  if(order.att==='keyring'){const R=10;const kc=top-.9+R;const kg=keep(new T.TorusGeometry(R,.8,10,72));for(const dz of [-.5,.5])add(kg).position.set(0,kc,dz);P=kc+R+.8;}
  else if(order.att==='clip'){
@@ -906,20 +921,46 @@ async function build3D(){
  hang.position.y=-P;pivot.position.y=P;pivot.add(hang);
  const mid=(P+bottom)/2;V.root.position.y=-mid;V.root.add(pivot);
  V.pivot=pivot;V.hang=hang;V.fitH=P-bottom;V.fitW=2*HALF*k;
- $('#mtag').innerHTML=`<svg class="spk" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="7" stroke-linejoin="round"/></svg><span class="tx"><b>${order.size}"</b> clear acrylic · ${SHAPES.find(s=>s.id===S.shape).name}${S.holo?' · holo stars':''}<br>with ${ATT[order.att].name} · printed both sides</span><svg class="spk" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="7" stroke-linejoin="round"/></svg>`;
+ $('#mtag').innerHTML=`<span class="spc" aria-hidden="true"><svg class="spk b" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="7" stroke-linejoin="round"/></svg><svg class="spk s" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="10" stroke-linejoin="round"/></svg></span><span class="tx"><b>${order.size}"</b> clear acrylic · ${SHAPES.find(s=>s.id===S.shape).name}${S.holo?' · holo stars':''}<br>with ${ATT[order.att].name} · printed both sides</span><span class="spc r" aria-hidden="true"><svg class="spk b" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="7" stroke-linejoin="round"/></svg><svg class="spk s" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="10" stroke-linejoin="round"/></svg></span>`;
 }
-function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=(B.bot-B.top)/B.H||1;const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*1.25,(V.fitW/2)/(tf*a)*1.5);const ty=-V.fitH*.04;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.controls.minDistance=d*.35;V.controls.maxDistance=d*2.4;V.controls.update();kick();}
+/* zoom is a rubber band, not a setting: pinch/wheel can stretch ~13% either way (at reduced speed = resistance),
+   then it always springs back to the framed distance with a small overshoot. Rotation is unchanged. */
+const ZOOM_IN=.87,ZOOM_OUT=1.13,ZB_MS=520;
+const easeOutBack=t=>{const c1=1.9,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
+function zoomHome(){if(!V||!V.homeD)return;const r=V.camera.position.distanceTo(V.controls.target);if(Math.abs(r-V.homeD)<V.homeD*.002)return;V.zb={from:r,t0:performance.now()};kick();}
+function zoomStep(now){const z=V.zb;if(!z)return;const p=Math.min(1,(now-z.t0)/ZB_MS);const r=z.from+(V.homeD-z.from)*easeOutBack(p);
+ const c=V.controls;const keep=[c.minDistance,c.maxDistance];c.minDistance=Math.min(keep[0],r);c.maxDistance=Math.max(keep[1],r);
+ const dir=V.camera.position.clone().sub(c.target).normalize();V.camera.position.copy(c.target).addScaledVector(dir,r);c.update();c.minDistance=keep[0];c.maxDistance=keep[1];
+ if(p>=1)V.zb=null;else V.changed=true;}
+function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=(B.bot-B.top)/B.H||1;const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*1.25,(V.fitW/2)/(tf*a)*1.5);const ty=-V.fitH*.04;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.homeD=d;V.zb=null;V.controls.minDistance=d*ZOOM_IN;V.controls.maxDistance=d*ZOOM_OUT;V.controls.zoomSpeed=.45;V.controls.update();kick();}
 // render loop runs only while something moves
 function tick(now){
  if(!V)return;V.raf=0;if(!modalOpen||document.hidden)return;
  const dt=Math.min(.05,(now-(V.last||now))/1000);V.last=now;
- if(motion&&V.pivot){V.tSway+=dt;const t=V.tSway;V.pivot.rotation.z=Math.sin(t*1.15)*.065;V.pivot.rotation.x=Math.sin(t*.85+.6)*.05;V.hang.rotation.y=Math.sin(t*.55)*.22;}
- V.inTick=true;V.changed=false;V.controls.update();V.inTick=false;
+ bumpStep(now);
+ V.inTick=true;V.changed=false;V.controls.update();zoomStep(now);V.inTick=false;
  V.renderer.render(V.scene,V.camera);
  if(!window.__3dReady)window.__3dReady=true;window.__frames=(window.__frames||0)+1;
  // keep going only while something moves: motion, a finger on it, or damping still settling
- if(!V.raf&&(motion||V.interacting||V.changed))V.raf=requestAnimationFrame(tick);
+ if(!V.raf&&(V.bump||V.interacting||V.changed))V.raf=requestAnimationFrame(tick);
 }
+/* idle "bag got bumped": after ~6.5s untouched the charm swings from the ring like a damped pendulum (pivot at the clasp),
+   twists a little so the acrylic catches the light, and the chain links jangle a beat behind. Renders only while it plays. */
+const BUMP_IDLE=6500,BUMP_MS=3200,BUMP_CANCEL_MS=320;
+function scheduleBump(){clearTimeout(idleT);if(!V||REDUCED||!motion)return;idleT=setTimeout(()=>{if(!V||!modalOpen||V.interacting||document.hidden){scheduleBump();return;}V.bump={t0:performance.now(),dir:Math.random()<.5?-1:1};kick();},BUMP_IDLE+Math.random()*700);}
+function restPose(){if(!V||!V.pivot)return;V.pivot.rotation.set(0,0,0);V.hang.rotation.y=0;(V.links||[]).forEach(l=>{l.rotation.z=0;l.rotation.x=0;});V.changed=true;}
+function cancelBump(){if(!V||!V.bump||V.bump.cancel)return;const b=V.bump;b.cancel={t0:performance.now(),z:V.pivot.rotation.z,x:V.pivot.rotation.x,y:V.hang.rotation.y,l:(V.links||[]).map(l=>[l.rotation.z,l.rotation.x])};}
+function bumpPose(t,dir){// t in seconds since the bump
+ const w=2*Math.PI/1.05,env=Math.exp(-t/.75)*(1-Math.exp(-t/.06));const fade=t>BUMP_MS/1000-.8?Math.max(0,(BUMP_MS/1000-t)/.8):1;const ef=fade*fade*(3-2*fade);
+ const sw=t2=>{const e=Math.exp(-t2/.75)*(1-Math.exp(-Math.max(0,t2)/.06));return t2<0?0:e*Math.sin(w*t2);};
+ return {z:dir*.30*env*Math.sin(w*t)*ef,x:.09*Math.exp(-t/.9)*Math.sin(w*.9*t+.7)*ef,y:dir*.32*Math.exp(-t/1.1)*Math.sin(w*.55*t)*ef,
+  link:i=>{const lag=.07*i;return [dir*(sw(t-lag)-sw(t))*.9*ef+dir*.06*Math.exp(-t/.6)*Math.sin(w*2.3*t+i)*ef,.05*Math.exp(-t/.6)*Math.sin(w*1.7*t+i*1.3)*ef];}};}
+function bumpStep(now){const b=V&&V.bump;if(!b||!V.pivot)return;const links=V.links||[];
+ if(b.cancel){const p=Math.min(1,(now-b.cancel.t0)/BUMP_CANCEL_MS),e=1-(1-p)*(1-p)*(1-p),k=1-e;const c=b.cancel;
+  V.pivot.rotation.z=c.z*k;V.pivot.rotation.x=c.x*k;V.hang.rotation.y=c.y*k;links.forEach((l,i)=>{l.rotation.z=c.l[i][0]*k;l.rotation.x=c.l[i][1]*k;});
+  if(p>=1){V.bump=null;restPose();}return;}
+ const t=(now-b.t0)/1000;if(t>=BUMP_MS/1000){V.bump=null;restPose();scheduleBump();return;}
+ const P=bumpPose(t,b.dir);V.pivot.rotation.z=P.z;V.pivot.rotation.x=P.x;V.hang.rotation.y=P.y;links.forEach(l=>{const [z,x]=P.link(l.userData.link);l.rotation.z=z;l.rotation.x=x;});}
 function kick(){if(V&&!V.raf&&!V.inTick&&modalOpen&&!document.hidden){V.last=0;V.raf=requestAnimationFrame(tick);}}
 document.addEventListener('visibilitychange',()=>{if(!V)return;if(document.hidden){cancelAnimationFrame(V.raf);V.raf=0;}else kick();});
 function disposeViewer(){
@@ -933,13 +974,13 @@ async function open3D(){
  try{
   await loadThree();if(!modalOpen)return;
   disposeViewer();V=createViewer();resize3D();await build3D();if(!modalOpen){disposeViewer();return;}
-  resize3D();resetView();$('#mload').style.display='none';kick();
+  V.links=V.hang?V.hang.children.filter(o=>o.userData.link):[];resize3D();resetView();$('#mload').style.display='none';kick();scheduleBump();
  }catch(err){console.error(err);$('#mload').innerHTML='hmm, 3D needs WebGL and an internet connection<br><small style="font-family:Fredoka;font-size:17px">(three.js loads from a CDN)</small>';}
 }
-function close3D(){modalOpen=false;clearTimeout(idleT);$('#modal').classList.remove('open');document.documentElement.classList.remove('m3d');syncThemeColor();disposeViewer();}
+function close3D(){modalOpen=false;clearTimeout(idleT);if(V)V.bump=null;$('#modal').classList.remove('open');document.documentElement.classList.remove('m3d');syncThemeColor();disposeViewer();}
 $('#open3d').onclick=open3D;$('#close3d').onclick=close3D;
 $('#add3d').onclick=()=>addToBag($('#add3d'));
-const setMotion=m=>{motion=m;clearTimeout(idleT);if(V){V.controls.autoRotate=m;kick();}};
+const setMotion=m=>{motion=m;clearTimeout(idleT);if(V){if(m)scheduleBump();else{V.bump=null;restPose();}kick();}};
 
 /* light / dark mode (UI only) */
 const THEME_KEY='charmlab.theme';
@@ -947,7 +988,7 @@ function syncThemeColor(){const h=document.documentElement;const open=h.classLis
 function applyTheme(t,save){const h=document.documentElement;h.classList.add('theming');h.dataset.theme=t;syncThemeColor();if(save){try{localStorage.setItem(THEME_KEY,t);}catch(_){}}setTimeout(()=>h.classList.remove('theming'),450);}
 $('#themeBtn').addEventListener('click',()=>{const b=$('#themeBtn');b.classList.remove('boop');void b.offsetWidth;b.classList.add('boop');applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true);});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',ev=>{let saved=null;try{saved=localStorage.getItem(THEME_KEY);}catch(_){}if(!saved)applyTheme(ev.matches?'dark':'light',false);});
-window.__charm={applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
+window.__charm={poseAt:t=>{if(!V||!V.pivot)return;clearTimeout(idleT);V.bump=null;const P=bumpPose(t,1);V.pivot.rotation.z=P.z;V.pivot.rotation.x=P.x;V.hang.rotation.y=P.y;(V.links||[]).forEach(l=>{const [z,x]=P.link(l.userData.link);l.rotation.z=z;l.rotation.x=x;});V.changed=true;kick();return +P.z.toFixed(3);},bumpNow:()=>{if(V&&V.pivot){V.bump={t0:performance.now(),dir:1};kick();}},applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
 renderAll();
 document.fonts&&document.fonts.ready.then(()=>{renderEls();updateSel();});
 </script>
