@@ -168,11 +168,13 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .three-wrap{position:absolute;inset:0;touch-action:none;background:var(--three)}
 .three-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .mload{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bagel Fat One';font-size:24px;text-align:center;padding:24px}
-.mtag{align-self:center;max-width:100%;text-align:center;background:#17142e;color:#fff;border:2px solid rgba(255,255,255,.18);border-radius:18px;padding:9px 16px;font-weight:600;font-size:15px;line-height:1.35;pointer-events:none;box-shadow:3px 3px 0 rgba(23,20,46,.35);animation:chipFloat 3.6s ease-in-out infinite;will-change:transform}
+.mtag{align-self:center;max-width:100%;text-align:center;background:none;border:0;padding:2px 8px;color:var(--ink);font-weight:700;font-size:16px;line-height:1.4;pointer-events:none;text-shadow:0 0 2px #fff,0 0 6px rgba(255,255,255,.95),0 0 14px rgba(255,255,255,.7);animation:chipFloat 3.6s ease-in-out infinite;will-change:transform}
 .mtag:empty{visibility:hidden}
 @keyframes chipFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @media (prefers-reduced-motion:reduce){.mtag{animation:none}}
-.mtag b{color:var(--lime)}
+.mtag b{color:var(--pink);font-weight:800}
+html[data-theme=dark] .mtag{color:#fff;text-shadow:0 0 2px #17142e,0 1px 6px rgba(23,20,46,.9),0 0 14px rgba(23,20,46,.6)}
+html[data-theme=dark] .mtag b{color:var(--lime)}
 .mfoot{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;gap:14px;padding:12px calc(14px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));pointer-events:none}
 .mbtns{display:flex;gap:12px;pointer-events:auto}
 .pbtn.on{background:var(--lime)}
