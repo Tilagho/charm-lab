@@ -858,9 +858,9 @@ function createViewer(){
  const rim=new T.DirectionalLight(0xff8fd0,1.0);rim.position.set(-90,20,-60);scene.add(rim);
  const root=new T.Group();scene.add(root);
  const v={renderer,scene,camera,controls,root,envRT,canvas,pivot:null,hang:null,raf:0,interacting:false,t0:performance.now(),tSway:0,last:0,disposables:[]};
- setupTap(v);v.ro=new ResizeObserver(()=>{resize3D();kick();});v.ro.observe($('#threeWrap'));v.ro.observe($('#mfoot'));
- controls.addEventListener('start',()=>{v.interacting=true;clearTimeout(v.zbT);v.zb=null;clearTimeout(idleT);kick();});
- controls.addEventListener('end',()=>{v.interacting=false;clearTimeout(v.zbT);v.zbT=setTimeout(zoomHome,140);kick();});
+ setupTap(v);setupZoom(v);v.ro=new ResizeObserver(()=>{resize3D();kick();});v.ro.observe($('#threeWrap'));v.ro.observe($('#mfoot'));
+ controls.addEventListener('start',()=>{v.interacting=true;clearTimeout(idleT);kick();});
+ controls.addEventListener('end',()=>{v.interacting=false;kick();});
  controls.addEventListener('change',()=>{if(v.inTick)v.changed=true;else kick();});
  return v;
 }
@@ -918,16 +918,27 @@ async function build3D(){
  V.pivot=pivot;V.hang=hang;V.fitH=P-bottom;V.fitW=2*HALF*k;
  $('#mtag').innerHTML=`<span class="spc" aria-hidden="true"><svg class="spk b" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="7" stroke-linejoin="round"/></svg><svg class="spk s" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="10" stroke-linejoin="round"/></svg></span><span class="tx"><b>${order.size}"</b> clear acrylic · ${SHAPES.find(s=>s.id===S.shape).name}${S.holo?' · holo stars':''}<br>with ${ATT[order.att].name} · printed both sides</span><span class="spc r" aria-hidden="true"><svg class="spk b" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="7" stroke-linejoin="round"/></svg><svg class="spk s" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#ff3ea5" stroke="#17142e" stroke-width="10" stroke-linejoin="round"/></svg></span>`;
 }
-/* zoom is a rubber band, not a setting: pinch/wheel can stretch ~13% either way (at reduced speed = resistance),
-   then it always springs back to the framed distance with a small overshoot. Rotation is unchanged. */
-const ZOOM_IN=.87,ZOOM_OUT=1.13,ZB_MS=520;
-const easeOutBack=t=>{const c1=1.9,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
-function zoomHome(){if(!V||!V.homeD)return;const r=V.camera.position.distanceTo(V.controls.target);if(Math.abs(r-V.homeD)<V.homeD*.002)return;V.zb={from:r,t0:performance.now()};kick();}
-function zoomStep(now){const z=V.zb;if(!z)return;const p=Math.min(1,(now-z.t0)/ZB_MS);const r=z.from+(V.homeD-z.from)*easeOutBack(p);
- const c=V.controls;const keep=[c.minDistance,c.maxDistance];c.minDistance=Math.min(keep[0],r);c.maxDistance=Math.max(keep[1],r);
- const dir=V.camera.position.clone().sub(c.target).normalize();V.camera.position.copy(c.target).addScaledVector(dir,r);c.update();c.minDistance=keep[0];c.maxDistance=keep[1];
- if(p>=1)V.zb=null;else V.changed=true;}
-function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=(B.bot-B.top)/B.H||1;const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*1.25,(V.fitW/2)/(tf*a)*1.5);const ty=-V.fitH*.04;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.homeD=d;V.zb=null;V.controls.minDistance=d*ZOOM_IN;V.controls.maxDistance=d*ZOOM_OUT;V.controls.zoomSpeed=.45;V.controls.update();kick();}
+/* zoom is a rubber band, not a setting. Pinch/wheel/trackpad stretch the camera distance in log space through a tanh
+   curve, so it moves freely at first and gets stiffer toward the limits (never a hard stop): up to ~35% farther and
+   ~22% closer (the charm looks ~26% smaller to ~28% bigger; capped there so the mesh never looks low-poly). On release it springs back to the
+   framed distance with a slight overshoot. Rotation is unchanged (OrbitControls, zoom disabled there). */
+const Z_OUT=Math.log(1.35),Z_IN=Math.log(1/.78),ZB_MS=560;// size range: ~26% smaller to ~28% bigger
+let FRAME_H=1.0,FRAME_W=1.25;// ~20% bigger than before: keychain fills ~93% of the clear band height, ~77% of the width
+const easeOutBack=t=>{const c1=1.7,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
+const zShape=raw=>raw>=0?Z_OUT*Math.tanh(raw/Z_OUT):-Z_IN*Math.tanh(-raw/Z_IN);
+const zUnshape=s=>s>=0?Z_OUT*Math.atanh(Math.min(.999,s/Z_OUT)):-Z_IN*Math.atanh(Math.min(.999,-s/Z_IN));
+function zApply(s){if(!V||!V.homeD)return;V.zDisp=s;const c=V.controls;const r=V.homeD*Math.exp(s);const dir=V.camera.position.clone().sub(c.target).normalize();V.camera.position.copy(c.target).addScaledVector(dir,r);V.changed=true;kick();}
+function zStretch(dRaw){if(!V||!V.homeD)return;if(V.zb){V.zRaw=zUnshape(V.zDisp||0);V.zb=null;}V.zRaw=(V.zRaw||0)+dRaw;V.zRaw=clamp(V.zRaw,-Z_IN*3,Z_OUT*3);zApply(zShape(V.zRaw));}
+function zoomHome(){if(!V||!V.homeD)return;const s=V.zDisp||0;V.zRaw=0;if(Math.abs(s)<.002){zApply(0);return;}V.zb={from:s,t0:performance.now()};kick();}
+function zoomStep(now){const z=V.zb;if(!z)return;const p=Math.min(1,(now-z.t0)/ZB_MS);zApply(z.from*(1-easeOutBack(p)));if(p>=1){V.zb=null;zApply(0);}else V.changed=true;}
+function setupZoom(v){const cv=v.canvas;const P=new Map();let pinch=null;
+ const dist=()=>{const [a,b]=[...P.values()];return Math.hypot(a.x-b.x,a.y-b.y);};
+ cv.addEventListener('pointerdown',ev=>{P.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(P.size===2){clearTimeout(v.zbT);pinch={d:dist()};}});
+ cv.addEventListener('pointermove',ev=>{if(!P.has(ev.pointerId))return;P.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});if(pinch&&P.size===2){const d=dist();if(d>4){zStretch(Math.log(pinch.d/d));pinch.d=d;}}});
+ const up=ev=>{P.delete(ev.pointerId);if(pinch&&P.size<2){pinch=null;clearTimeout(v.zbT);v.zbT=setTimeout(zoomHome,60);}};
+ cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+ cv.addEventListener('wheel',ev=>{ev.preventDefault();const dy=ev.deltaMode===1?ev.deltaY*16:ev.deltaY;zStretch(clamp(dy,-120,120)*(ev.ctrlKey?.01:.0018));clearTimeout(v.zbT);v.zbT=setTimeout(zoomHome,160);},{passive:false});}
+function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=Math.max(.3,(B.bot-B.top-24)/B.H)||1;/* keep ~12px clear above and below the keychain */const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*FRAME_H,(V.fitW/2)/(tf*a)*FRAME_W);const ty=0;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.homeD=d;V.zb=null;V.zRaw=0;V.zDisp=0;V.controls.enableZoom=false;V.controls.minDistance=d*.5;V.controls.maxDistance=d*1.6;V.controls.update();kick();}
 // render loop runs only while something moves
 function tick(now){
  if(!V)return;V.raf=0;if(!modalOpen||document.hidden)return;
@@ -945,7 +956,7 @@ function tick(now){
 const W_SW=2*Math.PI/1.05,K_Z=W_SW*W_SW,K_X=(W_SW*.9)**2,K_Y=(W_SW*.55)**2,C_SW=2/.75,C_Y=2/1.1,C_STOP=14;
 function restPose(){if(!V||!V.pivot)return;V.pivot.rotation.set(0,0,0);V.hang.rotation.y=0;(V.links||[]).forEach(l=>{l.rotation.z=0;l.rotation.x=0;});V.changed=true;}
 function bumpCharm(dir=1,str=1){if(!V||!V.pivot||REDUCED)return;const b=V.bump||(V.bump={z:0,vz:0,x:0,vx:0,y:0,vy:0,hist:[],t:0,stop:false,jit:Math.random()*6});
- b.stop=false;b.vz+=dir*1.9*str;b.vx+=.55*str;b.vy+=dir*1.05*str;kick();}
+ b.stop=false;b.vz=clamp(b.vz+dir*.6*str,-.85,.85);b.vx=clamp(b.vx+.3*str,-.5,.5);b.vy=clamp(b.vy+dir*.6*str,-.9,.9);kick();}// swing kept ~6-7deg so the bigger framing stays on screen
 function cancelBump(){if(V&&V.bump)V.bump.stop=true;}// heavy damping: eases to rest in ~0.3s, no snap
 function bumpStep(now,dt){const b=V&&V.bump;if(!b||!V.pivot)return;const links=V.links||[];
  const n=Math.max(1,Math.ceil(dt/.008)),h=dt/n,c=b.stop?C_STOP:C_SW,cy=b.stop?C_STOP:C_Y;
@@ -997,7 +1008,7 @@ function syncThemeColor(){const h=document.documentElement;const open=h.classLis
 function applyTheme(t,save){const h=document.documentElement;h.classList.add('theming');h.dataset.theme=t;syncThemeColor();if(save){try{localStorage.setItem(THEME_KEY,t);}catch(_){}}setTimeout(()=>h.classList.remove('theming'),450);}
 $('#themeBtn').addEventListener('click',()=>{const b=$('#themeBtn');b.classList.remove('boop');void b.offsetWidth;b.classList.add('boop');applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true);});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',ev=>{let saved=null;try{saved=localStorage.getItem(THEME_KEY);}catch(_){}if(!saved)applyTheme(ev.matches?'dark':'light',false);});
-window.__charm={bumpNow:()=>bumpCharm(1,1),applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
+window.__charm={zoomTo:s=>{if(V){V.zb=null;V.zRaw=zUnshape(s);zApply(s);}},setFrame:(h,w)=>{FRAME_H=h;FRAME_W=w;resetView();},bumpNow:()=>bumpCharm(1,1),applyTheme,exportPrintFiles,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
 renderAll();
 document.fonts&&document.fonts.ready.then(()=>{renderEls();updateSel();});
 </script>
