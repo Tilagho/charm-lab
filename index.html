@@ -160,18 +160,21 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 /* 3D modal */
 .modal{position:fixed;inset:0;z-index:60;display:none;background:rgba(23,20,46,.45)}
 .modal.open{display:flex;align-items:center;justify-content:center}
-.mcard{position:relative;width:100%;height:100%;display:flex;flex-direction:column;background:var(--card);overflow:hidden}
-.mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 10px calc(14px + env(safe-area-inset-left));border-bottom:3px solid var(--ink)}
-.mhead{border-bottom:3px solid var(--ink)}.mhead .logo h1{font-size:32px}
+.mcard{position:relative;width:100%;height:100%;background:var(--three);overflow:hidden}
+.mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 10px calc(14px + env(safe-area-inset-left));position:absolute;top:0;left:0;right:0;z-index:2;pointer-events:none}
+.mhead>*{pointer-events:auto}.mhead .logo h1{font-size:32px}
 .mfoot .mback{flex:0 0 38%;max-width:none;min-height:68px;font-size:20px;border-radius:24px;box-shadow:5px 5px 0 var(--shd)}
 .mfoot .madd{flex:1;width:auto;min-height:68px}
-.three-wrap{flex:1;position:relative;min-height:0;touch-action:none;background:var(--three)}
+.three-wrap{position:absolute;inset:0;touch-action:none;background:var(--three)}
 .three-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .mload{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bagel Fat One';font-size:24px;text-align:center;padding:24px}
-.mtag{position:absolute;top:14px;left:14px;background:#17142e;color:#fff;border:2px solid rgba(255,255,255,.18);border-radius:18px;padding:10px 14px;font-weight:600;font-size:16px;line-height:1.35;pointer-events:none}
+.mtag{align-self:center;max-width:100%;text-align:center;background:#17142e;color:#fff;border:2px solid rgba(255,255,255,.18);border-radius:18px;padding:9px 16px;font-weight:600;font-size:15px;line-height:1.35;pointer-events:none;box-shadow:3px 3px 0 rgba(23,20,46,.35);animation:chipFloat 3.6s ease-in-out infinite;will-change:transform}
+.mtag:empty{visibility:hidden}
+@keyframes chipFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@media (prefers-reduced-motion:reduce){.mtag{animation:none}}
 .mtag b{color:var(--lime)}
-.mfoot{flex:none;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-top:3px solid var(--ink);background:var(--card)}
-.mfoot{flex-wrap:nowrap}
+.mfoot{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;gap:14px;padding:12px calc(14px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));pointer-events:none}
+.mbtns{display:flex;gap:12px;pointer-events:auto}
 .pbtn.on{background:var(--lime)}
 @media (min-width:700px){.modal{padding:24px}.mcard{max-width:1000px;max-height:820px;border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{padding:12px 16px}.mfoot{padding:12px 16px}}
 /* desktop adaptation */
@@ -272,10 +275,9 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
  <div class="mcard">
   <div class="mhead"><div class="logo"><svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg><h1>charm lab</h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag (mockup)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
   <div class="three-wrap" id="threeWrap">
-   <div class="mtag" id="mtag"></div>
    <div class="mload" id="mload">polishing the acrylic…</div>
   </div>
-  <div class="mfoot"><button class="pbtn mback" id="close3d" aria-label="back to designer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>back</button><button class="addbag madd" id="add3d">add to cart ♡</button></div>
+  <div class="mfoot" id="mfoot"><div class="mtag" id="mtag"></div><div class="mbtns"><button class="pbtn mback" id="close3d" aria-label="back to designer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>back</button><button class="addbag madd" id="add3d">add to cart ♡</button></div></div>
  </div>
 </div>
 <script type="module">
@@ -308,7 +310,7 @@ const STICKERS=[
  {id:'shaka',name:'shaka',svg:`<rect x="66" y="16" width="15" height="38" rx="7.5" transform="rotate(30 73 50)" fill="#ffd23f" ${K}/><rect x="33" y="31" width="12" height="18" rx="6" fill="#ffd23f" ${K}/><rect x="45" y="30" width="12" height="18" rx="6" fill="#ffd23f" ${K}/><rect x="57" y="31" width="12" height="18" rx="6" fill="#ffd23f" ${K}/><rect x="27" y="40" width="48" height="46" rx="18" fill="#ffd23f" ${K}/><rect x="12" y="24" width="18" height="40" rx="9" transform="rotate(-40 21 54)" fill="#ffd23f" ${K}/><path d="M42 66 q8 6 16 0" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`},
  {id:'pineapple',name:'pineapple',svg:`<path d="M50 34 C40 24 38 12 42 4 C48 12 50 22 50 34 Z M50 34 C60 24 62 12 58 4 C52 12 50 22 50 34Z M50 37 C36 31 28 23 25 13 C38 17 46 26 50 37Z M50 37 C64 31 72 23 75 13 C62 17 54 26 50 37Z" fill="#3ccf5a" ${K}/><ellipse cx="50" cy="64" rx="24" ry="30" fill="#ffd23f" ${K}/><path d="M34 48 L66 80 M30 62 L56 88 M44 40 L72 68 M66 48 L34 80 M70 62 L44 88 M56 40 L28 68" stroke="#f0a91a" stroke-width="2.6" stroke-linecap="round" opacity=".7"/>${face(50,64,.9)}`},
  {id:'sun',name:'sun',svg:[0,1,2,3,4,5,6,7].map(i=>`<rect x="45" y="3" width="10" height="20" rx="5" fill="#ff8a3d" stroke="${INK}" stroke-width="3.5" transform="rotate(${i*45} 50 50)"/>`).join('')+`<circle cx="50" cy="50" r="27" fill="#ffe14a" ${K}/>${face(50,48,1.1)}`},
- {id:'rainbow',name:'rainbow',svg:`<path d="${arc(34)}" fill="none" stroke="${INK}" stroke-width="31"/><path d="${arc(43)}" fill="none" stroke="#ff3ea5" stroke-width="6.5"/><path d="${arc(37)}" fill="none" stroke="#ffe14a" stroke-width="6.5"/><path d="${arc(31)}" fill="none" stroke="#b8ff3c" stroke-width="6.5"/><path d="${arc(25)}" fill="none" stroke="#2e5bff" stroke-width="6.5"/><g fill="#fff" ${K}><circle cx="12" cy="76" r="9"/><circle cx="24" cy="80" r="8"/><circle cx="76" cy="80" r="8"/><circle cx="88" cy="76" r="9"/></g>`},
+ {id:'rainbow',name:'rainbow',svg:`<path d="${arc(34)}" fill="none" stroke="${INK}" stroke-width="31" data-band="24.5"/><path d="${arc(43)}" fill="none" stroke="#ff3ea5" stroke-width="6.5"/><path d="${arc(37)}" fill="none" stroke="#ffe14a" stroke-width="6.5"/><path d="${arc(31)}" fill="none" stroke="#b8ff3c" stroke-width="6.5"/><path d="${arc(25)}" fill="none" stroke="#2e5bff" stroke-width="6.5"/><g fill="#fff" ${K}><circle cx="12" cy="76" r="9"/><circle cx="24" cy="80" r="8"/><circle cx="76" cy="80" r="8"/><circle cx="88" cy="76" r="9"/></g>`},
  {id:'palm',name:'palm tree',svg:`<ellipse cx="50" cy="90" rx="32" ry="7" fill="#ffe14a" ${K}/><path d="M54 90 C52 70 46 52 52 34" fill="none" stroke="${INK}" stroke-width="12" stroke-linecap="round"/><path d="M54 90 C52 70 46 52 52 34" fill="none" stroke="#c98a4b" stroke-width="5" stroke-linecap="round"/><g fill="#3ccf5a" ${K}><path d="M52 32 C40 18 22 18 8 30 C26 27 38 29 52 32Z"/><path d="M52 32 C64 18 82 18 94 30 C78 27 66 29 52 32Z"/><path d="M52 32 C38 34 24 46 20 64 C30 50 40 42 52 32Z"/><path d="M52 32 C66 34 80 46 84 64 C74 50 64 42 52 32Z"/><path d="M52 32 C48 18 52 8 62 3 C58 14 56 22 52 32Z"/></g><circle cx="47" cy="36" r="5" fill="#8a5a2b" ${K} stroke-width="3"/><circle cx="57" cy="38" r="5" fill="#8a5a2b" ${K} stroke-width="3"/>`},
  {id:'turtle',name:'honu',svg:`<g fill="#5cf2c8" ${K}><ellipse cx="25" cy="38" rx="15" ry="8" transform="rotate(-35 25 38)"/><ellipse cx="75" cy="38" rx="15" ry="8" transform="rotate(35 75 38)"/><ellipse cx="30" cy="76" rx="11" ry="6" transform="rotate(35 30 76)"/><ellipse cx="70" cy="76" rx="11" ry="6" transform="rotate(-35 70 76)"/><circle cx="50" cy="18" r="11"/></g><ellipse cx="50" cy="56" rx="28" ry="30" fill="#3ccf5a" ${K}/><path d="M50 42 L62 49 L62 63 L50 70 L38 63 L38 49Z M50 26 V42 M62 49 L76 42 M62 63 L76 70 M50 70 V86 M38 63 L24 70 M38 49 L24 42" fill="#2fae4a" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><circle cx="45" cy="16" r="2.4" fill="${INK}"/><circle cx="55" cy="16" r="2.4" fill="${INK}"/>`},
  {id:'shaveice',name:'shave ice',svg:`<rect x="58" y="6" width="6" height="30" rx="3" transform="rotate(18 61 21)" fill="#ff3ea5" ${K} stroke-width="3"/><path d="M24 58 C24 40 30 30 40 27 L42 58Z" fill="#ff3ea5"/><path d="M40 27 C46 25 54 25 60 27 L58 58 L42 58Z" fill="#ffe14a"/><path d="M60 27 C70 30 76 40 76 58 L58 58Z" fill="#2e5bff"/><path d="M24 58 C24 22 76 22 76 58Z" fill="none" ${K}/><path d="M26 56 L74 56 L65 92 L35 92Z" fill="#fff" ${K}/><path d="M30 68 H70 M33 80 H67" stroke="#ff3ea5" stroke-width="4"/>${face(50,42,.7)}`},
@@ -319,7 +321,7 @@ const STICKERS=[
  {id:'cherry',name:'cherries',svg:`<path d="M34 64 C40 40 52 24 66 12 M66 64 C64 44 66 26 66 12" fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><path d="M34 64 C40 40 52 24 66 12 M66 64 C64 44 66 26 66 12" fill="none" stroke="#3ccf5a" stroke-width="3" stroke-linecap="round"/><path d="M66 12 C76 4 90 8 92 18 C82 22 72 20 66 12Z" fill="#3ccf5a" ${K}/><circle cx="32" cy="72" r="17" fill="#ff2d55" ${K}/><circle cx="68" cy="72" r="17" fill="#ff2d55" ${K}/><path d="M23 68 q2 -6 8 -7 M59 68 q2 -6 8 -7" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`},
  {id:'bolt',name:'bolt',svg:`<path d="M60 4 L18 56 L46 56 L38 96 L84 40 L56 40 Z" fill="#ffe14a" ${K} stroke-width="4.5"/><path d="M50 18 L32 46" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`},
  {id:'kitty',name:'kitty',svg:`<path d="M16 46 L22 8 L48 28Z M84 46 L78 8 L52 28Z" fill="#fff" ${K}/><path d="M23 34 L26 18 L37 27Z M77 34 L74 18 L63 27Z" fill="#ffb3d6"/><ellipse cx="50" cy="56" rx="39" ry="32" fill="#fff" ${K}/><ellipse cx="35" cy="54" rx="4.5" ry="6" fill="${INK}"/><ellipse cx="65" cy="54" rx="4.5" ry="6" fill="${INK}"/><path d="M47 62 L53 62 L50 66Z" fill="#ff3ea5" stroke="#ff3ea5" stroke-width="2" stroke-linejoin="round"/><path d="M44 69 q3 4 6 0 q3 4 6 0" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/><path d="M4 56 L20 60 M4 66 L20 64 M96 56 L80 60 M96 66 L80 64" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="26" cy="66" rx="6" ry="3.5" fill="#ff8fc4"/><ellipse cx="74" cy="66" rx="6" ry="3.5" fill="#ff8fc4"/><path d="M58 26 l8 -6 l2 8 l-8 2z" fill="#ff3ea5" ${K} stroke-width="2.5"/>`},
- {id:'aloha',name:'aloha bubble',svg:`<path d="M30 60 L18 84 L48 64Z" fill="#ff3ea5" ${K}/><rect x="5" y="22" width="90" height="44" rx="22" fill="#ff3ea5" ${K}/><path d="M30 60 L44 62" stroke="#ff3ea5" stroke-width="6"/><text x="50" y="52" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="21" fill="#fff" stroke="${INK}" stroke-width="1.2" letter-spacing=".5">ALOHA</text>`},
+ {id:'aloha',name:'aloha bubble',svg:`<path d="M30 60 L18 84 L48 64Z" fill="#ff3ea5" ${K}/><rect x="5" y="22" width="90" height="44" rx="22" fill="#ff3ea5" ${K}/><path d="M30 60 L44 62" stroke="#ff3ea5" stroke-width="6"/><text x="50" y="52" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="21" fill="#fff" stroke="none" letter-spacing=".5">ALOHA</text>`},
  {id:'hibiscus',name:'hibiscus',svg:[0,1,2,3,4].map(i=>`<circle cx="50" cy="27" r="21" transform="rotate(${i*72} 50 52)" fill="#ff4f7b" ${K}/>`).join('')+`<circle cx="50" cy="52" r="10" fill="#c2185b"/><path d="M50 52 L72 22" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><path d="M50 52 L72 22" stroke="#ffe14a" stroke-width="3" stroke-linecap="round"/><g fill="#ffe14a" stroke="${INK}" stroke-width="2.5"><circle cx="74" cy="19" r="4.5"/><circle cx="66" cy="18" r="3.5"/><circle cx="77" cy="27" r="3.5"/></g>`},
  {id:'boba',name:'boba',svg:`<rect x="53" y="2" width="10" height="36" rx="5" transform="rotate(12 58 20)" fill="#2e5bff" ${K} stroke-width="3.5"/><path d="M28 32 L72 32 L66 92 L34 92Z" fill="#ffe2c4" ${K}/><path d="M22 32 C22 16 78 16 78 32Z" fill="#fff" ${K}/><rect x="24" y="31" width="52" height="7" rx="3.5" fill="#ff3ea5" ${K} stroke-width="3"/><g fill="${INK}"><circle cx="40" cy="84" r="4.6"/><circle cx="50" cy="86" r="4.6"/><circle cx="60" cy="84" r="4.6"/><circle cx="45" cy="76" r="4.6"/><circle cx="56" cy="76" r="4.6"/></g>${face(50,56,.85)}`},
 ];
@@ -437,28 +439,37 @@ function delSel(){if(!sel)return;S.els=S.els.filter(e=>e.id!==sel);sel=null;comm
 /* ---------- universal line weights (charm units; the full charm cut is 2*HALF = 280 units ≈ 2") ----------
    every piece of art gets the same dark ink line and the same white sticker border no matter how it's scaled:
    strokes are rebuilt per scale (stroke = weight / scale), scaling only changes the size of the art */
-const INK_W=2.6,WHITE_W=4.2,SH_DX=1.4,SH_DY=2,S_MIN=.25,S_MAX=3;
+const INK_W=3.4,WHITE_W=5.4,SH_DX=1.4,SH_DY=2,S_MIN=.25,S_MAX=3;
 // Vograce minimum line widths: colored lines >= 0.3mm, white lines >= 0.5mm (checked at the smallest 1.5" size)
 const MIN_COLOR_U=.3*UPM_MAX,MIN_WHITE_U=.5*UPM_MAX;
 // minimum printable sizes: stickers >= ~6mm across, text >= ~2.5mm tall
-const MIN_STICKER_MM=6,MIN_TEXT_MM=2.5;
+const MIN_STICKER_MM=8,MIN_TEXT_MM=2.5;
 function minScale(e){const upm=upmFor(order.size);if(e.type==='sticker')return Math.max(S_MIN,MIN_STICKER_MM*upm/100);return Math.max(.2,MIN_TEXT_MM*upm/(e.size*.7));}
 function enforceMins(){for(const e of S.els){const m=minScale(e);if(e.s<m)e.s=m;}}
 const ART_INK=4;// sticker art is drawn with 4-unit ink lines at its native 100-unit size
-const qScale=v=>Math.round(clamp(v,S_MIN,S_MAX)*20)/20;// bake in 0.05 steps
+const qScale=v=>+Math.pow(1.02,Math.round(Math.log(clamp(v,S_MIN,S_MAX))/Math.log(1.02))).toFixed(4);// bake in 2% steps so line weights stay within ±1%
 const stickerURL={},stickerImgs={};// default-scale bake, for the tray + drag ghost
 const BAKE={};// `${sid}@${q}` -> {url,img,pad} | Promise
 function stickerXML(st,q,shadow=true){
- const f=INK_W/(ART_INK*q);// art-space multiplier that makes the ink line INK_W charm units at this scale
+ /* ONE line weight for every stroke in the art, whatever the sticker's scale: each stroke is set so it lands at exactly
+    INK_W charm units after the sticker is scaled (and after any scale() inside the art). The only exceptions are
+    "bands" — a coloured line drawn on top of a fatter ink line (cherry stems, palm trunk, rainbow): their coloured
+    part keeps its art size and the ink underneath becomes colour + 2*INK_W, so the ink edge each side is INK_W too. */
  const host=document.createElement('div');host.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg">${st.svg}</svg>`;const root=host.firstChild;
- root.querySelectorAll('[stroke-width]').forEach(n=>{const w=parseFloat(n.getAttribute('stroke-width'));if(!(w>0))return;
-  // thin lines scale with the ink line; thick bands (double-stroked outlines, rainbow) just gain the same absolute delta
-  let nw=w<=ART_INK?w*f:w+ART_INK*(f-1);
-  // never below the printer's minimum line width (white lines need more)
-  const sc=(n.closest('[stroke]')||n).getAttribute('stroke')||'';const white=/^#f{3}(f{3})?$/i.test(sc)||sc==='white';
-  nw=Math.max(nw,(white?MIN_WHITE_U:MIN_COLOR_U)/q);
-  n.setAttribute('stroke-width',nw.toFixed(2));});
- const wb=WHITE_W/q,sx=SH_DX/q,sy=SH_DY/q,pad=Math.ceil(wb+Math.max(sx,sy)+ART_INK*f/2+3);
+ const innerK=n=>{let k=1;for(let a=n;a&&a!==root;a=a.parentNode){const t=a.getAttribute&&a.getAttribute('transform');const m=t&&/scale\(\s*([\d.]+)/.exec(t);if(m)k*=parseFloat(m[1]);}return k;};
+ const L=n=>INK_W/(q*innerK(n));// universal line weight in this node's own units
+ const strokeOf=n=>{for(let a=n;a&&a!==root;a=a.parentNode){const c=a.getAttribute&&a.getAttribute('stroke');if(c)return c.toLowerCase();}return '';};
+ const nodes=[...root.querySelectorAll('[stroke-width]')];
+ nodes.forEach((n,i)=>{const w=parseFloat(n.getAttribute('stroke-width'));if(!(w>0))return;
+  const col=strokeOf(n);if(col==='none')return;let nw;
+  if(n.dataset.band)nw=parseFloat(n.dataset.band)+2*L(n);
+  else{const nx=nodes[i+1];const d=n.getAttribute('d');
+   if(col===INK&&nx&&d&&nx.getAttribute('d')===d&&strokeOf(nx)!==INK)nw=parseFloat(nx.getAttribute('stroke-width'))+2*L(n);// ink under a coloured band
+   else if(col!==INK&&i>0&&d&&nodes[i-1].getAttribute('d')===d&&strokeOf(nodes[i-1])===INK)nw=w;// the coloured band itself
+   else nw=(col==='#fff'||col==='#ffffff'||col==='white')?Math.max(L(n),MIN_WHITE_U/(q*innerK(n))):L(n);}// white shine marks: Vograce needs >=0.5mm
+  n.setAttribute('stroke-width',nw.toFixed(3));});
+ root.querySelectorAll('[stroke]').forEach(n=>{n.setAttribute('stroke-linejoin','round');n.setAttribute('stroke-linecap','round');});
+ const wb=WHITE_W/q,sx=SH_DX/q,sy=SH_DY/q,pad=Math.ceil(wb+Math.max(sx,sy)+INK_W/q/2+3);
  const filt=`<filter id="dc" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB"><feMorphology in="SourceAlpha" operator="dilate" radius="${wb.toFixed(2)}" result="d"/><feFlood flood-color="#ffffff"/><feComposite in2="d" operator="in" result="w"/><feOffset in="d" dx="${sx.toFixed(2)}" dy="${sy.toFixed(2)}" result="o"/><feFlood flood-color="#17142e" flood-opacity=".22"/><feComposite in2="o" operator="in" result="sh"/><feMerge>${shadow?'<feMergeNode in="sh"/>':''}<feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
  const span=100+2*pad,px=clamp(Math.round(span*q*4.2),128,1100);
  const inner=[...root.childNodes].map(n=>new XMLSerializer().serializeToString(n)).join('');
@@ -824,13 +835,17 @@ function createViewer(){
  const rim=new T.DirectionalLight(0xff8fd0,1.0);rim.position.set(-90,20,-60);scene.add(rim);
  const root=new T.Group();scene.add(root);
  const v={renderer,scene,camera,controls,root,envRT,canvas,pivot:null,hang:null,raf:0,interacting:false,t0:performance.now(),tSway:0,last:0,disposables:[]};
- v.ro=new ResizeObserver(()=>{resize3D();kick();});v.ro.observe($('#threeWrap'));
+ v.ro=new ResizeObserver(()=>{resize3D();kick();});v.ro.observe($('#threeWrap'));v.ro.observe($('#mfoot'));
  controls.addEventListener('start',()=>{v.interacting=true;clearTimeout(idleT);motion=false;controls.autoRotate=false;kick();});
  controls.addEventListener('end',()=>{v.interacting=false;kick();clearTimeout(idleT);if(!REDUCED)idleT=setTimeout(()=>{if(!V||V.interacting)return;motion=true;V.controls.autoRotate=true;kick();},2500);});
  controls.addEventListener('change',()=>{if(v.inTick)v.changed=true;else kick();});
  return v;
 }
-function resize3D(){if(!V)return;const r=$('#threeWrap').getBoundingClientRect();if(!r.width||!r.height)return;V.renderer.setSize(r.width,r.height,false);V.camera.aspect=r.width/r.height;V.camera.updateProjectionMatrix();}
+function band3D(){const r=$('#threeWrap').getBoundingClientRect();const top=$('.mhead').getBoundingClientRect().bottom-r.top;const t=$('#mtag');const fb=(t.textContent?t:$('.mbtns')).getBoundingClientRect().top-r.top;
+ const a=clamp(top,0,r.height*.3),b=clamp(fb-6,r.height*.55,r.height);return {W:r.width,H:r.height,top:a,bot:b};}
+function resize3D(){if(!V)return;const r=$('#threeWrap').getBoundingClientRect();if(!r.width||!r.height)return;V.renderer.setSize(r.width,r.height,false);V.camera.aspect=r.width/r.height;
+ // canvas fills the whole screen; shift the projection so the scene's centre sits mid-way in the clear band (no extra renders, just the matrix)
+ const B=band3D();V.band=B;const dy=(B.top+B.bot)/2-B.H/2;if(Math.abs(dy)>.5)V.camera.setViewOffset(B.W,B.H,0,-dy,B.W,B.H);else V.camera.clearViewOffset();V.camera.updateProjectionMatrix();}
 async function build3D(){
  const {T,BGU}=three;const D_=V.disposables;const keep=o=>{D_.push(o);return o;};
  const k=parseFloat(order.size)*25.4/(2*HALF);const g=geo(S.shape);
@@ -880,7 +895,7 @@ async function build3D(){
  V.pivot=pivot;V.hang=hang;V.fitH=P-bottom;V.fitW=2*HALF*k;
  $('#mtag').innerHTML=`<b>${order.size}"</b> clear acrylic · ${SHAPES.find(s=>s.id===S.shape).name}${S.holo?' · holo stars':''}<br>with ${ATT[order.att].name} · printed both sides`;
 }
-function resetView(){if(!V)return;const a=V.camera.aspect||1;const tf=Math.tan(V.camera.fov*Math.PI/360);const d=Math.max((V.fitH/2)/tf*1.25,(V.fitW/2)/(tf*a)*1.5);const ty=-V.fitH*.04;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.controls.minDistance=d*.35;V.controls.maxDistance=d*2.4;V.controls.update();kick();}
+function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=(B.bot-B.top)/B.H||1;const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*1.25,(V.fitW/2)/(tf*a)*1.5);const ty=-V.fitH*.04;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.controls.minDistance=d*.35;V.controls.maxDistance=d*2.4;V.controls.update();kick();}
 // render loop runs only while something moves
 function tick(now){
  if(!V)return;V.raf=0;if(!modalOpen||document.hidden)return;
