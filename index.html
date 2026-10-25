@@ -98,14 +98,14 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 .hint.fade{opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s}
 .hint{background:var(--hintbg);border:2.5px solid var(--ink);border-radius:999px;padding:10px 16px;font-weight:600;font-size:16px;text-align:center}
 .del{background:var(--pink);color:#fff}
-/* sheet */
-#sheet{flex:0 1 auto;height:var(--sheet-h,200px);min-height:0;margin:10px 12px 0;background:var(--card);border:3px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden}
+/* One card: the sliding panel is clipped to the same rounded stroke as the tab bar. */
+#drawer{flex:none;display:flex;flex-direction:column;min-height:0;margin:10px 12px 8px;background:var(--card);border:3px solid var(--ink);border-radius:30px;overflow:hidden;position:relative;z-index:2;transform:translateZ(0)}
+#sheet{flex:0 1 auto;height:var(--sheet-h,200px);min-height:0;margin:0;background:var(--card);border:0;border-radius:0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden;position:relative;z-index:1;will-change:transform}
 #app.collapsed #sheet{flex:none;height:39px}
 /* Retracted drawer is only the grab. The option tiles sit in .panels; hiding
    them means nothing from the drawer body can peek above the tab bar. */
 html:not(.typing) #app.collapsed #sheet .panels{display:none}
-#sheet{position:relative;z-index:2;will-change:transform}
-#tabbar{position:relative;z-index:3;touch-action:none}
+#tabbar{position:relative;z-index:2;touch-action:none}
 #app.collapsed #sheet{touch-action:none}
 .grab{flex:none;height:36px;display:grid;place-items:center;cursor:pointer;touch-action:none;border:0;background:none;width:100%}
 .grab::before{content:'';width:48px;height:6px;border-radius:9px;background:var(--muted)}
@@ -171,7 +171,7 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .addbag:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shd)}
 .fine{font-size:15px;opacity:.7;margin-top:14px;text-align:center;font-weight:500}
 /* tab bar */
-#tabbar{flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 12px 8px;padding:6px 6px calc(8px + var(--shell-pad-bot,var(--sab)));background:var(--card);border:3px solid var(--ink);border-top:0;border-radius:0 0 30px 30px}
+#tabbar{flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0;padding:6px 6px calc(8px + var(--shell-pad-bot,var(--sab)));background:var(--card);border:0;border-radius:0}
 .tab{min-height:64px;border:3px solid transparent;border-radius:20px;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:700 15px 'Fredoka';cursor:pointer;padding:4px 0;transition:background .15s}
 .tab svg{width:28px;height:28px}
 .tab.on{border-color:var(--ink);box-shadow:3px 3px 0 var(--shd)}
@@ -182,8 +182,9 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 @media (max-width:959px){
  html.typing #tabbar{display:none}
  html.typing #stageWrap{flex:0 0 auto;height:84px;min-height:0}
+ html.typing #drawer{flex:1 1 auto;min-height:0;margin-top:8px;border-radius:26px}
  html.typing #sheet,
- html.typing #app.collapsed #sheet{flex:1 1 auto;height:auto!important;min-height:0;margin-top:8px;border-bottom:3px solid var(--ink);border-radius:26px;transition:none}
+ html.typing #app.collapsed #sheet{flex:1 1 auto;height:auto!important;min-height:0;margin:0;border:0;border-radius:0;transition:none}
  html.typing .grab{display:none}
  html.typing #panels{padding-bottom:calc(14px + var(--shell-pad-bot,var(--sab)))}
  html.typing .selbar{display:none}
@@ -256,6 +257,7 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
  .marquee{display:block;grid-column:1/-1}
  .logo h1{font-size:40px}
  #stageWrap{grid-column:1;grid-row:3/5;margin:0}
+ #drawer{display:contents}
  #sheet{grid-column:2;grid-row:3;height:100%!important;max-height:100%;align-self:stretch;margin:0;border:3px solid var(--ink);border-bottom:0;border-radius:28px 28px 0 0}
  #sheet .grab{display:none}
  .panels{padding-top:18px}
@@ -382,6 +384,7 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
   </div>
   <div class="selbar" id="selbar"></div>
  </section>
+ <div id="drawer">
  <section id="sheet">
   <button class="grab" id="grab" aria-label="show or hide tools"></button>
   <div class="panels" id="panels">
@@ -432,6 +435,7 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
   <button class="tab" data-tab="stickers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="m12 2.5 2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" fill="#fff"/></svg>stickers</button>
   <button class="tab" data-tab="order"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#fff"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span id="tabPrice">$16</span></button>
  </nav>
+ </div>
 </div>
 <div class="toast" id="toast" role="status"></div>
 <div class="flow" id="flow" aria-hidden="true">
@@ -803,9 +807,11 @@ function layoutSheet(){
   const sheet=$('#sheet'),tab=$('#tabbar'),head=app.querySelector('header');
   if(!sheet||!tab)return;
   const padTop=parseFloat(getComputedStyle(app).paddingTop)||0;
-  const stageMin=108,margin=10;
-  const tabMb=parseFloat(getComputedStyle(tab).marginBottom)||0;
-  const room=app.clientHeight-padTop-(head?head.offsetHeight:0)-tab.offsetHeight-tabMb-stageMin-margin;
+  const stageMin=108;
+  const dock=document.getElementById('drawer');
+  const dockCs=dock?getComputedStyle(dock):null;
+  const dockM=(dockCs?(parseFloat(dockCs.marginTop)||0)+(parseFloat(dockCs.marginBottom)||0):18);
+  const room=app.clientHeight-padTop-(head?head.offsetHeight:0)-tab.offsetHeight-dockM-stageMin;
   let preferred=200;
   const shapes=$('#shapes'),grab=sheet.querySelector('.grab'),panels=sheet.querySelector('.panels');
   if(shapes&&shapes.offsetHeight&&grab){
