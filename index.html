@@ -62,14 +62,15 @@ button{font-family:inherit;color:inherit;-webkit-appearance:none;appearance:none
 #app{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);margin:0 auto;max-width:620px;display:flex;flex-direction:column;padding-top:var(--shell-pad-top,var(--sat));padding-left:var(--sal);padding-right:var(--sar);overflow:hidden}
 header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px 10px;background:transparent}
 .logo{display:flex;align-items:center;min-width:0}
-.logo h1{margin:0;line-height:0}
-/* Balloon-physics chrome loop, cropped to the float so the white frame is gone. */
+.logo h1{position:relative;margin:0;line-height:0}
+/* Balloon loop. The video keeps its white render field; a canvas knocks that field out each frame. */
 .wordmark{display:block;width:152px;height:auto;object-fit:cover;background:transparent;pointer-events:none}
-video.wordmark{vertical-align:top;background:transparent}
+video.wordmark{vertical-align:top;opacity:0}
+canvas.wordmark{position:absolute;inset:0;width:100%;height:100%}
 video.wordmark::-webkit-media-controls,video.wordmark::-webkit-media-controls-start-playback-button{display:none!important}
 img.wordmark{display:none}
 @media (max-width:400px){.wordmark{width:136px}}
-@media (prefers-reduced-motion:reduce){video.wordmark{display:none}img.wordmark{display:block}}
+@media (prefers-reduced-motion:reduce){video.wordmark,canvas.wordmark{display:none}img.wordmark{display:block;position:static;height:auto}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .bagbtn{flex:none;display:flex;align-items:center;gap:8px;height:56px;background:var(--card);border:3px solid var(--ink);border-radius:999px;padding:0 10px 0 14px;font-weight:700;font-size:17px;box-shadow:3px 3px 0 var(--shd);cursor:pointer}
 .bagbtn svg{width:26px;height:26px}
@@ -445,8 +446,79 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
  </div>
 </div>
 <script>
-/* Reduced motion keeps the still. Drop the balloon loop so it does not decode or play. */
-(function(){if(!matchMedia('(prefers-reduced-motion: reduce)').matches)return;document.querySelectorAll('video.wordmark').forEach(function(v){v.removeAttribute('autoplay');v.pause();v.preload='none';v.removeAttribute('src');v.load();});})();
+/* Reduced motion keeps the still. Otherwise knock the white render field out of
+   each frame (near-white connected to the outside, plus the big letter holes).
+   Small interior whites are the chrome highlights, so they stay. */
+(function(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+    document.querySelectorAll('video.wordmark').forEach(function(v){v.removeAttribute('autoplay');v.pause();v.preload='none';v.removeAttribute('src');v.load();});
+    return;
+  }
+  var MN=232,CH=20,FR=210;
+  function makeKnock(w,h){
+    var n=w*h,white=new Uint8Array(n),bg=new Uint8Array(n),seen=new Uint8Array(n),q=new Int32Array(n),cq=new Int32Array(n);
+    var counter=Math.max(40,Math.round(60*n/(640*186)));
+    return function(img){
+      var d=img.data,p,i,r,g,b,mn,mx,x,qe=0,qs,s,cs,ce,k;
+      white.fill(0);bg.fill(0);seen.fill(0);
+      for(p=0,i=0;p<n;p++,i+=4){
+        r=d[i];g=d[i+1];b=d[i+2];
+        mn=r<g?r:g;if(b<mn)mn=b;mx=r>g?r:g;if(b>mx)mx=b;
+        if(mn>=MN&&mx-mn<=CH)white[p]=1;
+      }
+      function seed(pp){if(white[pp]&&!bg[pp]){bg[pp]=1;q[qe++]=pp;}}
+      for(x=0;x<w;x++){seed(x);seed((h-1)*w+x);}
+      for(var y=0;y<h;y++){seed(y*w);seed(y*w+w-1);}
+      for(qs=0;qs<qe;qs++){
+        p=q[qs];x=p%w;
+        if(x>0)seed(p-1);
+        if(x+1<w)seed(p+1);
+        if(p>=w)seed(p-w);
+        if(p<n-w)seed(p+w);
+      }
+      for(s=0;s<n;s++)if(bg[s])seen[s]=1;
+      for(s=0;s<n;s++){
+        if(!white[s]||seen[s])continue;
+        cs=0;ce=0;seen[s]=1;cq[ce++]=s;
+        while(cs<ce){
+          p=cq[cs++];x=p%w;
+          if(x>0&&white[p-1]&&!seen[p-1]){seen[p-1]=1;cq[ce++]=p-1;}
+          if(x+1<w&&white[p+1]&&!seen[p+1]){seen[p+1]=1;cq[ce++]=p+1;}
+          if(p>=w&&white[p-w]&&!seen[p-w]){seen[p-w]=1;cq[ce++]=p-w;}
+          if(p<n-w&&white[p+w]&&!seen[p+w]){seen[p+w]=1;cq[ce++]=p+w;}
+        }
+        if(ce>=counter)for(k=0;k<ce;k++)bg[cq[k]]=1;
+      }
+      for(p=0;p<n;p++){
+        if(bg[p])continue;
+        i=p*4;r=d[i];g=d[i+1];b=d[i+2];
+        mn=r<g?r:g;if(b<mn)mn=b;mx=r>g?r:g;if(b>mx)mx=b;
+        if(mn<FR||mx-mn>CH)continue;
+        x=p%w;
+        if((x>0&&bg[p-1]===1)||(x+1<w&&bg[p+1]===1)||(p>=w&&bg[p-w]===1)||(p<n-w&&bg[p+w]===1))bg[p]=2;
+      }
+      for(p=0,i=3;p<n;p++,i+=4)if(bg[p])d[i]=0;
+    };
+  }
+  function attach(v){
+    var c=document.createElement('canvas');
+    c.className='wordmark';c.setAttribute('aria-hidden','true');v.after(c);
+    var g=c.getContext('2d',{willReadFrequently:true}),knock=null,last=-1;
+    function tick(){
+      requestAnimationFrame(tick);
+      if(!v.videoWidth||v.readyState<2)return;
+      if(v.getBoundingClientRect().width<2)return;
+      if(v.currentTime===last)return;
+      last=v.currentTime;
+      if(!knock||c.width!==v.videoWidth||c.height!==v.videoHeight){c.width=v.videoWidth;c.height=v.videoHeight;knock=makeKnock(c.width,c.height);}
+      g.drawImage(v,0,0,c.width,c.height);
+      var img=g.getImageData(0,0,c.width,c.height);
+      knock(img);g.putImageData(img,0,0);
+    }
+    requestAnimationFrame(tick);
+  }
+  document.querySelectorAll('video.wordmark').forEach(attach);
+})();
 </script>
 <script type="module">
 const INK='#17142e';
