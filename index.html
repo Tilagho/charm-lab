@@ -168,11 +168,11 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .toast svg{width:44px;height:44px;flex:none}
 .toast small{font-weight:500;font-size:15px;opacity:.75}
 .conf{position:fixed;width:14px;height:14px;z-index:85;pointer-events:none;border:2px solid var(--ink)}
-/* 3D modal. Same visible rectangle as the designer (--app-top / --app-h).
-   On a phone the card is a column: header under the status bar, the model in the
-   middle, description + buttons glued to the bottom edge (just above Safari's
-   floating bar). The canvas is only that middle band, so the keyring can't draw
-   under the island or leave a gap under the buttons. */
+/* 3D modal. Same visible rectangle as the designer: pin3D copies #app's
+   used top and height (those come from visualViewport, not from 100lvh).
+   On a phone the header sits under the status bar, the model fills the middle,
+   and the description + buttons are fixed to the bottom of that same rectangle
+   — flush with the visual viewport, plus only the leftover safe-area inset. */
 .modal{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);box-sizing:border-box;z-index:60;display:none;background:transparent}
 .modal.open{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start}
 .mcard{position:relative;z-index:1;flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column;background:transparent;overflow:hidden}
@@ -208,16 +208,17 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
 .pbtn.on{background:var(--lime)}
 /* Phone: do not trust flex-grow. iOS sizes that column to the model and leaves
    the buttons mid-screen with empty gradient under them. The overlay is the
-   visual-viewport rectangle; the header, the canvas, and the description +
-   buttons are each pinned to an edge of it. 12px keeps the buttons just above
-   Safari's floating bar (shell-pad-bot is 0 while that bar is showing). */
+   same rectangle as #app. The action row is position:fixed against the visual
+   viewport (pin3D shifts `bottom` if this browser resolves fixed against the
+   layout viewport instead). Padding below the buttons is only --shell-pad-bot,
+   the safe area that is not already covered by Safari's floating bar. */
 @media (max-width:699px){
  html.m3d #app{visibility:hidden}
- .modal.open{display:block}
- .mcard{position:absolute;top:0;right:0;bottom:0;left:0;display:block;width:auto;height:auto;min-height:0}
- .mhead{position:absolute;top:0;left:0;right:0}
- .three-wrap{position:absolute;left:0;right:0;top:76px;bottom:160px}
- .mfoot{position:absolute;left:0;right:0;bottom:0;padding-bottom:calc(12px + var(--shell-pad-bot,0px))}
+ .modal.open{display:block;overflow:visible}
+ .mcard{position:absolute;top:0;right:0;bottom:0;left:0;display:block;width:auto;height:auto;min-height:0;overflow:visible}
+ .mhead{position:absolute;top:0;left:0;right:0;z-index:3}
+ .three-wrap{position:absolute;left:0;right:0;top:76px;bottom:160px;z-index:1}
+ .mfoot{position:fixed;left:0;right:0;bottom:0;z-index:5;margin:0;padding-bottom:var(--shell-pad-bot,0px)}
 }
 @media (min-width:700px){.modal.open{align-items:center;justify-content:center;padding:24px;background:rgba(23,20,46,.45)}html.m3d{background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px;background-repeat:repeat}.mcard{position:relative;top:auto;right:auto;bottom:auto;left:auto;display:flex;flex:1 1 auto;width:100%;height:100%;max-width:1000px;max-height:820px;background:var(--three);border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{position:relative;top:auto;left:auto;right:auto;padding:12px 16px}.three-wrap{position:relative;top:auto;right:auto;bottom:auto;left:auto}.mfoot{position:relative;left:auto;right:auto;bottom:auto;padding:12px 16px}}
 /* desktop adaptation */
@@ -750,21 +751,17 @@ function pulseStage(){const w=$('#stageWrap');w.animate([{transform:'scale(1)'},
 /* ---------- UI ---------- */
 $('#mq').innerHTML=['charm lab ✦','made in pāʻia','holo stars','stickers on stickers','acrylic but make it cute','shaka bb','custom everything','✿ ✿ ✿'].map(s=>`<span>${s}</span>`).join('').repeat(4);
 const TILECOLS=['#ffc2e2','#b8ff3c','#8fd8ff','#ffe14a','#c9b2ff','#5cf2c8','#ffc2e2','#ff8a3d'];
-/* picker icons only. One black outline: the loop and the shape are drawn as a single
-   silhouette (ink first, then the fill on top) so their strokes don't stack into a
-   double line or a white rim. The hole is a bit smaller than the first chubby pass.
-   The real cut (geo / export / 3D) stays the accurate small tab. */
+/* Drawer thumbnails only. Restored from 4aa2deb (the cut-path icons from before
+   the chubby bail redraw): one stroke, even-odd hole, same viewBox. The hanging
+   hole is 4 user units wider than that stroke used to close over — a couple of
+   pixels on the tile, not the large bail. geo / export / 3D keep the real 3mm hole. */
 function tileIcon(id,fill){
  const g=geo(id);
- const xs=g.body.map(p=>p[0]),ys=g.body.map(p=>p[1]);
- const left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bot=Math.max(...ys);
- const bw=Math.max(1,right-left),bh=Math.max(1,bot-top);
- const W=120,H=136,shapeTop=52,shapeBot=H-4;
- const s=Math.min((W-12)/bw,(shapeBot-shapeTop)/bh);
- const ox=(W-bw*s)/2-left*s,oy=shapeTop-top*s;
- const tf=`translate(${ox.toFixed(2)} ${oy.toFixed(2)}) scale(${s.toFixed(4)})`;
- const sw=(12/s).toFixed(2);
- return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><g fill="currentColor" stroke="currentColor" stroke-linejoin="round"><ellipse cx="60" cy="32" rx="36" ry="30" stroke-width="12"/><g transform="${tf}"><path d="${g.bodyD}" stroke-width="${sw}"/></g></g><g fill="${fill}"><ellipse cx="60" cy="32" rx="36" ry="30"/><g transform="${tf}"><path d="${g.bodyD}"/></g></g><ellipse cx="60" cy="32" rx="13" ry="10" fill="var(--card)" stroke="currentColor" stroke-width="4"/></svg>`;
+ const h=g.maxY-g.minY+20;
+ const half=Math.max(165,h/2);
+ const hr=g.holeR+4;
+ const hole=`M${(g.tab.x-hr).toFixed(2)},${g.tab.y.toFixed(2)}a${hr.toFixed(2)},${hr.toFixed(2)} 0 1,0 ${(2*hr).toFixed(2)},0a${hr.toFixed(2)},${hr.toFixed(2)} 0 1,0 ${(-2*hr).toFixed(2)},0Z`;
+ return `<svg viewBox="${-half} ${(g.minY-10).toFixed(0)} ${2*half} ${h.toFixed(0)}"><path d="${g.outerD} ${hole}" fill-rule="evenodd" fill="${fill}" stroke="currentColor" stroke-width="14" stroke-linejoin="round"/></svg>`;
 }
 $('#shapes').innerHTML=SHAPES.map((s,i)=>`<button class="tile" data-shape="${s.id}" aria-label="${s.name}">${tileIcon(s.id,TILECOLS[i])}</button>`).join('');
 $('#shapes').addEventListener('click',ev=>{const b=ev.target.closest('[data-shape]');if(!b)return;S.shape=b.dataset.shape;commit();});
@@ -1049,25 +1046,32 @@ function createViewer(){
  controls.addEventListener('change',()=>{if(v.inTick)v.changed=true;else kick();});
  return v;
 }
-/* Lock the phone overlay to the same pixel rectangle as the designer shell,
-   then park the canvas between the header and the pinned footer. Inline
-   px wins over any stylesheet height iOS resolves against the large viewport. */
+/* Lock the phone overlay to the same pixel rectangle #app is already using
+   (top/height from visualViewport). The action row is position:fixed so it stays
+   on the visual-viewport bottom even if a parent box is short. Some engines
+   resolve fixed `bottom:0` against the layout viewport (under Safari's bar, or
+   under a stubbed toolbar); measure that and shift `bottom` until the row's
+   border box lands on #app's bottom. Padding is only the leftover safe area. */
 function pin3D(){
  const modal=$('#modal');if(!modal||!modal.classList.contains('open'))return;
  const wrap=$('#threeWrap'),foot=$('#mfoot'),head=$('.mhead'),card=$('.mcard');
  const phone=matchMedia('(max-width:699px)').matches;
- if(!phone){
-  [modal,wrap,foot,head,card].forEach(el=>{if(!el)return;el.style.top=el.style.right=el.style.bottom=el.style.left=el.style.height=el.style.position='';});
-  return;
+ const clear=el=>{if(!el)return;el.style.top=el.style.right=el.style.bottom=el.style.left=el.style.height=el.style.position=el.style.paddingBottom=el.style.zIndex=el.style.boxSizing=el.style.margin=el.style.overflow='';};
+ if(!phone){[modal,wrap,foot,head,card].forEach(clear);return;}
+ const app=$('#app'),ar=app.getBoundingClientRect();
+ modal.style.position='absolute';modal.style.left='0px';modal.style.right='0px';modal.style.bottom='auto';
+ modal.style.top=getComputedStyle(app).top;modal.style.height=Math.round(ar.height)+'px';modal.style.boxSizing='border-box';
+ card.style.position='absolute';card.style.top='0';card.style.right='0';card.style.bottom='0';card.style.left='0';card.style.height='auto';card.style.overflow='visible';
+ head.style.position='absolute';head.style.top='0';head.style.left='0';head.style.right='0';head.style.zIndex='3';
+ const pad=Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--shell-pad-bot'))||0);
+ foot.style.position='fixed';foot.style.left='0px';foot.style.right='0px';foot.style.top='auto';foot.style.margin='0px';
+ foot.style.paddingBottom=pad+'px';foot.style.zIndex='5';foot.style.bottom='0px';
+ const target=ar.bottom,landed=foot.getBoundingClientRect().bottom;
+ foot.style.bottom=Math.round(landed-target)+'px';
+ if(Math.abs(foot.getBoundingClientRect().bottom-target)>2){
+  foot.style.position='absolute';foot.style.left='0px';foot.style.right='0px';foot.style.top='auto';foot.style.bottom='0px';
  }
- const cs=getComputedStyle(document.documentElement);
- const top=cs.getPropertyValue('--app-top').trim()||'0px';
- const h=cs.getPropertyValue('--app-h').trim()||(innerHeight+'px');
- modal.style.position='absolute';modal.style.left='0px';modal.style.right='0px';modal.style.bottom='auto';modal.style.top=top;modal.style.height=h;
- card.style.position='absolute';card.style.top='0';card.style.right='0';card.style.bottom='0';card.style.left='0';card.style.height='auto';
- head.style.position='absolute';head.style.top='0';head.style.left='0';head.style.right='0';
- foot.style.position='absolute';foot.style.left='0';foot.style.right='0';foot.style.bottom='0';foot.style.top='auto';
- wrap.style.position='absolute';wrap.style.left='0';wrap.style.right='0';wrap.style.height='auto';
+ wrap.style.position='absolute';wrap.style.left='0';wrap.style.right='0';wrap.style.height='auto';wrap.style.zIndex='1';
  wrap.style.top=head.offsetHeight+'px';wrap.style.bottom=foot.offsetHeight+'px';
 }
 function band3D(){const r=$('#threeWrap').getBoundingClientRect();const pad=18;return {W:r.width,H:r.height,top:pad,bot:Math.max(pad+1,r.height-pad)};}
