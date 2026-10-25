@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#ffffff">
 <script>(function(){var t=null;try{t=localStorage.getItem('charmlab.theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;document.querySelector('meta[name=theme-color]').setAttribute('content',t==='dark'?'#272042':'#ffffff');})();</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script>(function(){function fit(){var vv=window.visualViewport;var h=(vv?vv.height:window.innerHeight)+'px';var t=(vv?vv.offsetTop:0)+'px';var r=document.documentElement;if(r.style.getPropertyValue('--app-h')===h&&r.style.getPropertyValue('--app-top')===t)return;r.style.setProperty('--app-h',h);r.style.setProperty('--app-top',t);}fit();addEventListener('resize',fit);if(window.visualViewport){visualViewport.addEventListener('resize',fit);visualViewport.addEventListener('scroll',fit);}})();</script>
 <title>charm lab ✦ design your acrylic charm (mockup)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,17 +38,17 @@ html[data-theme=dark] .themebtn .moon{transform:none;opacity:1}
 @keyframes boop{40%{transform:scale(1.15) rotate(-12deg)}}
 @media (max-width:400px){.logo .star{width:28px;height:28px}.logo{gap:7px}.logo h1{font-size:26px}header{gap:8px;padding:8px 12px 10px}.bagbtn{padding:0 8px 0 12px;gap:6px}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-/* The page background lives on <html> (the root canvas), which Safari paints edge to edge, under its status bar and its
-   translucent floating toolbar. body is NOT position:fixed (iOS 26 Safari tints its bars from fixed edge elements and
-   falls back to a flat colour); it is a transparent normal-flow box the size of the visible viewport. */
+/* The page background lives on <html>, which Safari paints under its bars. body is NOT position:fixed (iOS 26 Safari
+   tints its bars from fixed edge elements). --app-h / --app-top track the visual viewport so a 100lvh canvas cannot
+   leave a dead band under the designer, and the keyboard cannot scroll the page out from under checkout. */
 html,body{margin:0;overscroll-behavior:none;overflow:hidden}
-html{min-height:100lvh;background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
+html{height:var(--app-h,100dvh);min-height:var(--app-h,100dvh);background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
 html.m3d{background-color:var(--three-bot);background-image:var(--three);background-size:100% 100lvh;background-repeat:no-repeat;background-position:0 0}
 html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{position:relative;height:100vh;height:100dvh;font-family:'Fredoka',system-ui,sans-serif;font-size:17px;color:var(--ink);background:transparent;-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body{position:relative;height:var(--app-h,100dvh);font-family:'Fredoka',system-ui,sans-serif;font-size:17px;color:var(--ink);background:transparent;-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input{-webkit-user-select:text;user-select:text}
 button{font-family:inherit;color:inherit;-webkit-appearance:none;appearance:none;margin:0}
-#app{position:absolute;inset:0;margin:0 auto;max-width:620px;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+#app{position:absolute;left:0;right:0;top:var(--app-top,0);height:var(--app-h,100dvh);margin:0 auto;max-width:620px;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);overflow:hidden}
 header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px 10px}
 .logo{display:flex;align-items:center;gap:10px;min-width:0}.lt{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
 .logo h1{font-family:'Bagel Fat One',cursive;font-weight:400;font-size:30px;line-height:1;margin:0;color:var(--pink);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:3px 3px 0 var(--shd);white-space:nowrap}
@@ -82,7 +83,7 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 .hint{background:var(--hintbg);border:2.5px solid var(--ink);border-radius:999px;padding:10px 16px;font-weight:600;font-size:16px;text-align:center}
 .del{background:var(--pink);color:#fff}
 /* sheet */
-#sheet{flex:none;height:clamp(240px,36dvh,420px);margin:14px 12px 0;background:var(--card);border:3px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden}
+#sheet{flex:none;height:clamp(240px,36dvh,420px);min-height:0;margin:14px 12px 0;background:var(--card);border:3px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden}
 #app.collapsed #sheet{height:48px}
 #sheet{position:relative;z-index:2;will-change:transform}
 #tabbar{position:relative;z-index:3;touch-action:none}
@@ -164,7 +165,7 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .toast small{font-weight:500;font-size:15px;opacity:.75}
 .conf{position:fixed;width:14px;height:14px;z-index:85;pointer-events:none;border:2px solid var(--ink)}
 /* 3D modal */
-.modal{position:absolute;inset:0;z-index:60;display:none;background:transparent}
+.modal{position:absolute;left:0;right:0;top:var(--app-top,0);height:var(--app-h,100dvh);z-index:60;display:none;background:transparent}
 /* full-bleed backdrop: a fixed layer sized well past every iOS edge (status bar, floating toolbar, overscroll) */
 @media (max-width:699px){html.m3d #app{visibility:hidden}}
 .modal.open{display:flex;align-items:center;justify-content:center}
@@ -208,7 +209,7 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
  .marquee{display:block;grid-column:1/-1}
  .logo h1{font-size:40px}
  #stageWrap{grid-column:1;grid-row:3/5;margin:0}
- #sheet{grid-column:2;grid-row:3;height:auto!important;margin:0;border:3px solid var(--ink);border-bottom:0;border-radius:28px 28px 0 0}
+ #sheet{grid-column:2;grid-row:3;height:100%!important;max-height:100%;align-self:stretch;margin:0;border:3px solid var(--ink);border-bottom:0;border-radius:28px 28px 0 0}
  #sheet .grab{display:none}
  .panels{padding-top:18px}
  #tabbar{grid-column:2;grid-row:4;margin:0;border:3px solid var(--ink);border-top:0;border-radius:0 0 28px 28px;box-shadow:5px 5px 0 var(--shd)}
@@ -218,7 +219,15 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
 .checkout{width:100%;margin-top:12px;min-height:64px;font-family:'Bagel Fat One';font-size:24px;background:var(--yellow);color:var(--dark);border:3px solid var(--ink);border-radius:24px;box-shadow:5px 5px 0 var(--shd);cursor:pointer}
 .checkout:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shd)}
 .ordersbtn{width:100%;margin-top:10px}
-.flow{position:absolute;inset:0;z-index:70;display:none;flex-direction:column;color:var(--ink);background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
+/* order actions stay in view. the options above them scroll; the buttons are not inside that scroller,
+   so a tall price breakdown cannot push checkout below the drawer (or the viewport). */
+#orderFoot{display:none}
+#app.tab-order:not(.collapsed) #orderFoot{display:flex;flex-direction:column;gap:8px;flex:none;padding:8px 12px 10px;background:var(--card);border-top:3px solid var(--ink)}
+#orderFoot .acts2{display:flex;gap:8px}
+#orderFoot .addbag,#orderFoot .checkout{flex:1;width:auto;margin:0;min-height:54px;font-size:20px}
+#orderFoot .ordersbtn{margin:0;min-height:44px}
+#orderFoot .fine{margin:0}
+.flow{position:absolute;left:0;right:0;top:var(--app-top,0);height:var(--app-h,100dvh);z-index:70;display:none;flex-direction:column;overflow:hidden;color:var(--ink);background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
 .flow.open{display:flex}
 .flowhead{flex:none;display:flex;align-items:center;gap:12px;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;max-width:560px;width:100%;margin:0 auto}
 .flowhead h2{font-family:'Bagel Fat One';font-weight:400;font-size:28px;margin:0;line-height:1}
@@ -322,11 +331,12 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
     <div class="qty"><button class="ibtn" id="qm" aria-label="one less">–</button><b id="qn">1</b><button class="ibtn" id="qp" aria-label="one more">+</button></div>
     <div class="price"><div class="big" id="price">$14</div><span class="ex">example prices</span></div>
     <div class="lines" id="lines"></div>
-    <button class="addbag" id="addBag">add to bag ♡</button>
-    <button class="checkout" id="checkoutBtn" type="button">checkout →</button>
-    <button class="pbtn ordersbtn" id="ordersBtn" type="button">orders</button>
     <div class="fine">demo checkout · example prices · no real charges</div>
    </div>
+  </div>
+  <div id="orderFoot">
+   <div class="acts2"><button class="addbag" id="addBag">add to bag ♡</button><button class="checkout" id="checkoutBtn" type="button">checkout →</button></div>
+   <button class="pbtn ordersbtn" id="ordersBtn" type="button">orders</button>
   </div>
  </section>
  <nav id="tabbar">
@@ -721,7 +731,7 @@ let curTab='shape',sheetTapAt=0;
 const isDrawer=()=>innerWidth<960;
 function collapse(){if(!isDrawer())return;const a=document.activeElement;if(a&&a.id==='txtIn')a.blur();$('#app').classList.add('collapsed');}
 $('#sheet').addEventListener('pointerdown',()=>{sheetTapAt=performance.now();},true);
-function setTab(t){curTab=t;$('#app').classList.remove('collapsed');$$('#tabbar .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));$$('.panel').forEach(p=>p.classList.toggle('on',p.dataset.panel===t));$('#panels').scrollTop=0;}
+function setTab(t){curTab=t;$('#app').classList.remove('collapsed');$('#app').classList.toggle('tab-order',t==='order');$$('#tabbar .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));$$('.panel').forEach(p=>p.classList.toggle('on',p.dataset.panel===t));$('#panels').scrollTop=0;}
 $('#tabbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-tab]');if(!b)return;if(performance.now()-swSuppress<400)return;if(b.dataset.tab===curTab&&innerWidth<960){$('#app').classList.toggle('collapsed');}else setTab(b.dataset.tab);});
 /* swipe-down-to-close: drag from the handle, or from the content when it's scrolled to the top and the gesture is downward */
 let sw=null,swSuppress=0;const sheetEl=$('#sheet'),panelsEl=$('#panels');
@@ -1402,7 +1412,7 @@ function routeHash(){const h=location.hash.replace(/^#/,'');if(h.startsWith('shi
 window.addEventListener('hashchange',routeHash);
 $('#flow').addEventListener('input',ev=>{const t=ev.target;if(t.dataset.cust){flow.customer[t.dataset.cust]=t.value;saveProfile();}if(t.dataset.ship){flow.ship[t.dataset.ship]=t.value;saveProfile();}if(t.dataset.track){const o=orders.find(x=>x.order_id===t.dataset.track);if(o){o.tracking_number=t.value.trim();saveOrders();}}});
 $('#flow').addEventListener('change',ev=>{const t=ev.target;if(!t.dataset.status||flow.busy)return;const tr=$(`#flow [data-track="${t.dataset.status}"]`);setStatus(t.dataset.status,t.value,tr?tr.value:'');});
-$('#flow').addEventListener('focusin',ev=>{const el=ev.target;if(el.matches&&el.matches('input,select,textarea'))setTimeout(()=>{try{el.scrollIntoView({block:'center'});}catch(_){}},280);});
+$('#flow').addEventListener('focusin',ev=>{const el=ev.target;if(!(el.matches&&el.matches('input,select,textarea')))return;setTimeout(()=>{const sc=$('#flowBody');if(!sc||!el.isConnected)return;const er=el.getBoundingClientRect(),sr=sc.getBoundingClientRect();if(er.bottom>sr.bottom-8)sc.scrollTop+=er.bottom-(sr.bottom-8);else if(er.top<sr.top+8)sc.scrollTop-=(sr.top+8)-er.top;},280);});
 $('#flow').addEventListener('click',ev=>{
  const b=ev.target.closest('[data-act]');if(!b||flow.busy)return;const act=b.dataset.act,id=b.dataset.id;
  if(act==='back'){goBack();return;}
