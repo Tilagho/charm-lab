@@ -95,7 +95,10 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 .del{background:var(--pink);color:#fff}
 /* sheet */
 #sheet{flex:0 1 auto;height:var(--sheet-h,200px);min-height:0;margin:10px 12px 0;background:var(--card);border:3px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden}
-#app.collapsed #sheet{flex:none;height:48px}
+#app.collapsed #sheet{flex:none;height:39px}
+/* Retracted drawer is only the grab. The option tiles sit in .panels; hiding
+   them means nothing from the drawer body can peek above the tab bar. */
+html:not(.typing) #app.collapsed #sheet .panels{display:none}
 #sheet{position:relative;z-index:2;will-change:transform}
 #tabbar{position:relative;z-index:3;touch-action:none}
 #app.collapsed #sheet{touch-action:none}
@@ -700,7 +703,6 @@ function renderEls(){elsL.innerHTML=S.els.map(elMarkup).join('');ensureBakes();c
 function updateEl(e){const n=nodeOf(e.id);if(n)n.setAttribute('transform',trOf(e));if(e.type==='text')restrokeText(e);}
 function pxRatio(){const r=svg.getBoundingClientRect();const vb=svg.viewBox.baseVal;if(!r.width||!vb||!vb.width)return 1;return Math.max(vb.width/r.width,vb.height/r.height);}
 const ICON={del:`<path d="M-7-7L7 7M7-7L-7 7" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`,
- rot:`<g transform="translate(-10.2 -10.2) scale(.85)" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></g>`,
  scl:`<path d="M-7 7 L7 -7 M1 -7 H7 V-1 M-7 1 V7 H-1" fill="none" stroke="${INK}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>`};
 function updateSel(){
  const e=getSel();if(!e){if(selL.firstChild)selL.innerHTML='';return;}
@@ -715,7 +717,7 @@ function updateSel(){
  const hand=(name,lx,ly,fill)=>{const L=Math.hypot(lx,ly)||1;const ex=lx+lx/L*off,ey=ly+ly/L*off;let [x,y]=P(ex,ey);x=clamp(x,vb.x+R+4*k,vb.x+vb.width-R-4*k);y=clamp(y,vb.y+VIEW.band+R,vb.y+vb.height-VIEW.bandB-R);const [cx,cy]=P(lx,ly);
   return `<line x1="${cx.toFixed(1)}" y1="${cy.toFixed(1)}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#2e5bff" stroke-width="${(2.5*k).toFixed(2)}" stroke-linecap="round" pointer-events="none"/><g data-handle="${name}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${k.toFixed(3)})"><circle r="32" fill="transparent"/><circle r="24" fill="${fill}" stroke="${INK}" stroke-width="3.5"/>${ICON[name]}</g>`;};
  selL.innerHTML=`<polygon points="${ps}" fill="none" stroke="${INK}" stroke-width="${(5*k).toFixed(2)}" stroke-linejoin="round" opacity=".16" pointer-events="none"/><polygon points="${ps}" fill="none" stroke="#2e5bff" stroke-width="${(2.6*k).toFixed(2)}" stroke-dasharray="${(8*k).toFixed(1)} ${(6*k).toFixed(1)}" stroke-linejoin="round" pointer-events="none"/>`
-  +hand('del',hw,-hh,'#ff3ea5')+hand('rot',-hw,hh,'#ffe14a')+hand('scl',hw,hh,'#b8ff3c');
+  +hand('del',hw,-hh,'#ff3ea5')+hand('scl',hw,hh,'#b8ff3c');
 }
 new ResizeObserver(()=>{fitView();updateSel();}).observe(svg);
 
@@ -731,7 +733,10 @@ svg.addEventListener('pointerdown',ev=>{
  if(ptrs.size>2)return;
  const hnd=ev.target.closest('[data-handle]'),elg=ev.target.closest('[data-id]');const p=toSvgXY(ev.clientX,ev.clientY);
  if(hnd){const e=getSel();if(!e)return;markUsed();const h=hnd.dataset.handle;if(h==='del'){ptrs.clear();delSel();return;}
-  drag={mode:h,pid:ev.pointerId,id:e.id,s0:e.s,r0:e.r,a0:Math.atan2(p.y-e.y,p.x-e.x),d0:Math.hypot(p.x-e.x,p.y-e.y)||1,sx:ev.clientX,sy:ev.clientY,moved:false};}
+  drag={mode:h,pid:ev.pointerId,id:e.id,s0:e.s,r0:e.r,x0:e.x,y0:e.y,a0:Math.atan2(p.y-e.y,p.x-e.x),d0:Math.hypot(p.x-e.x,p.y-e.y)||1,sx:ev.clientX,sy:ev.clientY,moved:false};
+  /* Scale handle is pan + zoom. Remember where on the asset the finger landed
+     so that point stays under the finger while distance from the start center zooms. */
+  if(h==='scl'){const rad=e.r*Math.PI/180,c=Math.cos(rad),sn=Math.sin(rad),dx=p.x-e.x,dy=p.y-e.y;drag.lx=(dx*c+dy*sn)/e.s;drag.ly=(-dx*sn+dy*c)/e.s;}}
  else if(elg){markUsed();const id=+elg.dataset.id;const e=S.els.find(x=>x.id===id);const changed=sel!==id;sel=id;drag={mode:'move',pid:ev.pointerId,id,dx:p.x-e.x,dy:p.y-e.y,sx:ev.clientX,sy:ev.clientY,moved:false};
   if(changed){if(e.type==='text'&&IS_MOBILE===false)setTab('text');selChanged();}}
  else drag={mode:'empty',pid:ev.pointerId,sx:ev.clientX,sy:ev.clientY,moved:false};
@@ -749,8 +754,7 @@ function frame(){
  if(drag.mode==='empty')return;
  const e=S.els.find(x=>x.id===drag.id);if(!e)return;const p=toSvgXY(q.cx,q.cy);
  if(drag.mode==='move'){e.x=clamp(p.x-drag.dx,-185,185);e.y=clamp(p.y-drag.dy,-220,200);}
- else if(drag.mode==='scl'){e.s=clamp(drag.s0*Math.hypot(p.x-e.x,p.y-e.y)/drag.d0,minScale(e),S_MAX);}
- else if(drag.mode==='rot'){let r=normDeg(drag.r0+(Math.atan2(p.y-e.y,p.x-e.x)-drag.a0)*180/Math.PI);const sn=Math.round(r/45)*45;if(Math.abs(r-sn)<4)r=sn;e.r=r;}
+ else if(drag.mode==='scl'){const d=Math.hypot(p.x-drag.x0,p.y-drag.y0)||1;e.s=clamp(drag.s0*d/drag.d0,minScale(e),S_MAX);const rad=drag.r0*Math.PI/180,c=Math.cos(rad),sn=Math.sin(rad);e.x=clamp(p.x-(drag.lx*c-drag.ly*sn)*e.s,-185,185);e.y=clamp(p.y-(drag.lx*sn+drag.ly*c)*e.s,-220,200);}
  updateEl(e);updateSel();
 }
 function endPtr(ev){
@@ -899,7 +903,7 @@ function swEnd(){if(!sw)return;const s=sw;sw=null;if(!s.active)return;
  const close=s.d>s.H*.3||(v>.45&&s.d>12);
  sheetEl.style.transition='transform .24s cubic-bezier(.25,.8,.35,1)';
  const done=()=>{sheetEl.style.transition='none';if(close)$('#app').classList.add('collapsed');sheetEl.style.transform='';void sheetEl.offsetHeight;sheetEl.style.transition='';fitView();updateSel();};
- if(close)sheetEl.style.transform=`translateY(${Math.max(s.d,s.H-48)}px)`;else sheetEl.style.transform='translateY(0px)';
+ if(close)sheetEl.style.transform=`translateY(${Math.max(s.d,s.H-SHEET_MIN)}px)`;else sheetEl.style.transform='translateY(0px)';
  setTimeout(done,250);}
 sheetEl.addEventListener('touchstart',ev=>{if(ev.touches.length!==1){sw=null;up=null;return;}const t=ev.touches[0],tg=ev.target;
  if(upStart(t.clientX,t.clientY,null))return;
@@ -908,7 +912,7 @@ sheetEl.addEventListener('touchmove',ev=>{if(up){if(ev.touches.length!==1){upEnd
 sheetEl.addEventListener('touchend',()=>{upEnd();swEnd();});sheetEl.addEventListener('touchcancel',()=>{upEnd();swEnd();});
 /* swipe-UP-to-open: from the tab bar or the peeking handle while collapsed. The sheet follows the finger (height), opens
    past ~30% of its height or on a fast upward flick, otherwise snaps back. Starting on a tab opens that tab. */
-let up=null;const SHEET_MIN=48;
+let up=null;const SHEET_MIN=39;
 const sheetOpenH=()=>{const n=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-h'));return n||200;};
 function upStart(x,y,tab){if(!isDrawer()||!$('#app').classList.contains('collapsed'))return false;up={x0:x,y0:y,prev:curTab,tab:tab||curTab||'shape',active:false,d:0,H:sheetOpenH(),hist:[[performance.now(),y]]};return true;}
 function upMove(x,y,ev){if(!up)return;const dy=up.y0-y,dx=x-up.x0;
@@ -942,7 +946,7 @@ const HINT_KEY='charmlab.gestureHintSeen';let hintSeen=false;try{hintSeen=localS
 function markUsed(){if(hintSeen)return;hintSeen=true;try{localStorage.setItem(HINT_KEY,'1');}catch(_){}const h=$('#selbar .hint[data-gesture]');if(h){h.classList.add('fade');setTimeout(()=>{if(h.isConnected)h.remove();},380);}}
 function renderSelbar(){
  const e=getSel();const bar=$('#selbar');
- if(!e){bar.innerHTML=S.els.length?(hintSeen?'':`<div class="hint" data-gesture>tap to edit ✦ pinch to size + spin</div>`):`<div class="hint">add stickers or text below ↓</div>`;return;}
+ if(!e){bar.innerHTML=S.els.length?(hintSeen?'':`<div class="hint" data-gesture>tap to edit ✦ drag the green corner to move + size</div>`):`<div class="hint">add stickers or text below ↓</div>`;return;}
  bar.innerHTML=`<button class="ibtn" data-act="up" aria-label="bring forward">${SB.up}</button><button class="ibtn" data-act="dn" aria-label="send back">${SB.dn}</button><button class="ibtn" data-act="dup" aria-label="duplicate">${SB.dup}</button><button class="ibtn del" data-act="del" aria-label="delete">${SB.del}</button>`;
 }
 $('#selbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');if(!b)return;markUsed();const a=b.dataset.act;const i=S.els.findIndex(x=>x.id===sel);if(i<0)return;
