@@ -12,7 +12,7 @@ window.CHARM_LAB_ORDERS_WEBHOOK={url:"",key:""};
 <meta name="theme-color" content="#ffffff">
 <script>(function(){var t=null;try{t=localStorage.getItem('charmlab.theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;document.querySelector('meta[name=theme-color]').setAttribute('content',t==='dark'?'#272042':'#ffffff');})();</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>charm lab ✦ design your acrylic charm (mockup)</title>
+<title>CharmLab ✦ design your acrylic charm (mockup)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Fredoka:wght@400;500;600;700&family=Pacifico&family=Press+Start+2P&family=Rubik+Bubbles&display=swap" rel="stylesheet">
@@ -41,7 +41,7 @@ html[data-theme=dark] .themebtn .moon{transform:none;opacity:1}
 .themebtn .sun .rays{transform-origin:12px 12px;animation:spin 8s linear infinite}
 .themebtn.boop{animation:boop .5s cubic-bezier(.3,1.6,.5,1)}
 @keyframes boop{40%{transform:scale(1.15) rotate(-12deg)}}
-@media (max-width:400px){.logo .star{width:28px;height:28px}.logo{gap:7px}.logo h1{font-size:26px}header{gap:8px;padding:8px 12px 10px}.bagbtn{padding:0 8px 0 12px;gap:6px}}
+@media (max-width:400px){header{gap:8px;padding:8px 12px 10px}.bagbtn{padding:0 8px 0 12px;gap:6px}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* The dotted canvas stays on the large viewport so it paints under Safari's glass.
    The app shell is NOT 100lvh: on iOS 26 that rectangle runs under the status bar and
@@ -61,11 +61,14 @@ input{-webkit-user-select:text;user-select:text}
 button{font-family:inherit;color:inherit;-webkit-appearance:none;appearance:none;margin:0}
 #app{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);margin:0 auto;max-width:620px;display:flex;flex-direction:column;padding-top:var(--shell-pad-top,var(--sat));padding-left:var(--sal);padding-right:var(--sar);overflow:hidden}
 header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px 10px}
-.logo{display:flex;align-items:center;gap:10px;min-width:0}.lt{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
-.logo h1{font-family:'Bagel Fat One',cursive;font-weight:400;font-size:30px;line-height:1;margin:0;color:var(--pink);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:3px 3px 0 var(--shd);white-space:nowrap}
-.logo .star{width:34px;height:34px;flex:none;animation:spin 9s linear infinite}
+.logo{display:flex;align-items:center;min-width:0}
+.logo h1{margin:0;line-height:0}
+/* Still chrome wordmark. A slow bob stands in for balloon letters — no live 3D. */
+.wordmark{display:block;width:152px;height:auto;transform-origin:50% 80%;animation:wordbob 3.2s ease-in-out infinite}
+@keyframes wordbob{0%,100%{transform:translateY(0) rotate(-0.7deg)}50%{transform:translateY(-3px) rotate(0.9deg)}}
+@media (max-width:400px){.wordmark{width:136px}}
+@media (prefers-reduced-motion:reduce){.wordmark{animation:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ph{font-weight:700;font-size:14px;background:var(--lime);border:2.5px solid var(--ink);border-radius:999px;padding:1px 10px;transform:rotate(-3deg);margin-left:4px;box-shadow:2px 2px 0 var(--shd);white-space:nowrap}
 .bagbtn{flex:none;display:flex;align-items:center;gap:8px;height:56px;background:var(--card);border:3px solid var(--ink);border-radius:999px;padding:0 10px 0 14px;font-weight:700;font-size:17px;box-shadow:3px 3px 0 var(--shd);cursor:pointer}
 .bagbtn svg{width:26px;height:26px}
 .bagbtn .n{background:var(--pink);color:#fff;border:2.5px solid var(--ink);border-radius:999px;min-width:34px;height:34px;display:grid;place-items:center;font-size:16px;transition:transform .25s}
@@ -198,7 +201,7 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .modal.open{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start}
 .mcard{position:relative;z-index:1;flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column;background:transparent;overflow:hidden}
 .mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + var(--shell-pad-top,var(--sat))) calc(14px + var(--sar)) 10px calc(14px + var(--sal));position:relative;z-index:2;pointer-events:none}
-.mhead>*{pointer-events:auto}.mhead .logo h1{font-size:32px}
+.mhead>*{pointer-events:auto}
 .mfoot .mback{flex:0 0 38%;max-width:none;min-height:68px;font-size:20px;border-radius:24px;box-shadow:5px 5px 0 var(--shd)}
 .mfoot .madd{flex:1;width:auto;min-height:68px}
 .three-wrap{position:relative;flex:1 1 auto;min-height:0;touch-action:none;background:transparent}
@@ -245,11 +248,10 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
 @media (min-width:700px){.modal.open{align-items:center;justify-content:center;padding:24px;background:rgba(23,20,46,.45)}html.m3d{background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px;background-repeat:repeat}.mcard{position:relative;top:auto;right:auto;bottom:auto;left:auto;display:flex;flex:1 1 auto;width:100%;height:100%;max-width:1000px;max-height:820px;background:var(--three);border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{position:relative;top:auto;left:auto;right:auto;padding:12px 16px}.three-wrap{position:relative;top:auto;right:auto;bottom:auto;left:auto}.mfoot{position:relative;left:auto;right:auto;bottom:auto;padding:12px 16px}}
 /* desktop adaptation */
 @media (min-width:960px){
- .lt{flex-direction:row;align-items:center;gap:12px}
  #app{max-width:1200px;display:grid;grid-template-columns:minmax(0,1fr) 440px;grid-template-rows:auto auto minmax(0,1fr) auto;column-gap:24px;padding:16px 24px 24px}
  header{grid-column:1/-1;padding:4px 0 14px}
  .marquee{display:block;grid-column:1/-1}
- .logo h1{font-size:40px}
+ .wordmark{width:180px}
  #stageWrap{grid-column:1;grid-row:3/5;margin:0}
  #sheet{grid-column:2;grid-row:3;height:100%!important;max-height:100%;align-self:stretch;margin:0;border:3px solid var(--ink);border-bottom:0;border-radius:28px 28px 0 0}
  #sheet .grab{display:none}
@@ -258,7 +260,7 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
  .shapes{gap:12px}
  #tabbar{grid-column:2;grid-row:4;margin:0;border:3px solid var(--ink);border-top:0;border-radius:0 0 28px 28px;box-shadow:5px 5px 0 var(--shd)}
 }
-@media (max-width:360px){.tab{font-size:14px}.logo h1{font-size:26px}}
+@media (max-width:360px){.tab{font-size:14px}.wordmark{width:124px}}
 /* demo checkout + orders (same chunky UI, no text glow) */
 .checkout{width:100%;margin-top:12px;min-height:64px;font-family:'Bagel Fat One';font-size:24px;background:var(--yellow);color:var(--dark);border:3px solid var(--ink);border-radius:24px;box-shadow:5px 5px 0 var(--shd);cursor:pointer}
 .checkout:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shd)}
@@ -357,8 +359,7 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
 <div id="app">
  <header>
   <div class="logo">
-   <svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg>
-   <div class="lt"><h1>charm lab</h1><span class="ph">placeholder name</span></div>
+   <h1><img class="wordmark" src="charmlab-logo.png" srcset="charmlab-logo.png 608w" sizes="152px" width="608" height="128" alt="CharmLab"></h1>
   </div>
   <div class="hbtns"><button class="themebtn" id="themeBtn" aria-label="switch light or dark mode"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><g class="rays"><path d="M12 1.5v2.6M12 19.9v2.6M1.5 12h2.6M19.9 12h2.6M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g><circle cx="12" cy="12" r="5" fill="#ffe14a" stroke="currentColor"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z" fill="#c9b2ff"/><path d="M17 3.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="#ffe14a" stroke-width="1.2"/></svg></button><button class="bagbtn" id="bagBtn" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN">0</span></button></div>
  </header>
@@ -434,7 +435,7 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
 <div class="modal" id="modal">
  
  <div class="mcard">
-  <div class="mhead"><div class="logo"><svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg><h1>charm lab</h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
+  <div class="mhead"><div class="logo"><h1><img class="wordmark" src="charmlab-logo.png" srcset="charmlab-logo.png 608w" sizes="152px" width="608" height="128" alt="CharmLab"></h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
   <div class="three-wrap" id="threeWrap">
    <div class="mload" id="mload">polishing the acrylic…</div>
   </div>
