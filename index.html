@@ -99,8 +99,8 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 .hint{background:var(--hintbg);border:2.5px solid var(--ink);border-radius:999px;padding:10px 16px;font-weight:600;font-size:16px;text-align:center}
 .del{background:var(--pink);color:#fff}
 /* One card: the sliding panel is clipped to the same rounded stroke as the tab bar. */
-#drawer{flex:none;display:flex;flex-direction:column;min-height:0;margin:10px 12px 8px;background:var(--card);border:3px solid var(--ink);border-radius:30px;overflow:hidden;position:relative;z-index:2;transform:translateZ(0)}
-#sheet{flex:0 1 auto;height:var(--sheet-h,200px);min-height:0;margin:0;background:var(--card);border:0;border-radius:0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden;position:relative;z-index:1;will-change:transform}
+#drawer{flex:none;display:flex;flex-direction:column;min-height:0;margin:10px 12px 8px;background:var(--card);border:3px solid var(--ink);border-radius:30px;box-shadow:5px 5px 0 var(--shd);overflow:hidden;position:relative;z-index:2;transform:translateZ(0)}
+#sheet{flex:0 1 auto;height:var(--sheet-h,200px);min-height:0;margin:0;background:var(--card);border:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1}
 #app.collapsed #sheet{flex:none;height:39px}
 /* Retracted drawer is only the grab. The option tiles sit in .panels; hiding
    them means nothing from the drawer body can peek above the tab bar. */
@@ -258,7 +258,7 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
  .logo h1{font-size:40px}
  #stageWrap{grid-column:1;grid-row:3/5;margin:0}
  #drawer{display:contents}
- #sheet{grid-column:2;grid-row:3;height:100%!important;max-height:100%;align-self:stretch;margin:0;border:3px solid var(--ink);border-bottom:0;border-radius:28px 28px 0 0}
+ #sheet{grid-column:2;grid-row:3;height:100%!important;max-height:100%;align-self:stretch;margin:0;border:3px solid var(--ink);border-bottom:0;border-radius:28px 28px 0 0;box-shadow:5px 5px 0 var(--shd)}
  #sheet .grab{display:none}
  .panels{padding-top:18px}
  .tile{height:88px}
@@ -689,15 +689,21 @@ function renderBase(){
  h+=`</g>`;
  baseL.innerHTML=h;
  glossL.innerHTML=`<g clip-path="url(#clipOuter)"><path d="${g.outerD}" fill="none" stroke="#fff" stroke-width="12" opacity=".6"/><ellipse cx="-70" cy="${CY-70}" rx="62" ry="20" transform="rotate(-38 -70 ${CY-70})" fill="#fff" opacity=".42"/><ellipse cx="-104" cy="${CY-14}" rx="9" ry="5" transform="rotate(-50 -104 ${CY-14})" fill="#fff" opacity=".55"/><path d="M60 ${CY+120} q50 -20 70 -70" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/></g><circle cx="${g.tab.x}" cy="${g.tab.y}" r="${g.holeR.toFixed(2)}" fill="none" stroke="#a7bde0" stroke-width="2"/>`;
- // viewBox hugs the charm, with room for the floating bars
+ // viewBox: the biggest size fills the frame; smaller sizes stay in proportion
  fitView();
 }
-const BAND_T=76,BAND_B=76;let VIEW={band:0,bandB:0};
-function fitView(){const r=svg.getBoundingClientRect();if(!r.width||!r.height)return;const g=geo(S.shape);
- const top=g.minY-40,bot=g.maxY+16,cw=310,ch=bot-top;const avH=Math.max(120,r.height-BAND_T-BAND_B);
- /* the frame fits the biggest (2.5") charm; smaller sizes draw proportionally smaller so the size jump reads true */
- const gr=geo(S.shape,String(SIZE_MAX)),chR=gr.maxY+16-(gr.minY-40);const sc=Math.min(r.width/cw,avH/chR)*sizeF();const vw=r.width/sc,vh=r.height/sc;const y0=top-BAND_T/sc-(avH/sc-ch)/2;
- svg.setAttribute('viewBox',`${(-vw/2).toFixed(1)} ${y0.toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);VIEW={band:BAND_T/sc,bandB:BAND_B/sc};}
+/* Toolbar bands only keep selection handles clear of the floating buttons.
+   The charm itself is framed edge to edge: 2.5" uses the stage minus a slim pad,
+   and 2" / 1.5" are 0.8 / 0.6 of that so the size steps stay obvious. */
+const BAND_T=76,BAND_B=76,FRAME_PAD=10;let VIEW={band:0,bandB:0};
+function fitView(){const r=svg.getBoundingClientRect();if(!r.width||!r.height)return;
+ const g=geo(S.shape,String(SIZE_MAX));
+ const bw=Math.max(1,g.bb.x1-g.bb.x0),bh=Math.max(1,g.maxY-g.minY);
+ const availW=Math.max(48,r.width-FRAME_PAD*2),availH=Math.max(48,r.height-FRAME_PAD*2);
+ const sc=Math.min(availW/bw,availH/bh)*sizeF();
+ const vw=r.width/sc,vh=r.height/sc,cx=(g.bb.x0+g.bb.x1)/2,cy=(g.minY+g.maxY)/2;
+ svg.setAttribute('viewBox',`${(cx-vw/2).toFixed(1)} ${(cy-vh/2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
+ VIEW={band:BAND_T/sc,bandB:BAND_B/sc};}
 // text strokes in element space so they land at the universal charm-space weights (stroke is centered, fill covers the inner half)
 function txtW(e){const s=e.s||1;return {ink:(2*INK_W/s).toFixed(2),white:(2*(INK_W+WHITE_W)/s).toFixed(2),sx:(SH_DX/s).toFixed(2),sy:(SH_DY/s).toFixed(2)};}
 function restrokeText(e){const n=nodeOf(e.id);if(!n||!e.outline)return;const w=txtW(e);n.querySelectorAll('[data-k]').forEach(t=>{const k=t.dataset.k;t.setAttribute('stroke-width',k==='ink'?w.ink:w.white);if(k==='sh')t.setAttribute('transform',`translate(${w.sx} ${w.sy})`);});}
@@ -841,6 +847,10 @@ function syncTyping(){
   if(on!==was){
     root.classList.toggle('typing',on);
     if(on){
+      cancelMotion();
+      sheetEl.style.height='';
+      sheetEl.style.transition='';
+      sheetEl.style.transform='';
       $('#app').classList.remove('collapsed');
       const panels=$('#panels');
       if(panels)panels.scrollTop=0;
@@ -890,64 +900,109 @@ window.addEventListener('pointercancel',()=>{tray=null;if(ghost){ghost.remove();
 // sheet + tabs
 let curTab='shape',sheetTapAt=0;
 const isDrawer=()=>innerWidth<960;
-function collapse(){if(!isDrawer())return;const a=document.activeElement;if(a&&a.id==='txtIn')a.blur();$('#app').classList.add('collapsed');}
+function collapse(){if(!isDrawer())return;const a=document.activeElement;if(a&&a.id==='txtIn')a.blur();closeDrawer();}
 $('#sheet').addEventListener('pointerdown',()=>{sheetTapAt=performance.now();},true);
-function setTab(t){curTab=t;$('#app').classList.remove('collapsed');$('#app').classList.toggle('tab-order',t==='order');$$('#tabbar .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));$$('.panel').forEach(p=>p.classList.toggle('on',p.dataset.panel===t));$('#panels').scrollTop=0;}
-$('#tabbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-tab]');if(!b)return;if(performance.now()-swSuppress<400)return;if(b.dataset.tab===curTab&&innerWidth<960){$('#app').classList.toggle('collapsed');}else setTab(b.dataset.tab);});
-/* swipe-down-to-close: drag from the handle, or from the content when it's scrolled to the top and the gesture is downward */
-let sw=null,swSuppress=0;const sheetEl=$('#sheet'),panelsEl=$('#panels');
+function applyTab(t){curTab=t;$('#app').classList.toggle('tab-order',t==='order');$$('#tabbar .tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));$$('.panel').forEach(p=>p.classList.toggle('on',p.dataset.panel===t));$('#panels').scrollTop=0;}
+function setTab(t){applyTab(t);if(!isDrawer()||document.documentElement.classList.contains('typing')){$('#app').classList.remove('collapsed');return;}if($('#app').classList.contains('collapsed'))openDrawer();}
+$('#tabbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-tab]');if(!b)return;if(performance.now()-swSuppress<400)return;if(b.dataset.tab===curTab&&isDrawer())toggleDrawer();else setTab(b.dataset.tab);});
+/* The shell stays a rounded card and its height follows the finger. Sliding the
+   sheet with translateY left the icons parked under the clip and the empty
+   white card stuck on screen; shrinking the card never shows that frame. */
+let sw=null,swSuppress=0,up=null,sheetGen=0,settleTimer=0,settleHandler=null,fitLoop=0;
+const SHEET_MIN=39;
+const sheetEl=$('#sheet'),panelsEl=$('#panels');
 const drawerExpanded=()=>isDrawer()&&!$('#app').classList.contains('collapsed')&&!document.documentElement.classList.contains('typing');
-function swReset(){sw=null;sheetEl.style.transition='';sheetEl.style.transform='';}
-function swStart(x,y,src){if(!drawerExpanded())return;sw={x0:x,y0:y,src,active:false,d:0,H:sheetEl.offsetHeight,hist:[[performance.now(),y]]};if(src==='grab')swBegin(y);}
-function swBegin(y){if(!drawerExpanded()){swReset();return;}sw.active=true;sw.y0=y;sheetEl.style.transition='none';}
-function swMove(x,y,ev){if(!sw)return;if(!drawerExpanded()){swReset();return;}const dy=y-sw.y0,dx=x-sw.x0;
+const sheetFull=()=>{const n=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-h'));return n||200;};
+function stopFitLoop(){fitLoop++;}
+function startFitLoop(token){const id=++fitLoop;const loop=()=>{if(id!==fitLoop||token!==sheetGen)return;fitView();requestAnimationFrame(loop);};requestAnimationFrame(loop);}
+function cancelMotion(){
+  sheetGen++;stopFitLoop();
+  if(settleTimer){clearTimeout(settleTimer);settleTimer=0;}
+  if(settleHandler){sheetEl.removeEventListener('transitionend',settleHandler);settleHandler=null;}
+  if(sheetEl.style.height||sheetEl.style.transition){const h=sheetEl.getBoundingClientRect().height;sheetEl.style.transition='none';if(h)sheetEl.style.height=Math.round(h)+'px';}
+  sheetEl.style.transform='none';
+}
+function settleHeight(from,to,opening){
+  cancelMotion();const token=sheetGen;from=Math.round(from);to=Math.round(to);
+  const finish=()=>{
+    if(token!==sheetGen||finish.done)return;finish.done=true;
+    if(settleTimer){clearTimeout(settleTimer);settleTimer=0;}
+    if(settleHandler){sheetEl.removeEventListener('transitionend',settleHandler);settleHandler=null;}
+    stopFitLoop();
+    sheetEl.style.transition='none';sheetEl.style.transform='none';
+    $('#app').classList.toggle('collapsed',!opening);
+    sheetEl.style.height='';
+    void sheetEl.offsetHeight;sheetEl.style.transition='';sheetEl.style.transform='';
+    fitView();updateSel();
+  };
+  if(REDUCED||Math.abs(to-from)<1){finish();return;}
+  const ms=Math.round(Math.max(180,Math.min(360,Math.abs(to-from)*1.35)));
+  sheetEl.style.transition='none';sheetEl.style.height=from+'px';void sheetEl.offsetHeight;
+  sheetEl.style.transition=`height ${ms}ms cubic-bezier(.22,1,.36,1)`;sheetEl.style.height=to+'px';
+  startFitLoop(token);
+  settleHandler=ev=>{if(ev.target!==sheetEl||ev.propertyName!=='height')return;finish();};
+  sheetEl.addEventListener('transitionend',settleHandler);
+  settleTimer=setTimeout(finish,ms+90);
+}
+function openDrawer(){
+  if(!isDrawer()||document.documentElement.classList.contains('typing')){$('#app').classList.remove('collapsed');return;}
+  const from=sheetEl.getBoundingClientRect().height||SHEET_MIN;
+  sheetEl.style.transition='none';sheetEl.style.transform='none';sheetEl.style.height=Math.round(from)+'px';
+  $('#app').classList.remove('collapsed');
+  settleHeight(from,sheetFull(),true);
+}
+function closeDrawer(){
+  if(!isDrawer())return;
+  if($('#app').classList.contains('collapsed')&&!sheetEl.style.height)return;
+  settleHeight(sheetEl.getBoundingClientRect().height||sheetFull(),SHEET_MIN,false);
+}
+function toggleDrawer(){if($('#app').classList.contains('collapsed'))openDrawer();else closeDrawer();}
+function swReset(){sw=null;sheetEl.style.transform='none';}
+function swStart(x,y,src){if(!drawerExpanded())return;cancelMotion();const H=Math.round(sheetEl.getBoundingClientRect().height)||Math.round(sheetFull());sheetEl.style.transition='none';sheetEl.style.height=H+'px';sw={x0:x,y0:y,src,active:false,d:0,H,hist:[[performance.now(),y]],fitRaf:0};if(src==='grab')swBegin(y);}
+function swBegin(y){if(!sw)return;sw.active=true;sw.y0=y;sheetEl.style.transition='none';}
+function swMove(x,y,ev){if(!sw)return;if(!drawerExpanded()&&!sw.active){swReset();return;}const dy=y-sw.y0,dx=x-sw.x0;
  if(!sw.active){const atTop=panelsEl.scrollTop<=0;
-  if(atTop&&dy>0&&Math.abs(dy)>=Math.abs(dx)&&ev&&ev.cancelable)ev.preventDefault();// keep iOS from committing to a rubber-band scroll
+  if(atTop&&dy>0&&Math.abs(dy)>=Math.abs(dx)&&ev&&ev.cancelable)ev.preventDefault();
   if(Math.abs(dy)<8&&Math.abs(dx)<8)return;
   if(atTop&&dy>0&&Math.abs(dy)>Math.abs(dx))swBegin(y);else{sw=null;return;}}
  if(ev&&ev.cancelable)ev.preventDefault();
- /* Stop once the body is tucked down to the grab. The tab bar is not part of this
-    motion, and a further pull must not drag the remaining chrome off screen. */
- const maxSlide=Math.max(0,sw.H-SHEET_MIN);
- sw.d=Math.min(maxSlide,Math.max(0,y-sw.y0));sheetEl.style.transform=`translateY(${sw.d}px)`;
- const now=performance.now();sw.hist.push([now,y]);while(sw.hist.length>2&&now-sw.hist[0][0]>100)sw.hist.shift();}
-function swEnd(){if(!sw)return;const s=sw;sw=null;if(!s.active)return;
- if(s.d<6){sheetEl.style.transition='';sheetEl.style.transform='';return;}
+ const h=Math.round(Math.max(SHEET_MIN,Math.min(sheetFull(),sw.H-(y-sw.y0))));
+ sw.d=sw.H-h;sheetEl.style.height=h+'px';
+ const now=performance.now();sw.hist.push([now,y]);while(sw.hist.length>2&&now-sw.hist[0][0]>100)sw.hist.shift();
+ if(!sw.fitRaf)sw.fitRaf=requestAnimationFrame(()=>{if(sw)sw.fitRaf=0;fitView();});}
+function swEnd(){if(!sw)return;const s=sw;sw=null;if(!s.active)return;const h=sheetEl.getBoundingClientRect().height;
+ if(s.d<6){settleHeight(h,sheetFull(),true);return;}
  swSuppress=performance.now();
- const [t0,y0]=s.hist[0],[t1,y1]=s.hist[s.hist.length-1];const v=t1>t0?(y1-y0)/(t1-t0):0;// px/ms, + = down
+ const [t0,y0]=s.hist[0],[t1,y1]=s.hist[s.hist.length-1];const v=t1>t0?(y1-y0)/(t1-t0):0;
  const close=s.d>s.H*.3||(v>.45&&s.d>12);
- sheetEl.style.transition='transform .24s cubic-bezier(.25,.8,.35,1)';
- const done=()=>{sheetEl.style.transition='none';if(close)$('#app').classList.add('collapsed');sheetEl.style.transform='';void sheetEl.offsetHeight;sheetEl.style.transition='';fitView();updateSel();};
- if(close)sheetEl.style.transform=`translateY(${Math.max(s.d,s.H-SHEET_MIN)}px)`;else sheetEl.style.transform='translateY(0px)';
- setTimeout(done,250);}
+ settleHeight(h,close?SHEET_MIN:sheetFull(),!close);}
 sheetEl.addEventListener('touchstart',ev=>{if(ev.touches.length!==1){sw=null;up=null;return;}const t=ev.touches[0],tg=ev.target;
  if(upStart(t.clientX,t.clientY,null))return;
  if(tg.closest('input,select,textarea'))return;swStart(t.clientX,t.clientY,tg.closest('#grab')?'grab':'content');},{passive:true});
 sheetEl.addEventListener('touchmove',ev=>{if(up){if(ev.touches.length!==1){upEnd();return;}upMove(ev.touches[0].clientX,ev.touches[0].clientY,ev);if(!up&&ev.cancelable)ev.preventDefault();return;}if(!sw){if($('#app').classList.contains('collapsed')&&ev.cancelable)ev.preventDefault();return;}if(ev.touches.length!==1){swEnd();return;}const t=ev.touches[0];swMove(t.clientX,t.clientY,ev);},{passive:false});
 sheetEl.addEventListener('touchend',()=>{upEnd();swEnd();});sheetEl.addEventListener('touchcancel',()=>{upEnd();swEnd();});
-/* swipe-UP-to-open: from the tab bar or the peeking handle while collapsed. The sheet follows the finger (height), opens
-   past ~30% of its height or on a fast upward flick, otherwise snaps back. Starting on a tab opens that tab. */
-let up=null;const SHEET_MIN=39;
-const sheetOpenH=()=>{const n=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-h'));return n||200;};
-function upStart(x,y,tab){if(!isDrawer()||!$('#app').classList.contains('collapsed'))return false;up={x0:x,y0:y,prev:curTab,tab:tab||curTab||'shape',active:false,d:0,H:sheetOpenH(),hist:[[performance.now(),y]]};return true;}
+/* swipe-up opens from the tab bar or the grab. Height tracks the finger, then eases
+   open or shut. A downward move on the retracted tab bar is not a dismiss. */
+function upStart(x,y,tab){if(!isDrawer()||!$('#app').classList.contains('collapsed')||document.documentElement.classList.contains('typing'))return false;up={x0:x,y0:y,prev:curTab,tab:tab||curTab||'shape',active:false,d:0,H:sheetFull(),hist:[[performance.now(),y]]};return true;}
 function upMove(x,y,ev){if(!up)return;const dy=up.y0-y,dx=x-up.x0;
- if(!up.active){if(Math.abs(dy)<8&&Math.abs(dx)<8)return;if(dy>0&&dy>Math.abs(dx)){up.active=true;up.y0=y;sheetEl.style.transition='none';sheetEl.style.height=SHEET_MIN+'px';setTab(up.tab);}else{up=null;if(ev&&ev.cancelable)ev.preventDefault();return;}}
+ if(!up.active){if(Math.abs(dy)<8&&Math.abs(dx)<8)return;if(dy>0&&dy>Math.abs(dx)){up.active=true;up.y0=y;cancelMotion();sheetEl.style.transition='none';sheetEl.style.height=SHEET_MIN+'px';$('#app').classList.remove('collapsed');applyTab(up.tab);}else{up=null;if(ev&&ev.cancelable)ev.preventDefault();return;}}
  if(ev&&ev.cancelable)ev.preventDefault();
- const raw=Math.max(0,up.y0-y);up.d=raw<=up.H-SHEET_MIN?raw:(up.H-SHEET_MIN)+Math.sqrt(raw-(up.H-SHEET_MIN))*3;// a little rubber past fully open
- sheetEl.style.height=(SHEET_MIN+up.d)+'px';
+ const raw=Math.max(0,up.y0-y),max=Math.max(0,up.H-SHEET_MIN);
+ const d=raw<=max?raw:max+Math.sqrt(Math.max(0,raw-max))*3;
+ const h=Math.round(Math.min(up.H+24,SHEET_MIN+d));
+ up.d=h-SHEET_MIN;sheetEl.style.height=h+'px';
  const now=performance.now();up.hist.push([now,y]);while(up.hist.length>2&&now-up.hist[0][0]>100)up.hist.shift();}
 function upEnd(){if(!up)return;const s=up;up=null;if(!s.active)return;swSuppress=performance.now();
- const [t0,y0]=s.hist[0],[t1,y1]=s.hist[s.hist.length-1];const v=t1>t0?(y0-y1)/(t1-t0):0;// px/ms, + = up
+ const h=sheetEl.getBoundingClientRect().height;
+ const [t0,y0]=s.hist[0],[t1,y1]=s.hist[s.hist.length-1];const v=t1>t0?(y0-y1)/(t1-t0):0;
  const open=s.d>(s.H-SHEET_MIN)*.3||(v>.45&&s.d>12);
- sheetEl.style.transition='height .3s cubic-bezier(.3,1.2,.5,1)';void sheetEl.offsetHeight;
- sheetEl.style.height=(open?s.H:SHEET_MIN)+'px';
- setTimeout(()=>{sheetEl.style.transition='none';if(!open){if(s.prev&&s.prev!==curTab)setTab(s.prev);$('#app').classList.add('collapsed');}else $('#app').classList.remove('collapsed');sheetEl.style.height='';void sheetEl.offsetHeight;sheetEl.style.transition='';fitView();updateSel();},310);}
+ if(!open&&s.prev&&s.prev!==curTab)applyTab(s.prev);
+ settleHeight(h,open?s.H:SHEET_MIN,open);}
 const tabbarEl=$('#tabbar');
 tabbarEl.addEventListener('touchstart',ev=>{if(ev.touches.length!==1)return;const t=ev.touches[0];const b=ev.target.closest('[data-tab]');if($('#app').classList.contains('collapsed'))upStart(t.clientX,t.clientY,b&&b.dataset.tab);},{passive:true});
 tabbarEl.addEventListener('touchmove',ev=>{
  if(ev.touches.length!==1){upEnd();return;}
  const t=ev.touches[0];
- /* Retracted drawer: the tab bar stays put. Downward is not a dismiss. */
  if($('#app').classList.contains('collapsed')){
   if(sw)swReset();
   if(!up){if(ev.cancelable)ev.preventDefault();return;}
@@ -962,7 +1017,7 @@ tabbarEl.addEventListener('touchend',upEnd);tabbarEl.addEventListener('touchcanc
 $('#grab').addEventListener('pointerdown',ev=>{if(ev.pointerType==='touch')return;swStart(ev.clientX,ev.clientY,'grab');});
 window.addEventListener('pointermove',ev=>{if(sw&&ev.pointerType!=='touch')swMove(ev.clientX,ev.clientY,null);});
 window.addEventListener('pointerup',ev=>{if(sw&&ev.pointerType!=='touch')swEnd();});
-$('#grab').addEventListener('click',()=>{if(performance.now()-swSuppress<400)return;$('#app').classList.toggle('collapsed');});
+$('#grab').addEventListener('click',()=>{if(performance.now()-swSuppress<400)return;toggleDrawer();});
 $('#sheet').addEventListener('transitionend',()=>updateSel());
 $('#undoB').onclick=undo;$('#redoB').onclick=redo;
 $('#clearB').onclick=()=>{if(!S.els.length)return;S.els=[];sel=null;commit();toast('fresh start ✿ undo brings it back');};
