@@ -174,7 +174,6 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
    floating bar). The canvas is only that middle band, so the keyring can't draw
    under the island or leave a gap under the buttons. */
 .modal{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);box-sizing:border-box;z-index:60;display:none;background:transparent}
-@media (max-width:699px){html.m3d #app{visibility:hidden}}
 .modal.open{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start}
 .mcard{position:relative;z-index:1;flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column;background:transparent;overflow:hidden}
 .mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + var(--shell-pad-top,var(--sat))) calc(14px + var(--sar)) 10px calc(14px + var(--sal));position:relative;z-index:2;pointer-events:none}
@@ -207,7 +206,20 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
 .mfoot{position:relative;flex:none;z-index:2;display:flex;flex-direction:column;gap:10px;padding:8px calc(14px + var(--sar)) calc(12px + var(--shell-pad-bot,var(--sab))) calc(14px + var(--sal));pointer-events:none}
 .mbtns{display:flex;gap:12px;pointer-events:auto}
 .pbtn.on{background:var(--lime)}
-@media (min-width:700px){.modal.open{align-items:center;justify-content:center;padding:24px;background:rgba(23,20,46,.45)}html.m3d{background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px;background-repeat:repeat}.mcard{flex:1 1 auto;width:100%;height:100%;max-width:1000px;max-height:820px;background:var(--three);border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{padding:12px 16px}.mfoot{padding:12px 16px}}
+/* Phone: do not trust flex-grow. iOS sizes that column to the model and leaves
+   the buttons mid-screen with empty gradient under them. The overlay is the
+   visual-viewport rectangle; the header, the canvas, and the description +
+   buttons are each pinned to an edge of it. 12px keeps the buttons just above
+   Safari's floating bar (shell-pad-bot is 0 while that bar is showing). */
+@media (max-width:699px){
+ html.m3d #app{visibility:hidden}
+ .modal.open{display:block}
+ .mcard{position:absolute;top:0;right:0;bottom:0;left:0;display:block;width:auto;height:auto;min-height:0}
+ .mhead{position:absolute;top:0;left:0;right:0}
+ .three-wrap{position:absolute;left:0;right:0;top:76px;bottom:160px}
+ .mfoot{position:absolute;left:0;right:0;bottom:0;padding-bottom:calc(12px + var(--shell-pad-bot,0px))}
+}
+@media (min-width:700px){.modal.open{align-items:center;justify-content:center;padding:24px;background:rgba(23,20,46,.45)}html.m3d{background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px;background-repeat:repeat}.mcard{position:relative;top:auto;right:auto;bottom:auto;left:auto;display:flex;flex:1 1 auto;width:100%;height:100%;max-width:1000px;max-height:820px;background:var(--three);border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{position:relative;top:auto;left:auto;right:auto;padding:12px 16px}.three-wrap{position:relative;top:auto;right:auto;bottom:auto;left:auto}.mfoot{position:relative;left:auto;right:auto;bottom:auto;padding:12px 16px}}
 /* desktop adaptation */
 @media (min-width:960px){
  .lt{flex-direction:row;align-items:center;gap:12px}
@@ -302,7 +314,7 @@ function fit(){
   var sab=parseFloat(cs.getPropertyValue('--sab'))||0;
   r.style.setProperty('--shell-pad-top',Math.round(Math.max(0,sat-top))+'px');
   r.style.setProperty('--shell-pad-bot',Math.round(Math.max(0,sab-Math.max(0,bottomGap)))+'px');
-  try{document.dispatchEvent(new Event('charm-vv'));}catch(e){}
+  try{document.dispatchEvent(new Event('charm-vv',{bubbles:true}));}catch(e){}
 }
 var scheduled=false;
 function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(function(){scheduled=false;fit();});}
@@ -1037,8 +1049,29 @@ function createViewer(){
  controls.addEventListener('change',()=>{if(v.inTick)v.changed=true;else kick();});
  return v;
 }
+/* Lock the phone overlay to the same pixel rectangle as the designer shell,
+   then park the canvas between the header and the pinned footer. Inline
+   px wins over any stylesheet height iOS resolves against the large viewport. */
+function pin3D(){
+ const modal=$('#modal');if(!modal||!modal.classList.contains('open'))return;
+ const wrap=$('#threeWrap'),foot=$('#mfoot'),head=$('.mhead'),card=$('.mcard');
+ const phone=matchMedia('(max-width:699px)').matches;
+ if(!phone){
+  [modal,wrap,foot,head,card].forEach(el=>{if(!el)return;el.style.top=el.style.right=el.style.bottom=el.style.left=el.style.height=el.style.position='';});
+  return;
+ }
+ const cs=getComputedStyle(document.documentElement);
+ const top=cs.getPropertyValue('--app-top').trim()||'0px';
+ const h=cs.getPropertyValue('--app-h').trim()||(innerHeight+'px');
+ modal.style.position='absolute';modal.style.left='0px';modal.style.right='0px';modal.style.bottom='auto';modal.style.top=top;modal.style.height=h;
+ card.style.position='absolute';card.style.top='0';card.style.right='0';card.style.bottom='0';card.style.left='0';card.style.height='auto';
+ head.style.position='absolute';head.style.top='0';head.style.left='0';head.style.right='0';
+ foot.style.position='absolute';foot.style.left='0';foot.style.right='0';foot.style.bottom='0';foot.style.top='auto';
+ wrap.style.position='absolute';wrap.style.left='0';wrap.style.right='0';wrap.style.height='auto';
+ wrap.style.top=head.offsetHeight+'px';wrap.style.bottom=foot.offsetHeight+'px';
+}
 function band3D(){const r=$('#threeWrap').getBoundingClientRect();const pad=18;return {W:r.width,H:r.height,top:pad,bot:Math.max(pad+1,r.height-pad)};}
-function resize3D(){if(!V)return;const r=$('#threeWrap').getBoundingClientRect();if(!r.width||!r.height)return;V.renderer.setSize(r.width,r.height,false);V.camera.aspect=r.width/r.height;
+function resize3D(){if(modalOpen)pin3D();if(!V)return;const r=$('#threeWrap').getBoundingClientRect();if(!r.width||!r.height)return;V.renderer.setSize(r.width,r.height,false);V.camera.aspect=r.width/r.height;
  // the canvas is only the band between the header and the footer; nudge the projection if that band's padding isn't centred
  const B=band3D();V.band=B;const dy=(B.top+B.bot)/2-B.H/2;if(Math.abs(dy)>.5)V.camera.setViewOffset(B.W,B.H,0,-dy,B.W,B.H);else V.camera.clearViewOffset();V.camera.updateProjectionMatrix();}
 async function build3D(){
@@ -1197,15 +1230,15 @@ function disposeViewer(){
 }
 async function open3D(){
  sel=null;selChanged();clearTimeout(idleT);motion=!REDUCED;
- $('#modal').classList.add('open');document.documentElement.classList.add('m3d');syncThemeColor();modalOpen=true;$('#mload').style.display='grid';$('#mload').textContent='polishing the acrylic…';$('#mtag').innerHTML='';window.__3dReady=false;
+ $('#modal').classList.add('open');document.documentElement.classList.add('m3d');syncThemeColor();modalOpen=true;pin3D();$('#mload').style.display='grid';$('#mload').textContent='polishing the acrylic…';$('#mtag').innerHTML='';window.__3dReady=false;
  try{
   await loadThree();if(!modalOpen)return;
   disposeViewer();V=createViewer();resize3D();await build3D();if(!modalOpen){disposeViewer();return;}
-  V.links=V.hang?V.hang.children.filter(o=>o.userData.link):[];resize3D();resetView();$('#mload').style.display='none';kick();
+  V.links=V.hang?V.hang.children.filter(o=>o.userData.link):[];pin3D();resize3D();resetView();$('#mload').style.display='none';kick();
  }catch(err){console.error(err);$('#mload').innerHTML='hmm, 3D needs WebGL and an internet connection<br><small style="font-family:Fredoka;font-size:17px">(three.js loads from a CDN)</small>';}
 }
 function close3D(){modalOpen=false;clearTimeout(idleT);if(V)V.bump=null;$('#modal').classList.remove('open');document.documentElement.classList.remove('m3d');syncThemeColor();disposeViewer();}
-addEventListener('charm-vv',()=>{if(!modalOpen||!V)return;resize3D();if(!V.interacting)resetView();});
+document.addEventListener('charm-vv',()=>{if(!modalOpen)return;pin3D();if(!V)return;resize3D();if(!V.interacting)resetView();});
 $('#open3d').onclick=open3D;$('#close3d').onclick=close3D;
 $('#add3d').onclick=()=>addToBag($('#add3d'));
 const setMotion=m=>{motion=m;clearTimeout(idleT);if(V){if(!m){V.bump=null;restPose();}kick();}};
