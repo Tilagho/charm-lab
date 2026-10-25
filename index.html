@@ -101,9 +101,9 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 .sub{font-size:15px;font-weight:600;opacity:.72;margin:10px 2px 6px}
 .panel>.sub:first-child{margin-top:2px}
 .shapes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.tile{height:68px;min-height:0;border:3px solid var(--ink);border-radius:16px;background:var(--card);box-shadow:2px 2px 0 var(--shd);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:5px;transition:transform .08s,box-shadow .08s}
+.tile{height:68px;min-height:0;border:0;border-radius:16px;background:transparent;box-shadow:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:1px;transition:transform .08s}
 .tile svg{width:100%;height:100%;display:block}
-.tile.on{background:#fff4b8;outline:3px solid var(--pink);outline-offset:2px}
+.tile.on{background:#fff4b8;outline:3px solid var(--pink);outline-offset:0}
 .pnote{font-size:15px;font-weight:600;margin:-6px 2px 14px;padding:8px 12px;border:2.5px dashed var(--dash);border-radius:16px;background:var(--card2);color:var(--ink)}
 .sws{display:flex;flex-wrap:wrap;gap:10px}
 .sw{width:48px;height:48px;border-radius:50%;border:3px solid var(--ink);box-shadow:2px 2px 0 var(--shd);cursor:pointer;position:relative;padding:0}
@@ -735,8 +735,10 @@ function pulseStage(){const w=$('#stageWrap');w.animate([{transform:'scale(1)'},
 /* ---------- UI ---------- */
 $('#mq').innerHTML=['charm lab ✦','made in pāʻia','holo stars','stickers on stickers','acrylic but make it cute','shaka bb','custom everything','✿ ✿ ✿'].map(s=>`<span>${s}</span>`).join('').repeat(4);
 const TILECOLS=['#ffc2e2','#b8ff3c','#8fd8ff','#ffe14a','#c9b2ff','#5cf2c8','#ffc2e2','#ff8a3d'];
-/* picker icons only: a chubby hanging loop with a big hole, so the bail reads at thumbnail size.
-   the real cut (geo / export / 3D) stays the accurate small tab. */
+/* picker icons only. One black outline: the loop and the shape are drawn as a single
+   silhouette (ink first, then the fill on top) so their strokes don't stack into a
+   double line or a white rim. The hole is a bit smaller than the first chubby pass.
+   The real cut (geo / export / 3D) stays the accurate small tab. */
 function tileIcon(id,fill){
  const g=geo(id);
  const xs=g.body.map(p=>p[0]),ys=g.body.map(p=>p[1]);
@@ -745,8 +747,9 @@ function tileIcon(id,fill){
  const W=120,H=136,shapeTop=52,shapeBot=H-4;
  const s=Math.min((W-12)/bw,(shapeBot-shapeTop)/bh);
  const ox=(W-bw*s)/2-left*s,oy=shapeTop-top*s;
- const sw=(8/s).toFixed(2);
- return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><ellipse cx="60" cy="32" rx="36" ry="30" fill="${fill}" stroke="currentColor" stroke-width="7"/><g transform="translate(${ox.toFixed(2)} ${oy.toFixed(2)}) scale(${s.toFixed(4)})"><path d="${g.bodyD}" fill="${fill}" stroke="currentColor" stroke-width="${sw}" stroke-linejoin="round"/></g><ellipse cx="60" cy="32" rx="18" ry="14" fill="var(--card)" stroke="currentColor" stroke-width="5"/></svg>`;
+ const tf=`translate(${ox.toFixed(2)} ${oy.toFixed(2)}) scale(${s.toFixed(4)})`;
+ const sw=(12/s).toFixed(2);
+ return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><g fill="currentColor" stroke="currentColor" stroke-linejoin="round"><ellipse cx="60" cy="32" rx="36" ry="30" stroke-width="12"/><g transform="${tf}"><path d="${g.bodyD}" stroke-width="${sw}"/></g></g><g fill="${fill}"><ellipse cx="60" cy="32" rx="36" ry="30"/><g transform="${tf}"><path d="${g.bodyD}"/></g></g><ellipse cx="60" cy="32" rx="13" ry="10" fill="var(--card)" stroke="currentColor" stroke-width="4"/></svg>`;
 }
 $('#shapes').innerHTML=SHAPES.map((s,i)=>`<button class="tile" data-shape="${s.id}" aria-label="${s.name}">${tileIcon(s.id,TILECOLS[i])}</button>`).join('');
 $('#shapes').addEventListener('click',ev=>{const b=ev.target.closest('[data-shape]');if(!b)return;S.shape=b.dataset.shape;commit();});
