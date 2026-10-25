@@ -210,15 +210,16 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
    the buttons mid-screen with empty gradient under them. The overlay is the
    same rectangle as #app. The action row is position:fixed against the visual
    viewport (pin3D shifts `bottom` if this browser resolves fixed against the
-   layout viewport instead). Padding below the buttons is only --shell-pad-bot,
-   the safe area that is not already covered by Safari's floating bar. */
+   layout viewport instead). The row's border box stays on that bottom edge.
+   10px of padding, plus any leftover safe area, lifts the button border off
+   Safari's floating bar without opening a gap under the model. */
 @media (max-width:699px){
  html.m3d #app{visibility:hidden}
  .modal.open{display:block;overflow:visible}
  .mcard{position:absolute;top:0;right:0;bottom:0;left:0;display:block;width:auto;height:auto;min-height:0;overflow:visible}
  .mhead{position:absolute;top:0;left:0;right:0;z-index:3}
  .three-wrap{position:absolute;left:0;right:0;top:76px;bottom:160px;z-index:1}
- .mfoot{position:fixed;left:0;right:0;bottom:0;z-index:5;margin:0;padding-bottom:var(--shell-pad-bot,0px)}
+ .mfoot{position:fixed;left:0;right:0;bottom:0;z-index:5;margin:0;padding-bottom:calc(10px + var(--shell-pad-bot,0px))}
 }
 @media (min-width:700px){.modal.open{align-items:center;justify-content:center;padding:24px;background:rgba(23,20,46,.45)}html.m3d{background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px;background-repeat:repeat}.mcard{position:relative;top:auto;right:auto;bottom:auto;left:auto;display:flex;flex:1 1 auto;width:100%;height:100%;max-width:1000px;max-height:820px;background:var(--three);border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{position:relative;top:auto;left:auto;right:auto;padding:12px 16px}.three-wrap{position:relative;top:auto;right:auto;bottom:auto;left:auto}.mfoot{position:relative;left:auto;right:auto;bottom:auto;padding:12px 16px}}
 /* desktop adaptation */
@@ -1051,7 +1052,8 @@ function createViewer(){
    on the visual-viewport bottom even if a parent box is short. Some engines
    resolve fixed `bottom:0` against the layout viewport (under Safari's bar, or
    under a stubbed toolbar); measure that and shift `bottom` until the row's
-   border box lands on #app's bottom. Padding is only the leftover safe area. */
+   border box lands on #app's bottom. 10px of padding then holds the button
+   border just above that edge, plus whatever safe area is still uncovered. */
 function pin3D(){
  const modal=$('#modal');if(!modal||!modal.classList.contains('open'))return;
  const wrap=$('#threeWrap'),foot=$('#mfoot'),head=$('.mhead'),card=$('.mcard');
@@ -1065,7 +1067,7 @@ function pin3D(){
  head.style.position='absolute';head.style.top='0';head.style.left='0';head.style.right='0';head.style.zIndex='3';
  const pad=Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--shell-pad-bot'))||0);
  foot.style.position='fixed';foot.style.left='0px';foot.style.right='0px';foot.style.top='auto';foot.style.margin='0px';
- foot.style.paddingBottom=pad+'px';foot.style.zIndex='5';foot.style.bottom='0px';
+ foot.style.paddingBottom=(pad+10)+'px';foot.style.zIndex='5';foot.style.bottom='0px';
  const target=ar.bottom,landed=foot.getBoundingClientRect().bottom;
  foot.style.bottom=Math.round(landed-target)+'px';
  if(Math.abs(foot.getBoundingClientRect().bottom-target)>2){
