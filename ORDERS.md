@@ -4,13 +4,9 @@ Demo checkout only. Nothing is charged, and orders stay in this browser (`localS
 
 ## Demo
 
-1. On the **order** tab, tap **checkout** (an empty bag gets the charm on screen). Or add a few charms, then open the bag.
-2. Enter a name plus email or mobile. Tap **text me a link** or **email me a link** to open Messages or Mail with a prefilled note. Then tap **customer tapped the link**, or tap **I'll type the address**.
-3. Fill street, city, state, and ZIP (country defaults to US).
-4. Pick **Venmo**, **Cash App**, **Shop Pay**, or **Apple Pay**, then **payment received**.
-5. The order is **ordered**. Download the Vograce ZIP, download the CSV, or open **orders** and move the status along `ordered → exported → received_by_3rd_party → shipped` (or `cancelled`). Downloading the ZIP marks it exported.
+Customers never see fulfillment tools. Checkout asks for name, email, and a full shipping address. Phone is optional, with “Text me for order updates” as the opt-in. Then Venmo, Cash App, Shop Pay, or Apple Pay, then **payment received**. The thank-you page shows the order id, a plain summary, the address, and what’s next.
 
-The text/email link only opens the address form in a browser that has the same saved checkout (this phone or computer). Use **customer tapped the link** when you are demoing on one device.
+Fulfillment lives at `#/ops` (not linked from checkout): Vograce ZIP, orders CSV, copy for Sheets, and status `ordered → exported → received_by_3rd_party → shipped` (or `cancelled`). Downloading the ZIP marks it exported. The same ZIP is built when payment is received and, once `window.CHARM_LAB_ORDERS_WEBHOOK` has a url and key, POSTed with the order. Until those are filled in, the order still saves in this browser.
 
 ## CSV for Google Sheets
 
@@ -50,7 +46,7 @@ On Vograce, pick **Custom Clear Acrylic Keychains**, **Double sided different de
 
 ## Limits
 
-- Payments, texts, and emails are UI only. `sms:` and `mailto:` open the device composer and do not send by themselves.
+- Payments are UI only. Nothing is charged. “Text me for order updates” only stores the opt-in; it does not send a text.
 - Orders live in this browser only. Clearing site data clears them.
 - Print files are RGB PNG, not CMYK Japan Color 2001. Vograce accepts RGB PNG. Neon swatches are already softened in the designer, and they can still print a bit duller.
 - Export is 600 DPI, except 1.5" which is raised so the long side is at least 1000 px (about 667 DPI). 2" is 1200 px on the long side, 2.5" is 1500 px.

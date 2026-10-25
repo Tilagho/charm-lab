@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+/* Charm Lab order received — paste the webhook URL and sender key from the Grok Bot routine.
+   The key is sent as Authorization: Bearer <key>. Add header:"Header-Name" if that routine names a different header.
+   Leave url and key empty until then: checkout still finishes, and the print ZIP stays on #/ops. */
+window.CHARM_LAB_ORDERS_WEBHOOK={url:"",key:""};
+</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#ffffff">
 <script>(function(){var t=null;try{t=localStorage.getItem('charmlab.theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;document.querySelector('meta[name=theme-color]').setAttribute('content',t==='dark'?'#272042':'#ffffff');})();</script>
@@ -241,14 +247,16 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
 /* demo checkout + orders (same chunky UI, no text glow) */
 .checkout{width:100%;margin-top:12px;min-height:64px;font-family:'Bagel Fat One';font-size:24px;background:var(--yellow);color:var(--dark);border:3px solid var(--ink);border-radius:24px;box-shadow:5px 5px 0 var(--shd);cursor:pointer}
 .checkout:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shd)}
-.ordersbtn{width:100%;margin-top:10px}
+.opt{font-weight:600;opacity:.7}
+.optin{display:flex;align-items:flex-start;gap:12px;margin:0 0 16px;font-weight:700;font-size:16px;line-height:1.3}
+.optin input{width:28px;height:28px;flex:none;margin:0;accent-color:var(--pink)}
+.thanks{font-family:'Bagel Fat One';font-size:34px;line-height:1.05;margin:0 0 6px;color:var(--pink)}
 /* order actions stay in view. the options above them scroll; the buttons are not inside that scroller,
    so a tall price breakdown cannot push checkout below the drawer (or the viewport). */
 #orderFoot{display:none}
 #app.tab-order:not(.collapsed) #orderFoot{display:flex;flex-direction:column;gap:8px;flex:none;padding:8px 12px 10px;background:var(--card);border-top:3px solid var(--ink)}
 #orderFoot .acts2{display:flex;gap:8px}
 #orderFoot .addbag,#orderFoot .checkout{flex:1;width:auto;margin:0;min-height:54px;font-size:20px}
-#orderFoot .ordersbtn{margin:0;min-height:44px}
 #orderFoot .fine{margin:0}
 .flow{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);z-index:70;display:none;flex-direction:column;overflow:hidden;color:var(--ink);background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
 .flow.open{display:flex}
@@ -393,7 +401,6 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
   </div>
   <div id="orderFoot">
    <div class="acts2"><button class="addbag" id="addBag">add to bag ♡</button><button class="checkout" id="checkoutBtn" type="button">checkout →</button></div>
-   <button class="pbtn ordersbtn" id="ordersBtn" type="button">orders</button>
   </div>
  </section>
  <nav id="tabbar">
@@ -924,8 +931,7 @@ function addToBag(origin){pushCart();
 $('#addBag').onclick=()=>addToBag($('#addBag'));
 function openBag(){openFlow('cart');}
 $('#bagBtn').onclick=openBag;$('#bagBtn3d').onclick=openBag;
-$('#checkoutBtn').onclick=()=>{if(!cart.length){pushCart();openFlow('contact');}else openFlow('cart');};
-$('#ordersBtn').onclick=()=>openFlow('orders');
+$('#checkoutBtn').onclick=()=>{if(!cart.length){pushCart();openFlow('details');}else openFlow('cart');};
 let toastT;function toast(html){const t=$('#toast');t.innerHTML=html.startsWith('<svg')?html:`<span>${html}</span>`;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800);}
 function confetti(origin){const cols=['#ff3ea5','#b8ff3c','#2e5bff','#ffe14a','#c9b2ff'];const b=(origin||$('#addBag')).getBoundingClientRect();const ox=b.left+b.width/2,oy=b.top;for(let i=0;i<28;i++){const d=document.createElement('div');d.className='conf';d.style.background=cols[i%5];d.style.borderRadius=i%3?'50%':'3px';d.style.left=ox+'px';d.style.top=oy+'px';document.body.appendChild(d);const a=rand(-Math.PI*.95,-Math.PI*.05),v=rand(160,320);d.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${Math.cos(a)*v}px,${Math.sin(a)*v+260}px) rotate(${rand(-540,540)}deg)`,opacity:0}],{duration:rand(900,1300),easing:'cubic-bezier(.2,.7,.4,1)'}).onfinish=()=>d.remove();}}
 function renderPanels(){
@@ -1277,7 +1283,7 @@ const NEXT_STATUS={ordered:'exported',exported:'received_by_3rd_party',received_
 const NEXT_LABEL={ordered:'mark exported',exported:'mark received',received_by_3rd_party:'mark shipped'};
 const STATUSES=['ordered','exported','received_by_3rd_party','shipped','cancelled'];
 let orders=[];
-const flow={step:null,customer:{name:'',email:'',phone:''},ship:{line1:'',line2:'',city:'',state:'',zip:'',country:'US'},method:null,checkoutCart:null,placed:[],link:null,err:'',filter:'all',busy:false};
+const flow={step:null,customer:{name:'',email:'',phone:'',sms:false},ship:{line1:'',line2:'',city:'',state:'',zip:'',country:'US'},method:null,checkoutCart:null,placed:[],err:'',filter:'all',busy:false};
 let flowStepShown=null;
 const shapeName=id=>((SHAPES.find(s=>s.id===id)||{}).name)||id||'';
 function lineAmount(design,line){const each=(SIZE_PRICE[line.size]||0)+(ATT[line.att]?ATT[line.att].add:0)+(design&&design.holo?2:0);return {each,total:each*(line.qty||1)};}
@@ -1308,7 +1314,7 @@ function buildRow(item,customer,ship,method,taken){
  if(vog.attachment==='phone_strap')notes.push('Phone strap is only valid at 1.5" or smaller.');
  return {
   order_id:id,created_at:hstISO(),status:'ordered',
-  customer_name:(customer.name||'').trim(),customer_email:(customer.email||'').trim(),customer_phone:(customer.phone||'').trim(),
+  customer_name:(customer.name||'').trim(),customer_email:(customer.email||'').trim(),customer_phone:(customer.phone||'').trim(),sms_updates:!!customer.sms,
   ship_line1:(ship.line1||'').trim(),ship_line2:(ship.line2||'').trim(),ship_city:(ship.city||'').trim(),ship_state:(ship.state||'').trim(),ship_zip:(ship.zip||'').trim(),ship_country:(ship.country||'US').trim()||'US',
   payment_method:method,payment_demo:'true',amount_usd:price.total.toFixed(2),
   quantity:String(qty),
@@ -1338,7 +1344,6 @@ function ordersCsv(bom=false){const lines=[CSV_COLS.join(',')];for(const o of or
 function downloadBlob(name,blob){const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);}
 function downloadOrdersCsv(){downloadBlob('charm-lab-orders.csv',new Blob([ordersCsv(true)],{type:'text/csv;charset=utf-8'}));}
 async function copyOrdersCsv(){const text=ordersCsv(false);try{await navigator.clipboard.writeText(text);toast('CSV copied for Sheets ✦');}catch(_){const ta=document.createElement('textarea');ta.value=text;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('CSV copied for Sheets ✦');}catch(e){toast('copy failed — use download instead');}ta.remove();}}
-async function copyText(s){try{await navigator.clipboard.writeText(s);toast('link copied ✦');}catch(_){toast('copy failed');}}
 function printMetrics(design,line,dpi=600){
  const g=geo(design.shape,line.size);const bb=g.bb;const inch=parseFloat(line.size);const longU=Math.max(bb.w,bb.h)||1;
  let p=dpi*inch/(2*HALF);if(longU*p<1000)p=1000/longU;
@@ -1404,7 +1409,45 @@ async function buildVograceZip(id){
   {name:'mockup.png',data:await canvasToU8(pack.mockup)},
   {name:'order.json',data:enc.encode(JSON.stringify(orderJson(row,pack),null,2))}
  ];
- return {name:row.export_zip_filename,bytes:zipStore(files),pack};
+ return {name:row.export_zip_filename,bytes:zipStore(files),files:Object.fromEntries(files.map(f=>[f.name,f.data])),pack};
+}
+const ZIP_B64_MAX=4500000;
+function u8ToB64(u8){let s='';const n=0x8000;for(let i=0;i<u8.length;i+=n)s+=String.fromCharCode.apply(null,u8.subarray(i,i+n));return btoa(s);}
+function webhookReady(){
+ const c=window.CHARM_LAB_ORDERS_WEBHOOK;if(!c)return null;
+ const url=String(c.url||'').trim(),key=String(c.key||'').trim();
+ if(!url||!key||/paste_/i.test(url)||/paste_/i.test(key))return null;
+ return {url,key,header:String(c.header||'Authorization').trim()||'Authorization'};
+}
+function webhookBody(row,zip){
+ let stickers=[];try{stickers=JSON.parse(row.stickers_json||'[]');}catch(_){}
+ const item={shape:row.shape,shape_name:shapeName(row.shape),size_in:row.size_in,quantity:Number(row.quantity)||1,print_color:row.print_color,outline_color:row.outline_color,holo:row.holo==='yes',attachment:row.attachment,hardware_color:row.hardware_color,text_content:row.text_content,text_font:row.text_font,text_color:row.text_color,text_size:row.text_size,stickers,amount_usd:Number(row.amount_usd)};
+ const body={
+  order_id:row.order_id,created_at:row.created_at,
+  customer:{name:row.customer_name,email:row.customer_email,phone:row.customer_phone,sms_updates:!!row.sms_updates},
+  shipping:{line1:row.ship_line1,line2:row.ship_line2,city:row.ship_city,state:row.ship_state,zip:row.ship_zip,country:row.ship_country},
+  payment_method:row.payment_method,amount_usd:Number(row.amount_usd),line_items:[item],
+  vograce:{product:row.vograce_product,sides:row.vograce_sides,finish:row.vograce_finish,size:row.vograce_size,accessory:row.vograce_accessory,accessory_color:row.vograce_accessory_color,qty:row.vograce_qty,unit_cost_est:row.vograce_unit_cost_est,notes:row.notes},
+  fulfillment_zip_filename:row.export_zip_filename
+ };
+ const b64=u8ToB64(zip.bytes);
+ if(b64.length<=ZIP_B64_MAX)body.fulfillment_zip_base64=b64;
+ else {body.fulfillment_files={};for(const [name,data] of Object.entries(zip.files||{}))body.fulfillment_files[name]=u8ToB64(data);}
+ return body;
+}
+async function postOrderWebhook(row,zip){
+ const cfg=webhookReady();
+ if(!cfg){console.warn('Charm Lab orders webhook is not set (window.CHARM_LAB_ORDERS_WEBHOOK url + key). Order '+row.order_id+' stayed in this browser.');return;}
+ const headers={'Content-Type':'application/json'};
+ headers[cfg.header]=cfg.header.toLowerCase()==='authorization'?('Bearer '+cfg.key):cfg.key;
+ const res=await fetch(cfg.url,{method:'POST',headers,body:JSON.stringify(webhookBody(row,zip))});
+ if(!res.ok)console.warn('Charm Lab orders webhook rejected',row.order_id,res.status);
+}
+async function handoffOrders(rows){
+ for(const row of rows){
+  try{const z=await buildVograceZip(row.order_id);await postOrderWebhook(row,z);}
+  catch(err){console.warn('charm lab fulfillment handoff failed',row.order_id,err);}
+ }
 }
 function noteExport(row){if(!row.exported_at)row.exported_at=hstISO();if(row.status==='ordered')row.status='exported';saveOrders();}
 async function downloadZip(id){
@@ -1425,84 +1468,67 @@ function setStatus(id,status,tracking){
  if(status==='shipped'){if(!o.shipped_at)o.shipped_at=now;if(tracking!=null&&String(tracking).trim())o.tracking_number=String(tracking).trim();}
  saveOrders();renderFlow();
 }
-function syncFields(){$$('#flow [data-cust]').forEach(el=>{flow.customer[el.dataset.cust]=el.value;});$$('#flow [data-ship]').forEach(el=>{flow.ship[el.dataset.ship]=el.value;});saveProfile();}
-function validContact(kind){
+function syncFields(){$$('#flow [data-cust]').forEach(el=>{flow.customer[el.dataset.cust]=el.value;});$$('#flow [data-ship]').forEach(el=>{flow.ship[el.dataset.ship]=el.value;});const sms=$('#flow [data-sms]');if(sms)flow.customer.sms=!!sms.checked;saveProfile();}
+function validDetails(){
  syncFields();flow.err='';
- if(!flow.customer.name.trim()){flow.err='add a name';return false;}
- const email=flow.customer.email.trim(),phone=flow.customer.phone.trim();
- if(kind==='sms'&&phone.replace(/\D/g,'').length<7){flow.err='add a mobile number for the text';return false;}
- if(kind==='email'&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){flow.err='add an email address';return false;}
- if(kind==='either'&&!email&&phone.replace(/\D/g,'').length<7){flow.err='add an email or a mobile number';return false;}
- if(kind==='either'&&email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){flow.err='that email looks off';return false;}
- return true;
-}
-function validAddress(){
- syncFields();flow.err='';
+ if(!flow.customer.name.trim()){flow.err='add your name';return false;}
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(flow.customer.email.trim())){flow.err='add an email address';return false;}
  const s=flow.ship;
  if(!s.line1.trim()||!s.city.trim()||!s.state.trim()||!s.zip.trim()){flow.err='add street, city, state, and ZIP';return false;}
  if(!s.country.trim())s.country='US';
+ if(flow.customer.sms&&flow.customer.phone.replace(/\D/g,'').length<7){flow.err='add a mobile number for texts';return false;}
  return true;
 }
-function shipURL(token){const u=new URL(location.href);u.hash='ship/'+token;return u.href;}
-function linkMessage(token){return `charm lab: tap to add your shipping address so we can send your charm\n${shipURL(token)}`;}
-function smsHref(phone,body){const num=phone.replace(/[^\d+]/g,'');const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);return `sms:${num}${ios?'&':'?'}body=${encodeURIComponent(body)}`;}
-function mailHref(email,body){return `mailto:${email}?subject=${encodeURIComponent('your charm lab shipping link')}&body=${encodeURIComponent(body)}`;}
 function ensureCartSnapshot(){if(!flow.checkoutCart||!flow.checkoutCart.length)flow.checkoutCart=clone(cart);}
-function sendLink(kind){
- if(!cart.length){flow.err='your bag is empty';renderFlow();return;}
- if(!validContact(kind==='sms'?'sms':'email')){renderFlow();return;}
- const token=makeId('',6).toLowerCase();
- flow.checkoutCart=clone(cart);
- const pending={token,customer:clone(flow.customer),ship:clone(flow.ship),cart:flow.checkoutCart,created_at:hstISO()};
- savePending(pending);
- flow.link={kind,token,url:shipURL(token),message:linkMessage(token)};
- flow.err='';renderFlow();
-}
-function openShip(token){
- const p=loadPending();
- if(!p||p.token!==token){flow.err='that shipping link is not on this browser. send it again from checkout, or type the address here.';flow.link=null;openFlow('contact');return;}
- Object.assign(flow.customer,p.customer||{});Object.assign(flow.ship,p.ship||{});
- flow.checkoutCart=p.cart||[];flow.link={kind:'tap',token,url:shipURL(token),message:linkMessage(token)};flow.err='';
- if(!flow.checkoutCart.length){flow.err='that link has no charms in it';openFlow('cart');return;}
- openFlow('address');
-}
 function placeOrders(){
  if(flow.busy)return;
  const items=flow.checkoutCart||[];
  if(!items.length){flow.err='your bag is empty';openFlow('cart');return;}
- if(!validAddress()){openFlow('address');return;}
+ if(!validDetails()){openFlow('details');return;}
  if(!flow.method){flow.err='pick how you would pay';openFlow('pay');return;}
  const taken=new Set();const made=items.map(it=>buildRow(it,flow.customer,flow.ship,flow.method,taken));
  orders=made.concat(orders);saveOrders();
- if(location.hash.startsWith('#ship/'))history.replaceState(null,'',location.pathname+location.search);
  const ids=new Set(items.map(it=>it.id));cart=cart.filter(it=>!ids.has(it.id));saveCart();refreshBag();
- savePending(null);flow.placed=made.map(o=>o.order_id);flow.busy=false;flow.err='';
+ flow.placed=made.map(o=>o.order_id);flow.busy=false;flow.err='';
  openFlow('done');
+ handoffOrders(made);
 }
 function openFlow(step){if(modalOpen)close3D();flow.step=step;$('#flow').classList.add('open');$('#flow').setAttribute('aria-hidden','false');renderFlow();}
-function closeFlow(){$('#flow').classList.remove('open');$('#flow').setAttribute('aria-hidden','true');flow.busy=false;if(/^#(ship\/|orders$|checkout$)/.test(location.hash))history.replaceState(null,'',location.pathname+location.search);}
-function goBack(){const s=flow.step;flow.err='';if(s==='contact')openFlow('cart');else if(s==='address')openFlow('contact');else if(s==='pay'||s==='confirm')openFlow(s==='confirm'?'pay':'address');else if(s==='done')openFlow('orders');else closeFlow();}
-function stepsHtml(n){return `<div class="steps">${['contact','address','pay'].map((l,i)=>`<span class="${i===n?'on':''}">${i+1} ${l}</span>`).join('')}</div>`;}
+function closeFlow(){$('#flow').classList.remove('open');$('#flow').setAttribute('aria-hidden','true');flow.busy=false;if(/^#(\/?(ops|orders|checkout)|ship\/)/.test(location.hash))history.replaceState(null,'',location.pathname+location.search);}
+function goBack(){const s=flow.step;flow.err='';if(s==='details')openFlow('cart');else if(s==='pay')openFlow('details');else if(s==='confirm')openFlow('pay');else closeFlow();}
+function stepsHtml(n){return `<div class="steps">${['you','pay'].map((l,i)=>`<span class="${i===n?'on':''}">${i+1} ${l}</span>`).join('')}</div>`;}
 function errHtml(){return flow.err?`<p class="ferr">${esc(flow.err)}</p>`:'';}
-function contactFields(){const c=flow.customer;return `<label class="field">name<input data-cust="name" autocomplete="name" value="${esc(c.name)}"></label><label class="field">email<input data-cust="email" type="email" autocomplete="email" inputmode="email" value="${esc(c.email)}"></label><label class="field">mobile<input data-cust="phone" type="tel" autocomplete="tel" inputmode="tel" value="${esc(c.phone)}"></label>`;}
-function addressFields(){const s=flow.ship;return `<label class="field">street<input data-ship="line1" autocomplete="address-line1" value="${esc(s.line1)}"></label><label class="field">apt, suite <span style="font-weight:600;opacity:.7">(optional)</span><input data-ship="line2" autocomplete="address-line2" value="${esc(s.line2)}"></label><div class="grid2"><label class="field">city<input data-ship="city" autocomplete="address-level2" value="${esc(s.city)}"></label><label class="field">state<input data-ship="state" autocomplete="address-level1" value="${esc(s.state)}"></label></div><div class="grid2"><label class="field">ZIP<input data-ship="zip" autocomplete="postal-code" inputmode="text" value="${esc(s.zip)}"></label><label class="field">country<input data-ship="country" autocomplete="country" value="${esc(s.country||'US')}"></label></div>`;}
-function linkPanel(){if(!flow.link)return '';const L=flow.link,phone=flow.customer.phone.trim(),email=flow.customer.email.trim();
- return `<div class="fcard"><b>link ready</b><p class="hintline">demo only — nothing was actually sent. open the composer, or pretend the customer tapped the link on this browser.</p><p class="linkbox">${esc(L.url)}</p><div class="stack">${phone?`<a class="pbtn" href="${esc(smsHref(phone,L.message))}">open in messages</a>`:''}${email?`<a class="pbtn" href="${esc(mailHref(email,L.message))}">open in mail</a>`:''}<button class="pbtn" type="button" data-act="copylink">copy link</button><button class="pbtn go" type="button" data-act="tapped">customer tapped the link →</button></div></div>`;}
+function detailsFields(){
+ const c=flow.customer,s=flow.ship;
+ return `<label class="field">name<input data-cust="name" autocomplete="name" value="${esc(c.name)}"></label><label class="field">email<input data-cust="email" type="email" autocomplete="email" inputmode="email" value="${esc(c.email)}"></label><label class="field">street<input data-ship="line1" autocomplete="address-line1" value="${esc(s.line1)}"></label><label class="field">apt, suite <span class="opt">(optional)</span><input data-ship="line2" autocomplete="address-line2" value="${esc(s.line2)}"></label><div class="grid2"><label class="field">city<input data-ship="city" autocomplete="address-level2" value="${esc(s.city)}"></label><label class="field">state<input data-ship="state" autocomplete="address-level1" value="${esc(s.state)}"></label></div><div class="grid2"><label class="field">ZIP<input data-ship="zip" autocomplete="postal-code" inputmode="text" value="${esc(s.zip)}"></label><label class="field">country<input data-ship="country" autocomplete="country" value="${esc(s.country||'US')}"></label></div><label class="field">mobile <span class="opt">(optional)</span><input data-cust="phone" type="tel" autocomplete="tel" inputmode="tel" value="${esc(c.phone)}"></label><label class="optin"><input type="checkbox" data-sms ${c.sms?'checked':''}><span>Text me for order updates</span></label>`;
+}
 function summaryHtml(items){return (items||[]).map(it=>`<div class="r"><span>${esc(lineLabel(it))}</span><b>${money(lineAmount(it.design,it.line).total)}</b></div>`).join('');}
+function payLabel(id){const p=PAYS.find(x=>x.id===id);return p?p.name:(id||'');}
+function plainLine(o){const att=o.attachment==='bag_clip'?'bag clip':o.attachment==='phone_strap'?'phone strap':'keyring';const bits=[(o.size_in||'')+'" '+shapeName(o.shape),att];if(o.holo==='yes')bits.push('holo stars');bits.push('×'+(o.quantity||1));return bits.join(' · ');}
+function shipLines(o){const city=[o.ship_city,o.ship_state].filter(s=>s&&String(s).trim()).join(', ');const cityZip=[city,o.ship_zip].filter(s=>s&&String(s).trim()).join(' ');return [o.customer_name,o.customer_email,o.ship_line1,o.ship_line2,cityZip,o.ship_country].filter(s=>s&&String(s).trim());}
 function renderCart(){
  if(!cart.length)return `<p class="hintline">your bag is empty. design a charm, then add it.</p><button class="pbtn go" type="button" data-act="close">back to the studio</button>`;
- return cart.map(it=>`<div class="fcard"><div class="r"><b>${esc(shapeName(it.design.shape))} · ${esc(it.line.size)}"</b><span>${money(lineAmount(it.design,it.line).total)}</span></div><p class="hintline" style="margin:8px 0 0">${esc(ATT[it.line.att]?ATT[it.line.att].name:it.line.att)}${it.design.holo?' · holo stars':''}</p><div class="acts"><button class="ibtn" type="button" data-act="qty" data-id="${esc(it.id)}" data-d="-1" aria-label="one less">–</button><b style="font-size:22px">${esc(it.line.qty)}</b><button class="ibtn" type="button" data-act="qty" data-id="${esc(it.id)}" data-d="1" aria-label="one more">+</button><button class="pbtn" type="button" data-act="remove" data-id="${esc(it.id)}">remove</button></div></div>`).join('')+`<div class="fcard"><div class="r"><span>example total</span><b style="font-family:'Bagel Fat One';font-size:28px">${money(itemsTotal(cart))}</b></div></div><div class="stack"><button class="pbtn go" type="button" data-act="tocheckout">checkout →</button><button class="pbtn" type="button" data-act="orders">orders</button></div>`;
+ return cart.map(it=>`<div class="fcard"><div class="r"><b>${esc(shapeName(it.design.shape))} · ${esc(it.line.size)}"</b><span>${money(lineAmount(it.design,it.line).total)}</span></div><p class="hintline" style="margin:8px 0 0">${esc(ATT[it.line.att]?ATT[it.line.att].name:it.line.att)}${it.design.holo?' · holo stars':''}</p><div class="acts"><button class="ibtn" type="button" data-act="qty" data-id="${esc(it.id)}" data-d="-1" aria-label="one less">–</button><b style="font-size:22px">${esc(it.line.qty)}</b><button class="ibtn" type="button" data-act="qty" data-id="${esc(it.id)}" data-d="1" aria-label="one more">+</button><button class="pbtn" type="button" data-act="remove" data-id="${esc(it.id)}">remove</button></div></div>`).join('')+`<div class="fcard"><div class="r"><span>example total</span><b style="font-family:'Bagel Fat One';font-size:28px">${money(itemsTotal(cart))}</b></div></div><div class="stack"><button class="pbtn go" type="button" data-act="tocheckout">checkout →</button></div>`;
 }
 function renderOrders(){
  const list=flow.filter==='all'?orders:orders.filter(o=>o.status===flow.filter);
  const filters=[['all','all'],['ordered','ordered'],['exported','exported'],['received_by_3rd_party','at the printer'],['shipped','shipped'],['cancelled','cancelled']];
- let h=`<div class="filters">${filters.map(([id,label])=>`<button type="button" class="${flow.filter===id?'on':''}" data-act="filter" data-id="${id}">${label}</button>`).join('')}</div><div class="stack" style="margin-bottom:12px"><button class="pbtn go" type="button" data-act="csv">download orders CSV</button><button class="pbtn" type="button" data-act="copy">copy CSV for Sheets</button></div>`;
- if(!list.length)h+=`<p class="hintline">${orders.length?'nothing in this filter.':'no orders yet. checkout a charm to make one.'}</p>`;
- h+=list.map(o=>{const adv=NEXT_STATUS[o.status];return `<div class="fcard"><div class="r"><b>${esc(o.order_id)}</b><span class="chip" data-s="${esc(o.status)}">${esc(o.status)}</span></div><p class="hintline" style="margin:8px 0 0">${esc(prettyWhen(o.created_at))} · ${money(o.amount_usd)} · ${esc(o.payment_method)}</p><p class="hintline" style="margin:4px 0 0">${esc(shapeName(o.shape))} · ${esc(o.size_in)}" · ${esc(o.attachment)} · ${o.holo==='yes'?'holo · ':''}×${esc(o.quantity)}</p><p class="hintline" style="margin:4px 0 0">${esc(o.customer_name)} · ${esc([o.ship_city,o.ship_state].filter(Boolean).join(', '))}</p><label class="field" style="margin-top:10px">tracking<input data-track="${esc(o.order_id)}" value="${esc(o.tracking_number||'')}" placeholder="after it ships"></label><label class="field">status<select data-status="${esc(o.order_id)}">${STATUSES.map(s=>`<option value="${s}"${s===o.status?' selected':''}>${s}</option>`).join('')}</select></label><div class="acts"><button class="pbtn" type="button" data-act="zip" data-id="${esc(o.order_id)}">vograce ZIP</button>${adv?`<button class="pbtn" type="button" data-act="advance" data-id="${esc(o.order_id)}">${NEXT_LABEL[o.status]}</button>`:''}</div></div>`;}).join('');
+ let h=`<p class="hintline">studio only. customers never land here.</p><div class="filters">${filters.map(([id,label])=>`<button type="button" class="${flow.filter===id?'on':''}" data-act="filter" data-id="${id}">${label}</button>`).join('')}</div><div class="stack" style="margin-bottom:12px"><button class="pbtn go" type="button" data-act="csv">download orders CSV</button><button class="pbtn" type="button" data-act="copy">copy CSV for Sheets</button></div>`;
+ if(!list.length)h+=`<p class="hintline">${orders.length?'nothing in this filter.':'no orders yet. a demo checkout will land here.'}</p>`;
+ h+=list.map(o=>{const adv=NEXT_STATUS[o.status];return `<div class="fcard"><div class="r"><b>${esc(o.order_id)}</b><span class="chip" data-s="${esc(o.status)}">${esc(o.status)}</span></div><p class="hintline" style="margin:8px 0 0">${esc(prettyWhen(o.created_at))} · ${money(o.amount_usd)} · ${esc(o.payment_method)}${o.sms_updates?' · sms yes':''}</p><p class="hintline" style="margin:4px 0 0">${esc(shapeName(o.shape))} · ${esc(o.size_in)}" · ${esc(o.attachment)} · ${o.holo==='yes'?'holo · ':''}×${esc(o.quantity)}</p><p class="hintline" style="margin:4px 0 0">${esc(o.customer_name)} · ${esc(o.customer_email)} · ${esc([o.ship_city,o.ship_state].filter(Boolean).join(', '))}</p><label class="field" style="margin-top:10px">tracking<input data-track="${esc(o.order_id)}" value="${esc(o.tracking_number||'')}" placeholder="after it ships"></label><label class="field">status<select data-status="${esc(o.order_id)}">${STATUSES.map(s=>`<option value="${s}"${s===o.status?' selected':''}>${s}</option>`).join('')}</select></label><div class="acts"><button class="pbtn" type="button" data-act="zip" data-id="${esc(o.order_id)}">vograce ZIP</button>${adv?`<button class="pbtn" type="button" data-act="advance" data-id="${esc(o.order_id)}">${NEXT_LABEL[o.status]}</button>`:''}</div></div>`;}).join('');
  return h;
 }
+function renderThanks(){
+ const rows=flow.placed.map(id=>orders.find(o=>o.order_id===id)).filter(Boolean);
+ if(!rows.length)return `<p class="hintline">that order isn't on this browser anymore.</p><button class="pbtn go" type="button" data-act="close">back to the studio</button>`;
+ const o0=rows[0];
+ const sms=rows.some(o=>o.sms_updates);
+ const cards=rows.map(o=>`<div class="fcard"><p class="thanks">yay, it's ordered ♡</p><b class="oid">${esc(o.order_id)}</b><p class="hintline" style="margin:10px 0 0">${esc(plainLine(o))}</p><p class="hintline">paid with ${esc(payLabel(o.payment_method))} · ${money(o.amount_usd)} · demo, nothing was charged</p></div>`).join('');
+ const next=`we're cutting it in clear acrylic and sending it to the address below. we'll email ${esc(o0.customer_email)} when it ships.${sms?" we'll text you, too.":''}`;
+ return cards+`<div class="fcard"><b>shipping to</b><p class="hintline" style="margin:8px 0 0">${shipLines(o0).map(esc).join('<br>')}</p></div><div class="fcard"><b>what's next</b><p class="hintline" style="margin:8px 0 0">${next}</p></div><button class="pbtn go" type="button" data-act="close">keep designing ♡</button>`;
+}
 function renderFlow(){
- const title={cart:'your bag',contact:'checkout',address:'shipping',pay:'how to pay',confirm:'confirm pay',done:'order placed',orders:'orders'}[flow.step]||'charm lab';
+ const title={cart:'your bag',details:'checkout',pay:'how to pay',confirm:'confirm pay',done:"you're in",ops:'fulfillment'}[flow.step]||'charm lab';
  $('#flowTitle').textContent=flow.busy?'one moment…':title;
  const changed=flowStepShown!==flow.step;flowStepShown=flow.step;
  let html='';
@@ -1510,42 +1536,37 @@ function renderFlow(){
  html+=errHtml();
  const items=flow.checkoutCart&&flow.checkoutCart.length?flow.checkoutCart:cart;
  if(flow.step==='cart')html+=renderCart();
- else if(flow.step==='contact'){
-  html+=stepsHtml(0)+`<p class="hintline">${items.length?esc(items.length===1?lineLabel(items[0]):items.length+' charms'):'bag is empty'} · example total ${money(itemsTotal(items))}. demo checkout, nothing is charged.</p>`+contactFields()+`<p class="hintline">text or email a link to collect the shipping address. the link opens on this browser. you can also type the address yourself.</p><div class="stack"><button class="pbtn" type="button" data-act="send" data-kind="sms">text me a link</button><button class="pbtn" type="button" data-act="send" data-kind="email">email me a link</button><button class="pbtn go" type="button" data-act="typeaddr">I'll type the address</button></div>`+linkPanel();
+ else if(flow.step==='details'){
+  html+=stepsHtml(0)+`<p class="hintline">${items.length?esc(items.length===1?lineLabel(items[0]):items.length+' charms'):'bag is empty'} · example total ${money(itemsTotal(items))}. nothing is charged.</p>`+detailsFields()+`<button class="pbtn go" type="button" data-act="topay">continue to pay</button>`;
  }
- else if(flow.step==='address')html+=stepsHtml(1)+`<p class="hintline">where should this charm go?</p>`+addressFields()+`<button class="pbtn go" type="button" data-act="topay">continue to pay</button>`;
  else if(flow.step==='pay'){
-  const ship=flow.ship;html+=stepsHtml(2)+`<div class="fcard">${summaryHtml(flow.checkoutCart)}<div class="r" style="margin-top:8px"><span>example total</span><b>${money(itemsTotal(flow.checkoutCart))}</b></div><p class="hintline" style="margin:8px 0 0">${esc(ship.line1)}, ${esc(ship.city)} ${esc(ship.state)} ${esc(ship.zip)}</p></div><p class="hintline">pick a demo payment. no app opens and nothing is charged.</p><div class="pays">${PAYS.map(p=>`<button class="pay" type="button" data-act="method" data-id="${p.id}" style="background:${p.bg};color:${p.fg}">${esc(p.name)}<small>demo</small></button>`).join('')}</div>`;
+  const ship=flow.ship;html+=stepsHtml(1)+`<div class="fcard">${summaryHtml(flow.checkoutCart)}<div class="r" style="margin-top:8px"><span>example total</span><b>${money(itemsTotal(flow.checkoutCart))}</b></div><p class="hintline" style="margin:8px 0 0">${esc(ship.line1)}, ${esc(ship.city)} ${esc(ship.state)} ${esc(ship.zip)}</p></div><p class="hintline">pick a demo payment. no app opens and nothing is charged.</p><div class="pays">${PAYS.map(p=>`<button class="pay" type="button" data-act="method" data-id="${p.id}" style="background:${p.bg};color:${p.fg}">${esc(p.name)}<small>demo</small></button>`).join('')}</div>`;
  }
  else if(flow.step==='confirm'){
   const p=PAYS.find(x=>x.id===flow.method)||{name:flow.method};html+=`<div class="fcard"><p class="busy">pay ${money(itemsTotal(flow.checkoutCart))} with ${esc(p.name)}?</p><p class="hintline">demo only. no charge, no account, no app.</p></div><div class="stack"><button class="pbtn go" type="button" data-act="paid">payment received</button><button class="pbtn" type="button" data-act="backpay">not now</button></div>`;
  }
- else if(flow.step==='done'){
-  const rows=flow.placed.map(id=>orders.find(o=>o.order_id===id)).filter(Boolean);
-  html+=rows.map(o=>`<div class="fcard"><div class="r"><b style="font-family:'Bagel Fat One';font-size:26px">${esc(o.order_id)}</b><span class="chip" data-s="${esc(o.status)}">${esc(o.status)}</span></div><p class="hintline" style="margin:8px 0 0">${esc(lineLabel({design:o.design,line:o.line}))}</p><p class="hintline">payment received · ${esc(o.payment_method)} · ${money(o.amount_usd)} · nothing was charged</p><button class="pbtn" type="button" data-act="zip" data-id="${esc(o.order_id)}">download vograce ZIP</button></div>`).join('')+`<div class="stack"><button class="pbtn go" type="button" data-act="csv">download orders CSV</button><button class="pbtn" type="button" data-act="copy">copy CSV for Sheets</button><button class="pbtn" type="button" data-act="orders">view orders</button></div>`;
- }
- else if(flow.step==='orders')html+=renderOrders();
+ else if(flow.step==='done')html+=renderThanks();
+ else if(flow.step==='ops')html+=renderOrders();
  $('#flowBody').innerHTML=html;
  if(changed)$('#flowBody').scrollTop=0;
 }
-function routeHash(){const h=location.hash.replace(/^#/,'');if(h.startsWith('ship/'))openShip(decodeURIComponent(h.slice(5)));else if(h==='orders')openFlow('orders');else if(h==='checkout')openFlow(cart.length?'contact':'cart');}
+function routeHash(){
+ const h=location.hash.replace(/^#\/?/,'').replace(/\/$/,'').split('/')[0];
+ if(h==='ops'||h==='orders')openFlow('ops');
+ else if(h==='checkout')openFlow(cart.length?'details':'cart');
+}
 window.addEventListener('hashchange',routeHash);
-$('#flow').addEventListener('input',ev=>{const t=ev.target;if(t.dataset.cust){flow.customer[t.dataset.cust]=t.value;saveProfile();}if(t.dataset.ship){flow.ship[t.dataset.ship]=t.value;saveProfile();}if(t.dataset.track){const o=orders.find(x=>x.order_id===t.dataset.track);if(o){o.tracking_number=t.value.trim();saveOrders();}}});
-$('#flow').addEventListener('change',ev=>{const t=ev.target;if(!t.dataset.status||flow.busy)return;const tr=$(`#flow [data-track="${t.dataset.status}"]`);setStatus(t.dataset.status,t.value,tr?tr.value:'');});
+$('#flow').addEventListener('input',ev=>{const t=ev.target;if(t.dataset.cust){flow.customer[t.dataset.cust]=t.value;saveProfile();}if(t.dataset.ship){flow.ship[t.dataset.ship]=t.value;saveProfile();}});
+$('#flow').addEventListener('change',ev=>{const t=ev.target;if(t.hasAttribute&&t.hasAttribute('data-sms')){flow.customer.sms=!!t.checked;saveProfile();return;}if(!t.dataset.status||flow.busy)return;const tr=$(`#flow [data-track="${t.dataset.status}"]`);setStatus(t.dataset.status,t.value,tr?tr.value:'');});
 $('#flow').addEventListener('focusin',ev=>{const el=ev.target;if(!(el.matches&&el.matches('input,select,textarea')))return;setTimeout(()=>{const sc=$('#flowBody');if(!sc||!el.isConnected)return;const er=el.getBoundingClientRect(),sr=sc.getBoundingClientRect();if(er.bottom>sr.bottom-8)sc.scrollTop+=er.bottom-(sr.bottom-8);else if(er.top<sr.top+8)sc.scrollTop-=(sr.top+8)-er.top;},280);});
 $('#flow').addEventListener('click',ev=>{
  const b=ev.target.closest('[data-act]');if(!b||flow.busy)return;const act=b.dataset.act,id=b.dataset.id;
  if(act==='back'){goBack();return;}
  if(act==='close'){closeFlow();return;}
- if(act==='orders'){flow.err='';openFlow('orders');return;}
  if(act==='remove'){cart=cart.filter(it=>it.id!==id);saveCart();refreshBag();renderFlow();return;}
  if(act==='qty'){const it=cart.find(x=>x.id===id);if(!it)return;it.line.qty=clamp((it.line.qty||1)+(+b.dataset.d||0),1,20);saveCart();refreshBag();renderFlow();return;}
- if(act==='tocheckout'){if(!cart.length){flow.err='your bag is empty';renderFlow();return;}flow.err='';flow.checkoutCart=null;openFlow('contact');return;}
- if(act==='send'){sendLink(b.dataset.kind);return;}
- if(act==='typeaddr'){if(!cart.length){flow.err='your bag is empty';renderFlow();return;}if(!validContact('either')){renderFlow();return;}flow.checkoutCart=clone(cart);flow.err='';openFlow('address');return;}
- if(act==='copylink'){if(flow.link)copyText(flow.link.url);return;}
- if(act==='tapped'){if(flow.link)openShip(flow.link.token);return;}
- if(act==='topay'){if(!validAddress()){renderFlow();return;}ensureCartSnapshot();flow.err='';openFlow('pay');return;}
+ if(act==='tocheckout'){if(!cart.length){flow.err='your bag is empty';renderFlow();return;}flow.err='';flow.checkoutCart=null;openFlow('details');return;}
+ if(act==='topay'){if(!validDetails()){renderFlow();return;}ensureCartSnapshot();flow.err='';openFlow('pay');return;}
  if(act==='method'){flow.method=id;flow.err='';openFlow('confirm');return;}
  if(act==='backpay'){openFlow('pay');return;}
  if(act==='paid'){placeOrders();return;}
@@ -1555,7 +1576,6 @@ $('#flow').addEventListener('click',ev=>{
  if(act==='advance'){const o=orders.find(x=>x.order_id===id);if(!o)return;const n=NEXT_STATUS[o.status];if(!n)return;const tr=$(`#flow [data-track="${id}"]`);setStatus(id,n,tr?tr.value:'');return;}
  if(act==='filter'){flow.filter=id;renderFlow();}
 });
-
 window.__charm={flipFace:d=>{if(V){const s=camSph();const rel=wrapA(s.az-V.face.az0);flipFace(s.az-rel+(Math.abs(rel)<=Math.PI/2?0:Math.sign(rel)*Math.PI),d,1);}},get yaw(){if(!V||!V.face)return null;return wrapA(camSph().az-V.face.az0)*180/Math.PI;},get tilt(){if(!V||!V.face)return null;return (camSph().pol-V.face.pol0)*180/Math.PI;},zoomTo:s=>{if(V){V.zb=null;V.zRaw=unrubber(s);zApply(s);}},rubber,stretch:f=>zStretch(f),release:()=>zoomHome(),get zoom(){return V?V.zDisp:null},setFrame:(h,w)=>{FRAME_H=h;FRAME_W=w;resetView();},bumpNow:()=>bumpCharm(1,1),applyTheme,exportPrintFiles,buildPrintPack,buildVograceZip,ordersCsv,csvHeader:CSV_COLS.join(','),getOrders:()=>orders,getCart:()=>cart,geo,minScale,get ATT(){return ATT},get S(){return S},order,renderAll,open3D,close3D,commit,undo,redo,addSticker,setTab,setSel:id=>{sel=id;selChanged();},setMotion,collapse,get V(){return V}};
 loadCart();loadOrders();loadProfile();refreshBag();
 renderAll();
