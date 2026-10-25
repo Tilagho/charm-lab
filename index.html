@@ -60,14 +60,16 @@ body{position:relative;height:100lvh;font-family:'Fredoka',system-ui,sans-serif;
 input{-webkit-user-select:text;user-select:text}
 button{font-family:inherit;color:inherit;-webkit-appearance:none;appearance:none;margin:0}
 #app{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);margin:0 auto;max-width:620px;display:flex;flex-direction:column;padding-top:var(--shell-pad-top,var(--sat));padding-left:var(--sal);padding-right:var(--sar);overflow:hidden}
-header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px 10px}
+header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px 10px;background:transparent}
 .logo{display:flex;align-items:center;min-width:0}
 .logo h1{margin:0;line-height:0}
-/* Still chrome wordmark. A slow bob stands in for balloon letters — no live 3D. */
-.wordmark{display:block;width:152px;height:auto;transform-origin:50% 80%;animation:wordbob 3.2s ease-in-out infinite}
-@keyframes wordbob{0%,100%{transform:translateY(0) rotate(-0.7deg)}50%{transform:translateY(-3px) rotate(0.9deg)}}
+/* Pre-rendered chrome shine. The still's alpha masks the white field so the header shows through. */
+.wordmark{display:block;width:152px;height:auto;aspect-ratio:612/148;object-fit:cover;background:transparent;pointer-events:none}
+video.wordmark{vertical-align:top;-webkit-mask-image:url(charmlab-logo-still.png);mask-image:url(charmlab-logo-still.png);-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;mask-mode:alpha}
+video.wordmark::-webkit-media-controls,video.wordmark::-webkit-media-controls-start-playback-button{display:none!important}
+img.wordmark{display:none}
 @media (max-width:400px){.wordmark{width:136px}}
-@media (prefers-reduced-motion:reduce){.wordmark{animation:none}}
+@media (prefers-reduced-motion:reduce){video.wordmark{display:none}img.wordmark{display:block}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .bagbtn{flex:none;display:flex;align-items:center;gap:8px;height:56px;background:var(--card);border:3px solid var(--ink);border-radius:999px;padding:0 10px 0 14px;font-weight:700;font-size:17px;box-shadow:3px 3px 0 var(--shd);cursor:pointer}
 .bagbtn svg{width:26px;height:26px}
@@ -200,7 +202,7 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .modal{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);box-sizing:border-box;z-index:60;display:none;background:transparent}
 .modal.open{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start}
 .mcard{position:relative;z-index:1;flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column;background:transparent;overflow:hidden}
-.mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + var(--shell-pad-top,var(--sat))) calc(14px + var(--sar)) 10px calc(14px + var(--sal));position:relative;z-index:2;pointer-events:none}
+.mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + var(--shell-pad-top,var(--sat))) calc(14px + var(--sar)) 10px calc(14px + var(--sal));position:relative;z-index:2;pointer-events:none;background:transparent}
 .mhead>*{pointer-events:auto}
 .mfoot .mback{flex:0 0 38%;max-width:none;min-height:68px;font-size:20px;border-radius:24px;box-shadow:5px 5px 0 var(--shd)}
 .mfoot .madd{flex:1;width:auto;min-height:68px}
@@ -359,7 +361,7 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
 <div id="app">
  <header>
   <div class="logo">
-   <h1><img class="wordmark" src="charmlab-logo.png" srcset="charmlab-logo.png 608w" sizes="152px" width="608" height="129" alt="CharmLab"></h1>
+   <h1><video class="wordmark" src="charmlab-logo-shine.mp4" poster="charmlab-logo-still.png" width="612" height="148" autoplay muted loop playsinline webkit-playsinline disablepictureinpicture disableremoteplayback aria-label="CharmLab"></video><img class="wordmark" src="charmlab-logo-still.png" width="612" height="148" alt="CharmLab"></h1>
   </div>
   <div class="hbtns"><button class="themebtn" id="themeBtn" aria-label="switch light or dark mode"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><g class="rays"><path d="M12 1.5v2.6M12 19.9v2.6M1.5 12h2.6M19.9 12h2.6M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g><circle cx="12" cy="12" r="5" fill="#ffe14a" stroke="currentColor"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z" fill="#c9b2ff"/><path d="M17 3.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="#ffe14a" stroke-width="1.2"/></svg></button><button class="bagbtn" id="bagBtn" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN">0</span></button></div>
  </header>
@@ -435,13 +437,17 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
 <div class="modal" id="modal">
  
  <div class="mcard">
-  <div class="mhead"><div class="logo"><h1><img class="wordmark" src="charmlab-logo.png" srcset="charmlab-logo.png 608w" sizes="152px" width="608" height="129" alt="CharmLab"></h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
+  <div class="mhead"><div class="logo"><h1><video class="wordmark" src="charmlab-logo-shine.mp4" poster="charmlab-logo-still.png" width="612" height="148" autoplay muted loop playsinline webkit-playsinline disablepictureinpicture disableremoteplayback aria-label="CharmLab"></video><img class="wordmark" src="charmlab-logo-still.png" width="612" height="148" alt="CharmLab"></h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
   <div class="three-wrap" id="threeWrap">
    <div class="mload" id="mload">polishing the acrylic…</div>
   </div>
   <div class="mfoot" id="mfoot"><div class="mtag" id="mtag"></div><div class="mbtns"><button class="pbtn mback" id="close3d" aria-label="back to designer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>back</button><button class="addbag madd" id="add3d">add to cart ♡</button></div></div>
  </div>
 </div>
+<script>
+/* Reduced motion keeps the still. Drop the shine loop so it does not decode or play. */
+(function(){if(!matchMedia('(prefers-reduced-motion: reduce)').matches)return;document.querySelectorAll('video.wordmark').forEach(function(v){v.removeAttribute('autoplay');v.pause();v.preload='none';v.removeAttribute('src');v.load();});})();
+</script>
 <script type="module">
 const INK='#17142e';
 const CY=20, HALF=140;
