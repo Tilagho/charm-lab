@@ -171,7 +171,7 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .addbag:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shd)}
 .fine{font-size:15px;opacity:.7;margin-top:14px;text-align:center;font-weight:500}
 /* tab bar */
-#tabbar{flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 12px;padding:6px 6px calc(8px + var(--shell-pad-bot,var(--sab)));background:var(--card);border:3px solid var(--ink);border-top:0;border-bottom:0}
+#tabbar{flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 12px 8px;padding:6px 6px calc(8px + var(--shell-pad-bot,var(--sab)));background:var(--card);border:3px solid var(--ink);border-top:0;border-radius:0 0 30px 30px}
 .tab{min-height:64px;border:3px solid transparent;border-radius:20px;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:700 15px 'Fredoka';cursor:pointer;padding:4px 0;transition:background .15s}
 .tab svg{width:28px;height:28px}
 .tab.on{border-color:var(--ink);box-shadow:3px 3px 0 var(--shd)}
@@ -804,7 +804,8 @@ function layoutSheet(){
   if(!sheet||!tab)return;
   const padTop=parseFloat(getComputedStyle(app).paddingTop)||0;
   const stageMin=108,margin=10;
-  const room=app.clientHeight-padTop-(head?head.offsetHeight:0)-tab.offsetHeight-stageMin-margin;
+  const tabMb=parseFloat(getComputedStyle(tab).marginBottom)||0;
+  const room=app.clientHeight-padTop-(head?head.offsetHeight:0)-tab.offsetHeight-tabMb-stageMin-margin;
   let preferred=200;
   const shapes=$('#shapes'),grab=sheet.querySelector('.grab'),panels=sheet.querySelector('.panels');
   if(shapes&&shapes.offsetHeight&&grab){
@@ -889,15 +890,20 @@ function setTab(t){curTab=t;$('#app').classList.remove('collapsed');$('#app').cl
 $('#tabbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-tab]');if(!b)return;if(performance.now()-swSuppress<400)return;if(b.dataset.tab===curTab&&innerWidth<960){$('#app').classList.toggle('collapsed');}else setTab(b.dataset.tab);});
 /* swipe-down-to-close: drag from the handle, or from the content when it's scrolled to the top and the gesture is downward */
 let sw=null,swSuppress=0;const sheetEl=$('#sheet'),panelsEl=$('#panels');
-function swStart(x,y,src){if(!isDrawer()||$('#app').classList.contains('collapsed')||document.documentElement.classList.contains('typing'))return;sw={x0:x,y0:y,src,active:false,d:0,H:sheetEl.offsetHeight,hist:[[performance.now(),y]]};if(src==='grab')swBegin(y);}
-function swBegin(y){sw.active=true;sw.y0=y;sheetEl.style.transition='none';}
-function swMove(x,y,ev){if(!sw)return;const dy=y-sw.y0,dx=x-sw.x0;
+const drawerExpanded=()=>isDrawer()&&!$('#app').classList.contains('collapsed')&&!document.documentElement.classList.contains('typing');
+function swReset(){sw=null;sheetEl.style.transition='';sheetEl.style.transform='';}
+function swStart(x,y,src){if(!drawerExpanded())return;sw={x0:x,y0:y,src,active:false,d:0,H:sheetEl.offsetHeight,hist:[[performance.now(),y]]};if(src==='grab')swBegin(y);}
+function swBegin(y){if(!drawerExpanded()){swReset();return;}sw.active=true;sw.y0=y;sheetEl.style.transition='none';}
+function swMove(x,y,ev){if(!sw)return;if(!drawerExpanded()){swReset();return;}const dy=y-sw.y0,dx=x-sw.x0;
  if(!sw.active){const atTop=panelsEl.scrollTop<=0;
   if(atTop&&dy>0&&Math.abs(dy)>=Math.abs(dx)&&ev&&ev.cancelable)ev.preventDefault();// keep iOS from committing to a rubber-band scroll
   if(Math.abs(dy)<8&&Math.abs(dx)<8)return;
   if(atTop&&dy>0&&Math.abs(dy)>Math.abs(dx))swBegin(y);else{sw=null;return;}}
  if(ev&&ev.cancelable)ev.preventDefault();
- sw.d=Math.max(0,y-sw.y0);sheetEl.style.transform=`translateY(${sw.d}px)`;
+ /* Stop once the body is tucked down to the grab. The tab bar is not part of this
+    motion, and a further pull must not drag the remaining chrome off screen. */
+ const maxSlide=Math.max(0,sw.H-SHEET_MIN);
+ sw.d=Math.min(maxSlide,Math.max(0,y-sw.y0));sheetEl.style.transform=`translateY(${sw.d}px)`;
  const now=performance.now();sw.hist.push([now,y]);while(sw.hist.length>2&&now-sw.hist[0][0]>100)sw.hist.shift();}
 function swEnd(){if(!sw)return;const s=sw;sw=null;if(!s.active)return;
  if(s.d<6){sheetEl.style.transition='';sheetEl.style.transform='';return;}
@@ -911,7 +917,7 @@ function swEnd(){if(!sw)return;const s=sw;sw=null;if(!s.active)return;
 sheetEl.addEventListener('touchstart',ev=>{if(ev.touches.length!==1){sw=null;up=null;return;}const t=ev.touches[0],tg=ev.target;
  if(upStart(t.clientX,t.clientY,null))return;
  if(tg.closest('input,select,textarea'))return;swStart(t.clientX,t.clientY,tg.closest('#grab')?'grab':'content');},{passive:true});
-sheetEl.addEventListener('touchmove',ev=>{if(up){if(ev.touches.length!==1){upEnd();return;}upMove(ev.touches[0].clientX,ev.touches[0].clientY,ev);return;}if(!sw)return;if(ev.touches.length!==1){swEnd();return;}const t=ev.touches[0];swMove(t.clientX,t.clientY,ev);},{passive:false});
+sheetEl.addEventListener('touchmove',ev=>{if(up){if(ev.touches.length!==1){upEnd();return;}upMove(ev.touches[0].clientX,ev.touches[0].clientY,ev);if(!up&&ev.cancelable)ev.preventDefault();return;}if(!sw){if($('#app').classList.contains('collapsed')&&ev.cancelable)ev.preventDefault();return;}if(ev.touches.length!==1){swEnd();return;}const t=ev.touches[0];swMove(t.clientX,t.clientY,ev);},{passive:false});
 sheetEl.addEventListener('touchend',()=>{upEnd();swEnd();});sheetEl.addEventListener('touchcancel',()=>{upEnd();swEnd();});
 /* swipe-UP-to-open: from the tab bar or the peeking handle while collapsed. The sheet follows the finger (height), opens
    past ~30% of its height or on a fast upward flick, otherwise snaps back. Starting on a tab opens that tab. */
@@ -919,7 +925,7 @@ let up=null;const SHEET_MIN=39;
 const sheetOpenH=()=>{const n=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-h'));return n||200;};
 function upStart(x,y,tab){if(!isDrawer()||!$('#app').classList.contains('collapsed'))return false;up={x0:x,y0:y,prev:curTab,tab:tab||curTab||'shape',active:false,d:0,H:sheetOpenH(),hist:[[performance.now(),y]]};return true;}
 function upMove(x,y,ev){if(!up)return;const dy=up.y0-y,dx=x-up.x0;
- if(!up.active){if(Math.abs(dy)<8&&Math.abs(dx)<8)return;if(dy>0&&dy>Math.abs(dx)){up.active=true;up.y0=y;sheetEl.style.transition='none';sheetEl.style.height=SHEET_MIN+'px';setTab(up.tab);}else{up=null;return;}}
+ if(!up.active){if(Math.abs(dy)<8&&Math.abs(dx)<8)return;if(dy>0&&dy>Math.abs(dx)){up.active=true;up.y0=y;sheetEl.style.transition='none';sheetEl.style.height=SHEET_MIN+'px';setTab(up.tab);}else{up=null;if(ev&&ev.cancelable)ev.preventDefault();return;}}
  if(ev&&ev.cancelable)ev.preventDefault();
  const raw=Math.max(0,up.y0-y);up.d=raw<=up.H-SHEET_MIN?raw:(up.H-SHEET_MIN)+Math.sqrt(raw-(up.H-SHEET_MIN))*3;// a little rubber past fully open
  sheetEl.style.height=(SHEET_MIN+up.d)+'px';
@@ -931,8 +937,20 @@ function upEnd(){if(!up)return;const s=up;up=null;if(!s.active)return;swSuppress
  sheetEl.style.height=(open?s.H:SHEET_MIN)+'px';
  setTimeout(()=>{sheetEl.style.transition='none';if(!open){if(s.prev&&s.prev!==curTab)setTab(s.prev);$('#app').classList.add('collapsed');}else $('#app').classList.remove('collapsed');sheetEl.style.height='';void sheetEl.offsetHeight;sheetEl.style.transition='';fitView();updateSel();},310);}
 const tabbarEl=$('#tabbar');
-tabbarEl.addEventListener('touchstart',ev=>{if(ev.touches.length!==1)return;const t=ev.touches[0];const b=ev.target.closest('[data-tab]');upStart(t.clientX,t.clientY,b&&b.dataset.tab);},{passive:true});
-tabbarEl.addEventListener('touchmove',ev=>{if(!up)return;if(ev.touches.length!==1){upEnd();return;}const t=ev.touches[0];upMove(t.clientX,t.clientY,ev);},{passive:false});
+tabbarEl.addEventListener('touchstart',ev=>{if(ev.touches.length!==1)return;const t=ev.touches[0];const b=ev.target.closest('[data-tab]');if($('#app').classList.contains('collapsed'))upStart(t.clientX,t.clientY,b&&b.dataset.tab);},{passive:true});
+tabbarEl.addEventListener('touchmove',ev=>{
+ if(ev.touches.length!==1){upEnd();return;}
+ const t=ev.touches[0];
+ /* Retracted drawer: the tab bar stays put. Downward is not a dismiss. */
+ if($('#app').classList.contains('collapsed')){
+  if(sw)swReset();
+  if(!up){if(ev.cancelable)ev.preventDefault();return;}
+  const dy=t.clientY-up.y0,dx=t.clientX-up.x0;
+  if(dy>8&&Math.abs(dy)>=Math.abs(dx)){up=null;if(ev.cancelable)ev.preventDefault();return;}
+ }
+ if(!up)return;
+ upMove(t.clientX,t.clientY,ev);
+},{passive:false});
 tabbarEl.addEventListener('touchend',upEnd);tabbarEl.addEventListener('touchcancel',upEnd);
 
 $('#grab').addEventListener('pointerdown',ev=>{if(ev.pointerType==='touch')return;swStart(ev.clientX,ev.clientY,'grab');});
