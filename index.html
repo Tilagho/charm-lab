@@ -168,6 +168,18 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .tab svg{width:28px;height:28px}
 .tab.on{border-color:var(--ink);box-shadow:3px 3px 0 var(--shd)}
 .tab[data-tab=shape].on{background:var(--bubble)}.tab[data-tab=color].on{background:var(--sky)}.tab[data-tab=text].on{background:var(--lilac)}.tab[data-tab=stickers].on{background:var(--lime)}.tab[data-tab=order].on{background:var(--yellow)}
+/* Phone typing: the keyboard covers the tab bar and Safari pans the focused
+   field up under the status bar. Drop the tabs, collapse the canvas to the
+   edit toolbar, and let the text sheet fill the visual viewport. */
+@media (max-width:959px){
+ html.typing #tabbar{display:none}
+ html.typing #stageWrap{flex:0 0 auto;height:84px;min-height:0}
+ html.typing #sheet,
+ html.typing #app.collapsed #sheet{flex:1 1 auto;height:auto!important;min-height:0;margin-top:8px;border-bottom:3px solid var(--ink);border-radius:26px;transition:none}
+ html.typing .grab{display:none}
+ html.typing #panels{padding-bottom:calc(14px + var(--shell-pad-bot,var(--sab)))}
+ html.typing .selbar{display:none}
+}
 /* toast */
 .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 78px);transform:translate(-50%,-30px) rotate(-2deg);opacity:0;visibility:hidden;background:var(--yellow);border:3px solid var(--ink);border-radius:22px;box-shadow:5px 5px 0 var(--shd);padding:14px 20px;font-weight:700;font-size:17px;z-index:90;display:flex;align-items:center;gap:12px;transition:transform .4s cubic-bezier(.3,1.6,.5,1),opacity .2s,visibility .2s;width:max-content;max-width:calc(100vw - 32px)}
 .toast.show{transform:translate(-50%,0) rotate(-2deg);opacity:1;visibility:visible}
@@ -778,6 +790,9 @@ $('#shapes').addEventListener('click',ev=>{const b=ev.target.closest('[data-shap
 function layoutSheet(){
   const app=$('#app');if(!app)return;
   if(innerWidth>=960){document.documentElement.style.removeProperty('--sheet-h');return;}
+  /* While typing, the sheet is flex-filled by CSS. A fixed --sheet-h here
+     would bring back the empty band between the field and the keyboard. */
+  if(document.documentElement.classList.contains('typing'))return;
   const sheet=$('#sheet'),tab=$('#tabbar'),head=app.querySelector('header');
   if(!sheet||!tab)return;
   const padTop=parseFloat(getComputedStyle(app).paddingTop)||0;
@@ -792,7 +807,40 @@ function layoutSheet(){
   const h=Math.round(Math.max(150,Math.min(260,Math.min(Math.max(room,150),preferred))));
   document.documentElement.style.setProperty('--sheet-h',h+'px');
 }
-addEventListener('charm-vv',()=>{layoutSheet();fitView();});
+/* Designer text fields only. Checkout lives in #flow, and the size slider
+   is type=range — neither should hide the tab bar. */
+function designerField(el){
+  if(!el||!el.closest||!$('#app')||!$('#app').contains(el))return false;
+  if(el.tagName==='TEXTAREA')return true;
+  if(el.tagName!=='INPUT')return false;
+  const t=(el.type||'text').toLowerCase();
+  return t==='text'||t==='search'||t==='email'||t==='tel'||t==='url'||t==='number'||t==='password';
+}
+function pinTypingScroll(){
+  if(!document.documentElement.classList.contains('typing'))return;
+  if(window.scrollY||document.documentElement.scrollTop||document.body.scrollTop)window.scrollTo(0,0);
+}
+function syncTyping(){
+  const on=innerWidth<960&&designerField(document.activeElement);
+  const root=document.documentElement;
+  const was=root.classList.contains('typing');
+  if(on!==was){
+    root.classList.toggle('typing',on);
+    if(on){
+      $('#app').classList.remove('collapsed');
+      const panels=$('#panels');
+      if(panels)panels.scrollTop=0;
+    }
+    layoutSheet();
+    fitView();
+  }
+  if(on)pinTypingScroll();
+}
+document.addEventListener('focusin',()=>{syncTyping();requestAnimationFrame(pinTypingScroll);setTimeout(pinTypingScroll,80);setTimeout(pinTypingScroll,320);});
+document.addEventListener('focusout',()=>{setTimeout(syncTyping,0);setTimeout(syncTyping,320);});
+addEventListener('resize',syncTyping);
+window.addEventListener('scroll',()=>{if(document.documentElement.classList.contains('typing'))pinTypingScroll();},{passive:true});
+addEventListener('charm-vv',()=>{pinTypingScroll();layoutSheet();fitView();});
 layoutSheet();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{layoutSheet();fitView();});
 function swatches(el,list){el.innerHTML=list.map(c=>`<button class="sw" data-c="${c}" aria-label="${c}" style="background:${c}"></button>`).join('');}
@@ -834,7 +882,7 @@ function setTab(t){curTab=t;$('#app').classList.remove('collapsed');$('#app').cl
 $('#tabbar').addEventListener('click',ev=>{const b=ev.target.closest('[data-tab]');if(!b)return;if(performance.now()-swSuppress<400)return;if(b.dataset.tab===curTab&&innerWidth<960){$('#app').classList.toggle('collapsed');}else setTab(b.dataset.tab);});
 /* swipe-down-to-close: drag from the handle, or from the content when it's scrolled to the top and the gesture is downward */
 let sw=null,swSuppress=0;const sheetEl=$('#sheet'),panelsEl=$('#panels');
-function swStart(x,y,src){if(!isDrawer()||$('#app').classList.contains('collapsed'))return;sw={x0:x,y0:y,src,active:false,d:0,H:sheetEl.offsetHeight,hist:[[performance.now(),y]]};if(src==='grab')swBegin(y);}
+function swStart(x,y,src){if(!isDrawer()||$('#app').classList.contains('collapsed')||document.documentElement.classList.contains('typing'))return;sw={x0:x,y0:y,src,active:false,d:0,H:sheetEl.offsetHeight,hist:[[performance.now(),y]]};if(src==='grab')swBegin(y);}
 function swBegin(y){sw.active=true;sw.y0=y;sheetEl.style.transition='none';}
 function swMove(x,y,ev){if(!sw)return;const dy=y-sw.y0,dx=x-sw.x0;
  if(!sw.active){const atTop=panelsEl.scrollTop<=0;
