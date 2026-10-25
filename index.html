@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#ffffff">
 <script>(function(){var t=null;try{t=localStorage.getItem('charmlab.theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;document.querySelector('meta[name=theme-color]').setAttribute('content',t==='dark'?'#272042':'#ffffff');})();</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script>(function(){function fit(){var vv=window.visualViewport;var h=(vv?vv.height:window.innerHeight)+'px';var t=(vv?vv.offsetTop:0)+'px';var r=document.documentElement;if(r.style.getPropertyValue('--app-h')===h&&r.style.getPropertyValue('--app-top')===t)return;r.style.setProperty('--app-h',h);r.style.setProperty('--app-top',t);}fit();addEventListener('resize',fit);if(window.visualViewport){visualViewport.addEventListener('resize',fit);visualViewport.addEventListener('scroll',fit);}})();</script>
+<script>(function(){/* At rest the app is 100lvh (the canvas Safari actually paints). visualViewport / 100dvh are shorter on iOS 26 and that shortfall is the empty band under the tab bar. Only shrink while the keyboard is covering the page. */
+function fit(){var vv=window.visualViewport,r=document.documentElement;if(!vv)return;var full=Math.max(window.innerHeight,r.clientHeight||0);var covered=full-vv.height-vv.offsetTop;if(covered>150){r.style.setProperty('--app-h',Math.round(vv.height)+'px');r.style.setProperty('--app-top',Math.round(vv.offsetTop)+'px');}else{r.style.removeProperty('--app-h');r.style.removeProperty('--app-top');}}
+fit();addEventListener('resize',fit);if(window.visualViewport){visualViewport.addEventListener('resize',fit);visualViewport.addEventListener('scroll',fit);}})();</script>
 <title>charm lab ✦ design your acrylic charm (mockup)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,17 +40,18 @@ html[data-theme=dark] .themebtn .moon{transform:none;opacity:1}
 @keyframes boop{40%{transform:scale(1.15) rotate(-12deg)}}
 @media (max-width:400px){.logo .star{width:28px;height:28px}.logo{gap:7px}.logo h1{font-size:26px}header{gap:8px;padding:8px 12px 10px}.bagbtn{padding:0 8px 0 12px;gap:6px}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-/* The page background lives on <html>, which Safari paints under its bars. body is NOT position:fixed (iOS 26 Safari
-   tints its bars from fixed edge elements). --app-h / --app-top track the visual viewport so a 100lvh canvas cannot
-   leave a dead band under the designer, and the keyboard cannot scroll the page out from under checkout. */
+/* Safari paints the root background across the large viewport (100lvh), including the area above the floating toolbar.
+   100dvh and visualViewport are shorter on iOS 26, so a dvh-sized app leaves that canvas showing as an empty dotted
+   band under the tab bar. The designer fills 100lvh instead; body stays position:relative (a fixed body makes iOS 26
+   tint its bars). --app-h / --app-top are set only while the keyboard is open. */
 html,body{margin:0;overscroll-behavior:none;overflow:hidden}
-html{height:var(--app-h,100dvh);min-height:var(--app-h,100dvh);background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
+html{height:100lvh;min-height:100lvh;background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
 html.m3d{background-color:var(--three-bot);background-image:var(--three);background-size:100% 100lvh;background-repeat:no-repeat;background-position:0 0}
 html{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{position:relative;height:var(--app-h,100dvh);font-family:'Fredoka',system-ui,sans-serif;font-size:17px;color:var(--ink);background:transparent;-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body{position:relative;height:100lvh;font-family:'Fredoka',system-ui,sans-serif;font-size:17px;color:var(--ink);background:transparent;-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input{-webkit-user-select:text;user-select:text}
 button{font-family:inherit;color:inherit;-webkit-appearance:none;appearance:none;margin:0}
-#app{position:absolute;left:0;right:0;top:var(--app-top,0);height:var(--app-h,100dvh);margin:0 auto;max-width:620px;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);overflow:hidden}
+#app{position:absolute;left:0;right:0;top:var(--app-top,0);height:var(--app-h,100%);margin:0 auto;max-width:620px;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);overflow:hidden}
 header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px 10px}
 .logo{display:flex;align-items:center;gap:10px;min-width:0}.lt{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
 .logo h1{font-family:'Bagel Fat One',cursive;font-weight:400;font-size:30px;line-height:1;margin:0;color:var(--pink);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:3px 3px 0 var(--shd);white-space:nowrap}
@@ -83,7 +86,7 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 .hint{background:var(--hintbg);border:2.5px solid var(--ink);border-radius:999px;padding:10px 16px;font-weight:600;font-size:16px;text-align:center}
 .del{background:var(--pink);color:#fff}
 /* sheet */
-#sheet{flex:none;height:clamp(240px,36dvh,420px);min-height:0;margin:14px 12px 0;background:var(--card);border:3px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden}
+#sheet{flex:none;height:clamp(240px,36%,420px);min-height:0;margin:14px 12px 0;background:var(--card);border:3px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden}
 #app.collapsed #sheet{height:48px}
 #sheet{position:relative;z-index:2;will-change:transform}
 #tabbar{position:relative;z-index:3;touch-action:none}
@@ -165,7 +168,7 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .toast small{font-weight:500;font-size:15px;opacity:.75}
 .conf{position:fixed;width:14px;height:14px;z-index:85;pointer-events:none;border:2px solid var(--ink)}
 /* 3D modal */
-.modal{position:absolute;left:0;right:0;top:var(--app-top,0);height:var(--app-h,100dvh);z-index:60;display:none;background:transparent}
+.modal{position:absolute;left:0;right:0;top:var(--app-top,0);height:var(--app-h,100%);z-index:60;display:none;background:transparent}
 /* full-bleed backdrop: a fixed layer sized well past every iOS edge (status bar, floating toolbar, overscroll) */
 @media (max-width:699px){html.m3d #app{visibility:hidden}}
 .modal.open{display:flex;align-items:center;justify-content:center}
@@ -227,7 +230,7 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
 #orderFoot .addbag,#orderFoot .checkout{flex:1;width:auto;margin:0;min-height:54px;font-size:20px}
 #orderFoot .ordersbtn{margin:0;min-height:44px}
 #orderFoot .fine{margin:0}
-.flow{position:absolute;left:0;right:0;top:var(--app-top,0);height:var(--app-h,100dvh);z-index:70;display:none;flex-direction:column;overflow:hidden;color:var(--ink);background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
+.flow{position:absolute;left:0;right:0;top:var(--app-top,0);height:var(--app-h,100%);z-index:70;display:none;flex-direction:column;overflow:hidden;color:var(--ink);background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
 .flow.open{display:flex}
 .flowhead{flex:none;display:flex;align-items:center;gap:12px;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;max-width:560px;width:100%;margin:0 auto}
 .flowhead h2{font-family:'Bagel Fat One';font-weight:400;font-size:28px;margin:0;line-height:1}
@@ -493,11 +496,12 @@ function geo(id,size=order.size){
 }
 /* ---------- state + history ---------- */
 const FONTS=[{id:'Bagel Fat One',label:'bubble'},{id:'Pacifico',label:'script'},{id:'Press Start 2P',label:'pixel'},{id:'Rubik Bubbles',label:'puffy'}];
-const FILLS=['#ffc2e2','#ef4f9d','#a9dc4e','#3c5fd4','#ffe14a','#c9b2ff','#8fd8ff','#5fd4b5','#ff8a3d','#ffffff','#17142e','none'];
-const OUTLINES=['#ef4f9d','#17142e','#3c5fd4','#a9dc4e','#ffe14a','#ffffff'];// solid printable colors only
-const OUTLINE_FALLBACK='#ffffff';
-const safeOutline=c=>OUTLINES.includes(c)?c:OUTLINE_FALLBACK;
+const FILLS=['#ffc2e2','#ef4f9d','#a9dc4e','#3c5fd4','#ffe14a','#c9b2ff','#8fd8ff','#5fd4b5','#ff8a3d','#ffffff','#17142e'];// solid printable colors only: no clear, no rainbow
+const OUTLINES=['#ef4f9d','#17142e','#3c5fd4','#a9dc4e','#ffe14a','#ffffff'];
 const TCOLORS=['#17142e','#ef4f9d','#3c5fd4','#a9dc4e','#ffe14a','#ffffff','#c9b2ff','#ff8a3d'];
+const OUTLINE_FALLBACK='#ffffff';
+const solidOf=(c,list,fallback)=>list.includes(c)?c:(list.includes(soften(c))?soften(c):fallback);
+const safeOutline=c=>solidOf(c,OUTLINES,OUTLINE_FALLBACK);
 const SIZE_PRICE={'1.5':12,'2':14,'2.5':16};
 const SIZES=['1.5','2','2.5'];/* explicit order: Object.keys puts the integer-like '2' first */
 const SIZE_MAX=2.5;const sizeF=()=>parseFloat(order.size)/SIZE_MAX;// on-screen scale vs the biggest size: 1.5"=.6, 2"=.8, 2.5"=1 (true proportions)
@@ -523,7 +527,7 @@ function delSel(){if(!sel)return;S.els=S.els.filter(e=>e.id!==sel);sel=null;comm
 /* ---------- universal line weights (charm units; the full charm cut is 2*HALF = 280 units ≈ 2") ----------
    every piece of art gets the same dark ink line and the same white sticker border no matter how it's scaled:
    strokes are rebuilt per scale (stroke = weight / scale), scaling only changes the size of the art */
-const INK_W=3.4,WHITE_W=5.4,SH_DX=1.4,SH_DY=2,S_MIN=.25,S_MAX=3;
+const INK_W=3.4,WHITE_W=4,SH_DX=1.4,SH_DY=2,S_MIN=.25,S_MAX=3;/* white sticker halo, shared with text outlines. 4 units stays just over Vograce's 0.5mm white minimum at 1.5" and is thinner than the old 5.4 halo */
 // Vograce minimum line widths: colored lines >= 0.3mm, white lines >= 0.5mm (checked at the smallest 1.5" size)
 const MIN_COLOR_U=.3*UPM_MAX,MIN_WHITE_U=.5*UPM_MAX;
 // minimum printable sizes: stickers >= ~6mm across, text >= ~2.5mm tall
@@ -696,8 +700,8 @@ $('#mq').innerHTML=['charm lab ✦','made in pāʻia','holo stars','stickers on 
 const TILECOLS=['#ffc2e2','#b8ff3c','#8fd8ff','#ffe14a','#c9b2ff','#5cf2c8','#ffc2e2','#ff8a3d'];
 $('#shapes').innerHTML=SHAPES.map((s,i)=>{const g=geo(s.id);const h=g.maxY-g.minY+20;return `<button class="tile" data-shape="${s.id}" aria-label="${s.name}"><svg viewBox="${-Math.max(165,h/2)} ${(g.minY-10).toFixed(0)} ${2*Math.max(165,h/2)} ${h.toFixed(0)}"><path d="${g.outerD} ${g.holeD}" fill-rule="evenodd" fill="${TILECOLS[i]}" stroke="currentColor" stroke-width="14" stroke-linejoin="round"/></svg><span>${s.name}</span></button>`;}).join('');
 $('#shapes').addEventListener('click',ev=>{const b=ev.target.closest('[data-shape]');if(!b)return;S.shape=b.dataset.shape;commit();});
-function swatches(el,list,custom=true){el.innerHTML=list.map(c=>`<button class="sw ${c==='none'?'none':''}" data-c="${c}" aria-label="${c==='none'?'none':c}" style="${c!=='none'?`background:${c}`:''}"></button>`).join('')+(custom?`<label class="sw custom" aria-label="custom color"><input type="color" value="#ff3ea5"></label>`:'');}
-swatches($('#fills'),FILLS);swatches($('#outlines'),OUTLINES,false);swatches($('#tcolors'),TCOLORS);
+function swatches(el,list){el.innerHTML=list.map(c=>`<button class="sw" data-c="${c}" aria-label="${c}" style="background:${c}"></button>`).join('');}
+swatches($('#fills'),FILLS);swatches($('#outlines'),OUTLINES);swatches($('#tcolors'),TCOLORS);
 function bindSw(el,apply){el.addEventListener('click',ev=>{const b=ev.target.closest('[data-c]');if(b){apply(b.dataset.c,true);}});const inp=el.querySelector('input[type=color]');if(inp)inp.addEventListener('input',()=>apply(inp.value,false));if(inp)inp.addEventListener('change',()=>{apply(inp.value,true);});}
 bindSw($('#fills'),(c,done)=>{S.fill=c;done?commit():(renderBase(),renderPanels());});
 bindSw($('#outlines'),(c,done)=>{S.outline=safeOutline(c);done?commit():(renderBase(),renderPanels());});
@@ -762,7 +766,7 @@ sheetEl.addEventListener('touchend',()=>{upEnd();swEnd();});sheetEl.addEventList
 /* swipe-UP-to-open: from the tab bar or the peeking handle while collapsed. The sheet follows the finger (height), opens
    past ~30% of its height or on a fast upward flick, otherwise snaps back. Starting on a tab opens that tab. */
 let up=null;const SHEET_MIN=48;
-const sheetOpenH=()=>Math.round(clamp(.36*innerHeight,240,420));
+const sheetOpenH=()=>Math.round(clamp(.36*(($('#app')&&$('#app').clientHeight)||innerHeight),240,420));
 function upStart(x,y,tab){if(!isDrawer()||!$('#app').classList.contains('collapsed'))return false;up={x0:x,y0:y,prev:curTab,tab:tab||curTab||'shape',active:false,d:0,H:sheetOpenH(),hist:[[performance.now(),y]]};return true;}
 function upMove(x,y,ev){if(!up)return;const dy=up.y0-y,dx=x-up.x0;
  if(!up.active){if(Math.abs(dy)<8&&Math.abs(dx)<8)return;if(dy>0&&dy>Math.abs(dx)){up.active=true;up.y0=y;sheetEl.style.transition='none';sheetEl.style.height=SHEET_MIN+'px';setTab(up.tab);}else{up=null;return;}}
@@ -852,7 +856,7 @@ function renderPanels(){
  $('#undoB').disabled=H.i<=0;$('#redoB').disabled=H.i>=H.stack.length-1;$('#clearB').disabled=!S.els.length;
 }
 function selChanged(){updateSel();renderSelbar();renderPanels();}
-function sanitize(st){st.fill=soften(st.fill);st.outline=safeOutline(soften(st.outline));for(const e of st.els)if(e.type==='text')e.color=soften(e.color);if(!ATT[order.att])order.att='keyring';return st;}
+function sanitize(st){st.fill=solidOf(st.fill,FILLS,'#ffc2e2');st.outline=safeOutline(st.outline);for(const e of st.els)if(e.type==='text')e.color=solidOf(e.color,TCOLORS,'#17142e');if(!ATT[order.att])order.att='keyring';return st;}
 function renderAll(){sanitize(S);renderBase();renderEls();updateSel();renderSelbar();renderPanels();renderOrder();}
 window.addEventListener('keydown',ev=>{
  if($('#flow').classList.contains('open')){if(ev.key==='Escape'){ev.preventDefault();closeFlow();}return;}
