@@ -168,17 +168,20 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .toast svg{width:44px;height:44px;flex:none}
 .toast small{font-weight:500;font-size:15px;opacity:.75}
 .conf{position:fixed;width:14px;height:14px;z-index:85;pointer-events:none;border:2px solid var(--ink)}
-/* 3D modal */
-.modal{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);z-index:60;display:none;background:transparent}
-/* full-bleed backdrop: a fixed layer sized well past every iOS edge (status bar, floating toolbar, overscroll) */
+/* 3D modal. Same visible rectangle as the designer (--app-top / --app-h).
+   On a phone the card is a column: header under the status bar, the model in the
+   middle, description + buttons glued to the bottom edge (just above Safari's
+   floating bar). The canvas is only that middle band, so the keyring can't draw
+   under the island or leave a gap under the buttons. */
+.modal{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);box-sizing:border-box;z-index:60;display:none;background:transparent}
 @media (max-width:699px){html.m3d #app{visibility:hidden}}
-.modal.open{display:flex;align-items:center;justify-content:center}
-.mcard{position:relative;z-index:1;width:100%;height:100%;background:transparent;overflow:hidden}
-.mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + var(--shell-pad-top,var(--sat))) calc(14px + var(--sar)) 10px calc(14px + var(--sal));position:absolute;top:0;left:0;right:0;z-index:2;pointer-events:none}
+.modal.open{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start}
+.mcard{position:relative;z-index:1;flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column;background:transparent;overflow:hidden}
+.mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + var(--shell-pad-top,var(--sat))) calc(14px + var(--sar)) 10px calc(14px + var(--sal));position:relative;z-index:2;pointer-events:none}
 .mhead>*{pointer-events:auto}.mhead .logo h1{font-size:32px}
 .mfoot .mback{flex:0 0 38%;max-width:none;min-height:68px;font-size:20px;border-radius:24px;box-shadow:5px 5px 0 var(--shd)}
 .mfoot .madd{flex:1;width:auto;min-height:68px}
-.three-wrap{position:absolute;inset:0;touch-action:none;background:transparent}
+.three-wrap{position:relative;flex:1 1 auto;min-height:0;touch-action:none;background:transparent}
 .three-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .mload{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bagel Fat One';font-size:24px;text-align:center;padding:24px}
 .mtag{align-self:center;max-width:100%;text-align:center;background:none;border:0;padding:2px 0;color:var(--ink);font-weight:700;font-size:clamp(13px,3.9vw,16px);letter-spacing:.01em;display:flex;align-items:center;justify-content:center;gap:4px;line-height:1.4;pointer-events:none;animation:chipFloat 3.6s ease-in-out infinite;will-change:transform}
@@ -201,10 +204,10 @@ html[data-theme=dark] .mtag{color:#fff}
 @keyframes spkS{0%{transform:translate(0,0) rotate(0) scale(1);opacity:1}30%{transform:translate(-2px,2px) rotate(-30deg) scale(.7);opacity:.7}60%{transform:translate(1px,3px) rotate(-60deg) scale(1.15);opacity:1}100%{transform:translate(0,0) rotate(-90deg) scale(1);opacity:1}}
 @media (prefers-reduced-motion:reduce){.mtag .spk{animation:none!important}}
 html[data-theme=dark] .mtag b{color:var(--lime)}
-.mfoot{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;flex-direction:column;gap:14px;padding:12px calc(14px + var(--sar)) calc(14px + var(--shell-pad-bot,var(--sab))) calc(14px + var(--sal));pointer-events:none}
+.mfoot{position:relative;flex:none;z-index:2;display:flex;flex-direction:column;gap:10px;padding:8px calc(14px + var(--sar)) calc(12px + var(--shell-pad-bot,var(--sab))) calc(14px + var(--sal));pointer-events:none}
 .mbtns{display:flex;gap:12px;pointer-events:auto}
 .pbtn.on{background:var(--lime)}
-@media (min-width:700px){.modal{padding:24px;background:rgba(23,20,46,.45)}html.m3d{background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px;background-repeat:repeat}.mcard{background:var(--three);max-width:1000px;max-height:820px;border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{padding:12px 16px}.mfoot{padding:12px 16px}}
+@media (min-width:700px){.modal.open{align-items:center;justify-content:center;padding:24px;background:rgba(23,20,46,.45)}html.m3d{background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px;background-repeat:repeat}.mcard{flex:1 1 auto;width:100%;height:100%;max-width:1000px;max-height:820px;background:var(--three);border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{padding:12px 16px}.mfoot{padding:12px 16px}}
 /* desktop adaptation */
 @media (min-width:960px){
  .lt{flex-direction:row;align-items:center;gap:12px}
@@ -1034,10 +1037,9 @@ function createViewer(){
  controls.addEventListener('change',()=>{if(v.inTick)v.changed=true;else kick();});
  return v;
 }
-function band3D(){const r=$('#threeWrap').getBoundingClientRect();const top=$('.mhead').getBoundingClientRect().bottom-r.top;const t=$('#mtag');const fb=(t.textContent?t:$('.mbtns')).getBoundingClientRect().top-r.top;
- const a=clamp(top,0,r.height*.3),b=clamp(fb-6,r.height*.55,r.height);return {W:r.width,H:r.height,top:a,bot:b};}
+function band3D(){const r=$('#threeWrap').getBoundingClientRect();const pad=18;return {W:r.width,H:r.height,top:pad,bot:Math.max(pad+1,r.height-pad)};}
 function resize3D(){if(!V)return;const r=$('#threeWrap').getBoundingClientRect();if(!r.width||!r.height)return;V.renderer.setSize(r.width,r.height,false);V.camera.aspect=r.width/r.height;
- // canvas fills the whole screen; shift the projection so the scene's centre sits mid-way in the clear band (no extra renders, just the matrix)
+ // the canvas is only the band between the header and the footer; nudge the projection if that band's padding isn't centred
  const B=band3D();V.band=B;const dy=(B.top+B.bot)/2-B.H/2;if(Math.abs(dy)>.5)V.camera.setViewOffset(B.W,B.H,0,-dy,B.W,B.H);else V.camera.clearViewOffset();V.camera.updateProjectionMatrix();}
 async function build3D(){
  const {T,BGU}=three;const D_=V.disposables;const keep=o=>{D_.push(o);return o;};
@@ -1143,7 +1145,7 @@ function setupZoom(v){const cv=v.canvas;const P=new Map();let pinch=null;
     if(Math.abs(vx)>.45&&Math.abs(dx)>=24&&Math.abs(dx)<170&&Math.abs(dx)>1.4*Math.abs(dy)&&Math.sign(vx)===Math.sign(dx))flipFace(g.faceAz,-Math.sign(dx),vx);}}};
  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
  cv.addEventListener('wheel',ev=>{ev.preventDefault();const dy=ev.deltaMode===1?ev.deltaY*16:ev.deltaY;zStretch(Math.exp(-clamp(dy,-120,120)*(ev.ctrlKey?.01:.0025)));clearTimeout(v.zbT);v.zbT=setTimeout(zoomHome,150);},{passive:false});}
-function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=Math.max(.3,(B.bot-B.top-24)/B.H)||1;/* keep ~12px clear above and below the keychain */const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*FRAME_H,(V.fitW/2)/(tf*a)*FRAME_W);const ty=0;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.homeD=d;V.zb=null;V.zRaw=1;V.zDisp=1;V.controls.enableZoom=false;{const o=V.camera.position.clone().sub(V.controls.target);const r=o.length();V.face={az0:Math.atan2(o.x,o.z),pol0:Math.acos(o.y/r)};V.fs=null;V.controls.minPolarAngle=V.face.pol0-.32;V.controls.maxPolarAngle=V.face.pol0+.32;}V.controls.minDistance=d*.5;V.controls.maxDistance=d*1.6;V.controls.update();kick();}
+function resetView(){if(!V)return;const B=V.band||{H:1,top:0,bot:1};const k=Math.max(.3,(B.bot-B.top-28)/B.H)||1;/* padding inside the canvas so the keyring and the charm both clear the edges */const a=(V.camera.aspect||1)/k;const tf=Math.tan(V.camera.fov*Math.PI/360)*k;const d=Math.max((V.fitH/2)/tf*FRAME_H,(V.fitW/2)/(tf*a)*FRAME_W);const ty=0;V.camera.position.set(d*.28,ty+d*.1,d*.95);V.controls.target.set(0,ty,0);V.homeD=d;V.zb=null;V.zRaw=1;V.zDisp=1;V.controls.enableZoom=false;{const o=V.camera.position.clone().sub(V.controls.target);const r=o.length();V.face={az0:Math.atan2(o.x,o.z),pol0:Math.acos(o.y/r)};V.fs=null;V.controls.minPolarAngle=V.face.pol0-.32;V.controls.maxPolarAngle=V.face.pol0+.32;}V.controls.minDistance=d*.5;V.controls.maxDistance=d*1.6;V.controls.update();kick();}
 // render loop runs only while something moves
 function tick(now){
  if(!V)return;V.raf=0;if(!modalOpen||document.hidden)return;
@@ -1203,6 +1205,7 @@ async function open3D(){
  }catch(err){console.error(err);$('#mload').innerHTML='hmm, 3D needs WebGL and an internet connection<br><small style="font-family:Fredoka;font-size:17px">(three.js loads from a CDN)</small>';}
 }
 function close3D(){modalOpen=false;clearTimeout(idleT);if(V)V.bump=null;$('#modal').classList.remove('open');document.documentElement.classList.remove('m3d');syncThemeColor();disposeViewer();}
+addEventListener('charm-vv',()=>{if(!modalOpen||!V)return;resize3D();if(!V.interacting)resetView();});
 $('#open3d').onclick=open3D;$('#close3d').onclick=close3D;
 $('#add3d').onclick=()=>addToBag($('#add3d'));
 const setMotion=m=>{motion=m;clearTimeout(idleT);if(V){if(!m){V.bump=null;restPose();}kick();}};
