@@ -31,7 +31,7 @@ html[data-theme=dark]{--bg:#272042;--dot:#3f3566;--card:#9488c4;--card2:#a497d0;
 /* dark mode = same sticker look, just dimmer: black outlines, black text and black hard shadows stay */
 html.theming *{transition:background-color .35s,border-color .35s,color .25s!important}
 .b3d,.ph,.ex,.toast,.tab.on,.tile.on,.fonts .pbtn.on,.seg button.on,.att.on,.pbtn.on,.marquee{color:var(--dark)}
-.hbtns{display:flex;align-items:center;gap:10px;flex:none}
+.hbtns{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
 .themebtn{width:56px;height:56px;flex:none;border-radius:50%;border:3px solid var(--ink);background:var(--card);box-shadow:3px 3px 0 var(--shd);display:grid;place-items:center;cursor:pointer;padding:0;position:relative;overflow:hidden;transition:transform .08s,box-shadow .08s}
 .themebtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shd)}
 .themebtn svg{position:absolute;width:30px;height:30px;transition:transform .55s cubic-bezier(.3,1.6,.5,1),opacity .3s}
@@ -41,7 +41,7 @@ html[data-theme=dark] .themebtn .moon{transform:none;opacity:1}
 .themebtn .sun .rays{transform-origin:12px 12px;animation:spin 8s linear infinite}
 .themebtn.boop{animation:boop .5s cubic-bezier(.3,1.6,.5,1)}
 @keyframes boop{40%{transform:scale(1.15) rotate(-12deg)}}
-@media (max-width:400px){header{gap:8px;padding:8px 12px 10px}.bagbtn{padding:0 8px 0 12px;gap:6px}}
+@media (max-width:400px){.hbtns{gap:4px}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* The dotted canvas stays on the large viewport so it paints under Safari's glass.
    The app shell is NOT 100lvh: on iOS 26 that rectangle runs under the status bar and
@@ -60,17 +60,27 @@ body{position:relative;height:100lvh;font-family:'Fredoka',system-ui,sans-serif;
 input{-webkit-user-select:text;user-select:text}
 button{font-family:inherit;color:inherit;-webkit-appearance:none;appearance:none;margin:0}
 #app{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);margin:0 auto;max-width:620px;display:flex;flex-direction:column;padding-top:var(--shell-pad-top,var(--sat));padding-left:var(--sal);padding-right:var(--sar);overflow:hidden}
-header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px 10px;background:transparent}
-.logo{display:flex;align-items:center;min-width:0}
-.logo h1{position:relative;margin:0;line-height:0}
-/* Balloon loop. The video keeps its white render field; a canvas knocks that field out each frame. */
-.wordmark{display:block;width:152px;height:auto;object-fit:cover;background:transparent;pointer-events:none}
-video.wordmark{vertical-align:top;opacity:0}
-canvas.wordmark{position:absolute;inset:0;width:100%;height:100%}
-video.wordmark::-webkit-media-controls,video.wordmark::-webkit-media-controls-start-playback-button{display:none!important}
-img.wordmark{display:none}
-@media (max-width:400px){.wordmark{width:136px}}
-@media (prefers-reduced-motion:reduce){video.wordmark,canvas.wordmark{display:none}img.wordmark{display:block;position:static;height:auto}}
+header{flex:none;position:relative;display:flex;align-items:flex-start;justify-content:flex-end;min-height:max(var(--brand-h,78px),96px);padding:0 8px 4px 0;background:transparent}
+/* One wordmark, outside #app / the 3D modal / checkout, so view changes never remount it.
+   It fills the header except a corner for the theme and bag buttons. */
+#brand{position:absolute;left:0;right:0;top:var(--app-top,0px);z-index:76;pointer-events:none;padding-top:var(--shell-pad-top,var(--sat));padding-left:var(--sal);padding-right:var(--sar);display:flex;justify-content:center}
+#brand .lockup{width:100%;max-width:620px;padding:0 60px 0 12px}
+#brand h1{position:relative;width:100%;margin:0;line-height:0;aspect-ratio:932/224}
+#brand .wordmark{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent;pointer-events:none;display:block}
+#brand video.wordmark{opacity:0}
+#brand video.wordmark::-webkit-media-controls,#brand video.wordmark::-webkit-media-controls-start-playback-button{display:none!important}
+#brand img.wordmark{display:none}
+#brand:not(.ready) img.wordmark{display:block}
+html[data-theme=dark] #brand{filter:brightness(.74) contrast(1.08)}
+header .themebtn{width:44px;height:44px}
+header .themebtn svg{width:22px;height:22px}
+header .bagbtn{width:44px;height:44px;padding:0;gap:0;justify-content:center;border-radius:50%;position:relative}
+header .bagbtn svg{width:22px;height:22px}
+header .bagbtn .n{position:absolute;right:1px;bottom:1px;min-width:16px;height:16px;font-size:10px;border-width:2px}
+.mhead .bagbtn{width:44px;height:44px;padding:0;gap:0;justify-content:center;border-radius:50%;position:relative}
+.mhead .bagbtn svg{width:22px;height:22px}
+.mhead .bagbtn .n{position:absolute;right:1px;bottom:1px;min-width:16px;height:16px;font-size:10px;border-width:2px}
+@media (prefers-reduced-motion:reduce){#brand video.wordmark,#brand canvas.wordmark{display:none!important}#brand img.wordmark{display:block!important;opacity:1}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .bagbtn{flex:none;display:flex;align-items:center;gap:8px;height:56px;background:var(--card);border:3px solid var(--ink);border-radius:999px;padding:0 10px 0 14px;font-weight:700;font-size:17px;box-shadow:3px 3px 0 var(--shd);cursor:pointer}
 .bagbtn svg{width:26px;height:26px}
@@ -190,7 +200,7 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
  html.typing .selbar{display:none}
 }
 /* toast */
-.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 78px);transform:translate(-50%,-30px) rotate(-2deg);opacity:0;visibility:hidden;background:var(--yellow);border:3px solid var(--ink);border-radius:22px;box-shadow:5px 5px 0 var(--shd);padding:14px 20px;font-weight:700;font-size:17px;z-index:90;display:flex;align-items:center;gap:12px;transition:transform .4s cubic-bezier(.3,1.6,.5,1),opacity .2s,visibility .2s;width:max-content;max-width:calc(100vw - 32px)}
+.toast{position:fixed;left:50%;top:calc(var(--app-top,0px) + var(--shell-pad-top,env(safe-area-inset-top)) + var(--brand-h,78px) + 14px);transform:translate(-50%,-30px) rotate(-2deg);opacity:0;visibility:hidden;background:var(--yellow);border:3px solid var(--ink);border-radius:22px;box-shadow:5px 5px 0 var(--shd);padding:14px 20px;font-weight:700;font-size:17px;z-index:90;display:flex;align-items:center;gap:12px;transition:transform .4s cubic-bezier(.3,1.6,.5,1),opacity .2s,visibility .2s;width:max-content;max-width:calc(100vw - 32px)}
 .toast.show{transform:translate(-50%,0) rotate(-2deg);opacity:1;visibility:visible}
 .toast svg{width:44px;height:44px;flex:none}
 .toast small{font-weight:500;font-size:15px;opacity:.75}
@@ -203,7 +213,7 @@ input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;bac
 .modal{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);box-sizing:border-box;z-index:60;display:none;background:transparent}
 .modal.open{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start}
 .mcard{position:relative;z-index:1;flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column;background:transparent;overflow:hidden}
-.mhead{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + var(--shell-pad-top,var(--sat))) calc(14px + var(--sar)) 10px calc(14px + var(--sal));position:relative;z-index:2;pointer-events:none;background:transparent}
+.mhead{flex:none;display:flex;align-items:flex-start;justify-content:flex-end;gap:12px;min-height:calc(var(--brand-h,78px) + var(--shell-pad-top,var(--sat)));padding:var(--shell-pad-top,var(--sat)) calc(8px + var(--sar)) 0 calc(14px + var(--sal));position:relative;z-index:2;pointer-events:none;background:transparent}
 .mhead>*{pointer-events:auto}
 .mfoot .mback{flex:0 0 38%;max-width:none;min-height:68px;font-size:20px;border-radius:24px;box-shadow:5px 5px 0 var(--shd)}
 .mfoot .madd{flex:1;width:auto;min-height:68px}
@@ -245,16 +255,26 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
  .modal.open{display:block;overflow:visible}
  .mcard{position:absolute;top:0;right:0;bottom:0;left:0;display:block;width:auto;height:auto;min-height:0;overflow:visible}
  .mhead{position:absolute;top:0;left:0;right:0;z-index:3}
- .three-wrap{position:absolute;left:0;right:0;top:76px;bottom:160px;z-index:1}
+ .three-wrap{position:absolute;left:0;right:0;top:calc(var(--brand-h,78px) + var(--shell-pad-top,0px));bottom:160px;z-index:1}
  .mfoot{position:fixed;left:0;right:0;bottom:0;z-index:5;margin:0;padding-bottom:calc(10px + var(--shell-pad-bot,0px))}
 }
-@media (min-width:700px){.modal.open{align-items:center;justify-content:center;padding:24px;background:rgba(23,20,46,.45)}html.m3d{background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px;background-repeat:repeat}.mcard{position:relative;top:auto;right:auto;bottom:auto;left:auto;display:flex;flex:1 1 auto;width:100%;height:100%;max-width:1000px;max-height:820px;background:var(--three);border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{position:relative;top:auto;left:auto;right:auto;padding:12px 16px}.three-wrap{position:relative;top:auto;right:auto;bottom:auto;left:auto}.mfoot{position:relative;left:auto;right:auto;bottom:auto;padding:12px 16px}}
+@media (min-width:700px){.modal.open{align-items:center;justify-content:center;padding:calc(12px + var(--brand-h,78px)) 24px 24px;background:rgba(23,20,46,.45)}html.m3d{background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px;background-repeat:repeat}.mcard{position:relative;top:auto;right:auto;bottom:auto;left:auto;display:flex;flex:1 1 auto;width:100%;height:100%;max-width:1000px;max-height:820px;background:var(--three);border:3px solid var(--ink);border-radius:30px;box-shadow:8px 8px 0 var(--shd)}.mhead{position:relative;top:auto;left:auto;right:auto;min-height:0;padding:12px 16px}.mhead .bagbtn{width:auto;height:56px;padding:0 10px 0 14px;border-radius:999px;gap:8px}.mhead .bagbtn svg{width:26px;height:26px}.mhead .bagbtn .n{position:static;min-width:34px;height:34px;font-size:16px;border-width:2.5px}.three-wrap{position:relative;top:auto;right:auto;bottom:auto;left:auto}.mfoot{position:relative;left:auto;right:auto;bottom:auto;padding:12px 16px}}
 /* desktop adaptation */
 @media (min-width:960px){
  #app{max-width:1200px;display:grid;grid-template-columns:minmax(0,1fr) 440px;grid-template-rows:auto auto minmax(0,1fr) auto;column-gap:24px;padding:16px 24px 24px}
- header{grid-column:1/-1;padding:4px 0 14px}
+ header{grid-column:1/-1;padding:0;min-height:var(--brand-h,120px)}
+ .hbtns{flex-direction:row;align-items:center;gap:10px}
+ header .themebtn{width:56px;height:56px}
+ header .themebtn svg{width:30px;height:30px}
+ header .bagbtn{width:auto;height:56px;padding:0 10px 0 14px;border-radius:999px;gap:8px}
+ header .bagbtn svg{width:26px;height:26px}
+ header .bagbtn .n{position:static;min-width:34px;height:34px;font-size:16px;border-width:2.5px}
+ #brand{padding-top:calc(var(--shell-pad-top,0px) + 16px)}
+ #brand .lockup{max-width:1200px;padding:0 24px}
+ #brand h1{max-width:560px}
  .marquee{display:block;grid-column:1/-1}
- .wordmark{width:180px}
+ .flowhead{padding-top:calc(8px + 16px + var(--shell-pad-top,0px) + var(--brand-h,78px))}
+ .modal.open{padding-top:calc(12px + 16px + var(--brand-h,78px))}
  #stageWrap{grid-column:1;grid-row:3/5;margin:0}
  #sheet{grid-column:2;grid-row:3;height:100%!important;max-height:100%;align-self:stretch;margin:0;border:3px solid var(--ink);border-bottom:0;border-radius:28px 28px 0 0}
  #sheet .grab{display:none}
@@ -263,7 +283,7 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
  .shapes{gap:12px}
  #tabbar{grid-column:2;grid-row:4;margin:0;border:3px solid var(--ink);border-top:0;border-radius:0 0 28px 28px;box-shadow:5px 5px 0 var(--shd)}
 }
-@media (max-width:360px){.tab{font-size:14px}.wordmark{width:124px}}
+@media (max-width:360px){.tab{font-size:14px}}
 /* demo checkout + orders (same chunky UI, no text glow) */
 .checkout{width:100%;margin-top:12px;min-height:64px;font-family:'Bagel Fat One';font-size:24px;background:var(--yellow);color:var(--dark);border:3px solid var(--ink);border-radius:24px;box-shadow:5px 5px 0 var(--shd);cursor:pointer}
 .checkout:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--shd)}
@@ -280,7 +300,7 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
 #orderFoot .fine{margin:0}
 .flow{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);z-index:70;display:none;flex-direction:column;overflow:hidden;color:var(--ink);background-color:var(--bg);background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:22px 22px}
 .flow.open{display:flex}
-.flowhead{flex:none;display:flex;align-items:center;gap:12px;padding:calc(8px + var(--shell-pad-top,var(--sat))) 14px 8px;max-width:560px;width:100%;margin:0 auto}
+.flowhead{flex:none;display:flex;align-items:center;gap:12px;padding:calc(8px + var(--shell-pad-top,var(--sat)) + var(--brand-h,78px)) 14px 8px;max-width:560px;width:100%;margin:0 auto}
 .flowhead h2{font-family:'Bagel Fat One';font-weight:400;font-size:28px;margin:0;line-height:1}
 .flowbody{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:4px 16px calc(28px + var(--shell-pad-bot,var(--sab)));max-width:560px;width:100%;margin:0 auto}
 .flow input,.flow select,.flow textarea{-webkit-user-select:text;user-select:text}
@@ -359,11 +379,9 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
 </head>
 <body>
 <svg id="defs" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
+<div id="brand"><div class="lockup"><h1><video id="brandVid" class="wordmark" poster="charmlab-logo.png" width="932" height="224" autoplay muted loop playsinline webkit-playsinline disablepictureinpicture disableremoteplayback tabindex="-1" aria-label="CHARMLAB"></video><img class="wordmark" src="charmlab-logo.png" width="932" height="224" alt="CHARMLAB"></h1></div></div>
 <div id="app">
  <header>
-  <div class="logo">
-   <h1><video class="wordmark" src="charmlab-logo-balloon.mp4" poster="charmlab-logo-still.png" width="640" height="186" autoplay muted loop playsinline webkit-playsinline disablepictureinpicture disableremoteplayback aria-label="CharmLab"></video><img class="wordmark" src="charmlab-logo-still.png" width="612" height="148" alt="CharmLab"></h1>
-  </div>
   <div class="hbtns"><button class="themebtn" id="themeBtn" aria-label="switch light or dark mode"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><g class="rays"><path d="M12 1.5v2.6M12 19.9v2.6M1.5 12h2.6M19.9 12h2.6M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g><circle cx="12" cy="12" r="5" fill="#ffe14a" stroke="currentColor"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z" fill="#c9b2ff"/><path d="M17 3.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="#ffe14a" stroke-width="1.2"/></svg></button><button class="bagbtn" id="bagBtn" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN">0</span></button></div>
  </header>
  <div class="marquee"><div class="track" id="mq"></div></div>
@@ -438,7 +456,7 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
 <div class="modal" id="modal">
  
  <div class="mcard">
-  <div class="mhead"><div class="logo"><h1><video class="wordmark" src="charmlab-logo-balloon.mp4" poster="charmlab-logo-still.png" width="640" height="186" autoplay muted loop playsinline webkit-playsinline disablepictureinpicture disableremoteplayback aria-label="CharmLab"></video><img class="wordmark" src="charmlab-logo-still.png" width="612" height="148" alt="CharmLab"></h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
+  <div class="mhead"><button class="bagbtn" id="bagBtn3d" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
   <div class="three-wrap" id="threeWrap">
    <div class="mload" id="mload">polishing the acrylic…</div>
   </div>
@@ -446,78 +464,82 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
  </div>
 </div>
 <script>
-/* Reduced motion keeps the still. Otherwise knock the white render field out of
-   each frame (near-white connected to the outside, plus the big letter holes).
-   Small interior whites are the chrome highlights, so they stay. */
+/* One CHARMLAB wordmark for every screen. Chrome plays the alpha WebM straight
+   onto the canvas. iPhone Safari cannot composite that alpha, so it gets the
+   same frames on a magenta plate and this canvas lifts the plate off.
+   The source is chosen once and never swapped when the view changes. */
 (function(){
+  var root=document.documentElement;
+  var v=document.getElementById('brandVid');
+  var brand=document.getElementById('brand');
+  var h1=brand.querySelector('h1');
+  var bh=0;
+  function brandH(){
+    var h=Math.round(h1.getBoundingClientRect().height);
+    if(h>8&&h!==bh){bh=h;root.style.setProperty('--brand-h',h+'px');}
+  }
+  addEventListener('resize',brandH);
+  document.addEventListener('charm-vv',brandH);
+  brandH();
   if(matchMedia('(prefers-reduced-motion: reduce)').matches){
-    document.querySelectorAll('video.wordmark').forEach(function(v){v.removeAttribute('autoplay');v.pause();v.preload='none';v.removeAttribute('src');v.load();});
+    v.removeAttribute('autoplay');v.pause();v.removeAttribute('src');v.load();
     return;
   }
-  var MN=232,CH=20,FR=210;
-  function makeKnock(w,h){
-    var n=w*h,white=new Uint8Array(n),bg=new Uint8Array(n),seen=new Uint8Array(n),q=new Int32Array(n),cq=new Int32Array(n);
-    var counter=Math.max(40,Math.round(60*n/(640*186)));
-    return function(img){
-      var d=img.data,p,i,r,g,b,mn,mx,x,qe=0,qs,s,cs,ce,k;
-      white.fill(0);bg.fill(0);seen.fill(0);
-      for(p=0,i=0;p<n;p++,i+=4){
-        r=d[i];g=d[i+1];b=d[i+2];
-        mn=r<g?r:g;if(b<mn)mn=b;mx=r>g?r:g;if(b>mx)mx=b;
-        if(mn>=MN&&mx-mn<=CH)white[p]=1;
-      }
-      function seed(pp){if(white[pp]&&!bg[pp]){bg[pp]=1;q[qe++]=pp;}}
-      for(x=0;x<w;x++){seed(x);seed((h-1)*w+x);}
-      for(var y=0;y<h;y++){seed(y*w);seed(y*w+w-1);}
-      for(qs=0;qs<qe;qs++){
-        p=q[qs];x=p%w;
-        if(x>0)seed(p-1);
-        if(x+1<w)seed(p+1);
-        if(p>=w)seed(p-w);
-        if(p<n-w)seed(p+w);
-      }
-      for(s=0;s<n;s++)if(bg[s])seen[s]=1;
-      for(s=0;s<n;s++){
-        if(!white[s]||seen[s])continue;
-        cs=0;ce=0;seen[s]=1;cq[ce++]=s;
-        while(cs<ce){
-          p=cq[cs++];x=p%w;
-          if(x>0&&white[p-1]&&!seen[p-1]){seen[p-1]=1;cq[ce++]=p-1;}
-          if(x+1<w&&white[p+1]&&!seen[p+1]){seen[p+1]=1;cq[ce++]=p+1;}
-          if(p>=w&&white[p-w]&&!seen[p-w]){seen[p-w]=1;cq[ce++]=p-w;}
-          if(p<n-w&&white[p+w]&&!seen[p+w]){seen[p+w]=1;cq[ce++]=p+w;}
-        }
-        if(ce>=counter)for(k=0;k<ce;k++)bg[cq[k]]=1;
-      }
-      for(p=0;p<n;p++){
-        if(bg[p])continue;
-        i=p*4;r=d[i];g=d[i+1];b=d[i+2];
-        mn=r<g?r:g;if(b<mn)mn=b;mx=r>g?r:g;if(b>mx)mx=b;
-        if(mn<FR||mx-mn>CH)continue;
-        x=p%w;
-        if((x>0&&bg[p-1]===1)||(x+1<w&&bg[p+1]===1)||(p>=w&&bg[p-w]===1)||(p<n-w&&bg[p+w]===1))bg[p]=2;
-      }
-      for(p=0,i=3;p<n;p++,i+=4)if(bg[p])d[i]=0;
-    };
-  }
-  function attach(v){
-    var c=document.createElement('canvas');
-    c.className='wordmark';c.setAttribute('aria-hidden','true');v.after(c);
-    var g=c.getContext('2d',{willReadFrequently:true}),knock=null,last=-1;
-    function tick(){
-      requestAnimationFrame(tick);
-      if(!v.videoWidth||v.readyState<2)return;
-      if(v.getBoundingClientRect().width<2)return;
-      if(v.currentTime===last)return;
-      last=v.currentTime;
-      if(!knock||c.width!==v.videoWidth||c.height!==v.videoHeight){c.width=v.videoWidth;c.height=v.videoHeight;knock=makeKnock(c.width,c.height);}
-      g.drawImage(v,0,0,c.width,c.height);
-      var img=g.getImageData(0,0,c.width,c.height);
-      knock(img);g.putImageData(img,0,0);
-    }
+  var ua=navigator.userAgent||'';
+  var ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var safari=/Safari/.test(ua)&&!/Chrome|Chromium|CriOS|FxiOS|Edg/.test(ua);
+  var webm=!!document.createElement('video').canPlayType('video/webm; codecs="vp9"');
+  var useMp4=ios||safari||!webm;
+  v.src=useMp4?'charmlab-logo.mp4':'charmlab-logo.webm';
+  v.muted=true;v.loop=true;v.playsInline=true;
+  if(useMp4)root.classList.add('logo-key');
+  var c=document.createElement('canvas');
+  c.className='wordmark';c.setAttribute('aria-hidden','true');v.after(c);
+  var g=c.getContext('2d',{willReadFrequently:!!useMp4});
+  var last=-1,alphaOK=null;
+  function clamp8(n){n=n<0?0:n;return n>255?255:n|0;}
+  function tick(){
     requestAnimationFrame(tick);
+    brandH();
+    if(!v.videoWidth||v.readyState<2)return;
+    if(h1.getBoundingClientRect().width<2)return;
+    if(v.currentTime===last&&c.width===v.videoWidth)return;
+    last=v.currentTime;
+    if(c.width!==v.videoWidth||c.height!==v.videoHeight){c.width=v.videoWidth;c.height=v.videoHeight;}
+    if(!useMp4){
+      g.clearRect(0,0,c.width,c.height);
+      g.drawImage(v,0,0,c.width,c.height);
+      if(alphaOK===null){
+        alphaOK=g.getImageData(0,0,1,1).data[3]<16;
+        if(!alphaOK){v.style.opacity='1';c.style.display='none';}
+      }
+      brand.classList.add('ready');
+      return;
+    }
+    g.drawImage(v,0,0,c.width,c.height);
+    var img=g.getImageData(0,0,c.width,c.height);
+    var d=img.data,n=c.width*c.height;
+    var br=d[0],bgc=d[1],bb=d[2];
+    var denom=(br<bb?br:bb)-bgc;
+    if(denom<30)return;
+    var i,o,r,gc,b,a,ia;
+    for(i=0;i<n;i++){
+      o=i*4;r=d[o];gc=d[o+1];b=d[o+2];
+      a=1-((r<b?r:b)-gc)/denom;
+      if(a<0)a=0;else if(a>1)a=1;
+      if(a<0.06){d[o+3]=0;continue;}
+      ia=a;
+      d[o]=clamp8((r-br*(1-ia))/ia+0.5);
+      d[o+1]=clamp8((gc-bgc*(1-ia))/ia+0.5);
+      d[o+2]=clamp8((b-bb*(1-ia))/ia+0.5);
+      d[o+3]=a>0.96?255:(a*255+0.5)|0;
+    }
+    g.putImageData(img,0,0);
+    brand.classList.add('ready');
   }
-  document.querySelectorAll('video.wordmark').forEach(attach);
+  requestAnimationFrame(tick);
+  var play=v.play();
+  if(play&&play.catch)play.catch(function(){});
 })();
 </script>
 <script type="module">
