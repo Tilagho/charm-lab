@@ -61,8 +61,23 @@ input{-webkit-user-select:text;user-select:text}
 button{font-family:inherit;color:inherit;-webkit-appearance:none;appearance:none;margin:0}
 #app{position:absolute;left:0;right:0;top:var(--app-top,0px);height:100vh;height:var(--app-h,100dvh);margin:0 auto;max-width:620px;display:flex;flex-direction:column;padding-top:var(--shell-pad-top,var(--sat));padding-left:var(--sal);padding-right:var(--sar);overflow:hidden}
 header{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px 10px}
-.logo{display:flex;align-items:center;gap:10px;min-width:0}.lt{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
-.logo h1{font-family:'Bagel Fat One',cursive;font-weight:400;font-size:30px;line-height:1;margin:0;color:var(--pink);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:3px 3px 0 var(--shd);white-space:nowrap}
+.logo{display:flex;align-items:center;gap:10px;min-width:0}.lt{display:flex;flex-direction:column;align-items:flex-start;gap:12px;min-width:0}
+.logo h1{font-family:'Bagel Fat One',cursive;font-weight:400;font-size:30px;line-height:1;margin:0;color:var(--pink);-webkit-text-stroke:10px var(--ink);paint-order:stroke fill;text-shadow:8px 8px 0 var(--shd);white-space:nowrap}
+.logo h1 span{display:inline-block;transform-origin:50% 55%;animation:balloon var(--dur,3.3s) ease-in-out infinite;animation-delay:var(--lag,0s)}
+.logo h1 span:nth-child(odd){animation-name:balloon}
+.logo h1 span:nth-child(even):not(.gap){animation-name:balloon2}
+.logo h1 span:nth-child(1){--dur:3.15s;--lag:-.35s}
+.logo h1 span:nth-child(2){--dur:3.65s;--lag:-1.5s}
+.logo h1 span:nth-child(3){--dur:2.9s;--lag:-.85s}
+.logo h1 span:nth-child(4){--dur:3.4s;--lag:-2.15s}
+.logo h1 span:nth-child(5){--dur:3.2s;--lag:-.15s}
+.logo h1 span:nth-child(7){--dur:3.5s;--lag:-1.75s}
+.logo h1 span:nth-child(8){--dur:3.05s;--lag:-1.05s}
+.logo h1 span:nth-child(9){--dur:3.75s;--lag:-2.55s}
+.logo h1 span.gap{width:.3em;animation:none}
+@keyframes balloon{0%,100%{transform:translate(0,0) rotate(0)}32%{transform:translate(1px,-2.2px) rotate(-2.4deg)}58%{transform:translate(-1px,.5px) rotate(1.8deg)}80%{transform:translate(.5px,-1.3px) rotate(-1deg)}}
+@keyframes balloon2{0%,100%{transform:translate(0,0) rotate(0)}28%{transform:translate(-1px,-1.4px) rotate(2.2deg)}54%{transform:translate(.9px,-2.4px) rotate(-1.7deg)}78%{transform:translate(-.4px,.4px) rotate(1.1deg)}}
+@media (prefers-reduced-motion:reduce){.logo h1 span{animation:none!important}}
 .logo .star{width:34px;height:34px;flex:none;animation:spin 9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .ph{font-weight:700;font-size:14px;background:var(--lime);border:2.5px solid var(--ink);border-radius:999px;padding:1px 10px;transform:rotate(-3deg);margin-left:4px;box-shadow:2px 2px 0 var(--shd);white-space:nowrap}
@@ -358,7 +373,7 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
  <header>
   <div class="logo">
    <svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg>
-   <div class="lt"><h1>charm lab</h1><span class="ph">placeholder name</span></div>
+   <div class="lt"><h1 aria-label="charm lab"><span aria-hidden="true">c</span><span aria-hidden="true">h</span><span aria-hidden="true">a</span><span aria-hidden="true">r</span><span aria-hidden="true">m</span><span class="gap" aria-hidden="true"></span><span aria-hidden="true">l</span><span aria-hidden="true">a</span><span aria-hidden="true">b</span></h1><span class="ph">placeholder name</span></div>
   </div>
   <div class="hbtns"><button class="themebtn" id="themeBtn" aria-label="switch light or dark mode"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><g class="rays"><path d="M12 1.5v2.6M12 19.9v2.6M1.5 12h2.6M19.9 12h2.6M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g><circle cx="12" cy="12" r="5" fill="#ffe14a" stroke="currentColor"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z" fill="#c9b2ff"/><path d="M17 3.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="#ffe14a" stroke-width="1.2"/></svg></button><button class="bagbtn" id="bagBtn" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN">0</span></button></div>
  </header>
@@ -434,7 +449,7 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
 <div class="modal" id="modal">
  
  <div class="mcard">
-  <div class="mhead"><div class="logo"><svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg><h1>charm lab</h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
+  <div class="mhead"><div class="logo"><svg class="star" viewBox="0 0 100 100"><path d="M50 4 C55 36 64 45 96 50 C64 55 55 64 50 96 C45 64 36 55 4 50 C36 45 45 36 50 4Z" fill="#b8ff3c" stroke="#17142e" stroke-width="5" stroke-linejoin="round"/></svg><h1 aria-label="charm lab"><span aria-hidden="true">c</span><span aria-hidden="true">h</span><span aria-hidden="true">a</span><span aria-hidden="true">r</span><span aria-hidden="true">m</span><span class="gap" aria-hidden="true"></span><span aria-hidden="true">l</span><span aria-hidden="true">a</span><span aria-hidden="true">b</span></h1></div><button class="bagbtn" id="bagBtn3d" aria-label="bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z" fill="#ffc2e2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n" id="bagN3d">0</span></button></div>
   <div class="three-wrap" id="threeWrap">
    <div class="mload" id="mload">polishing the acrylic…</div>
   </div>
