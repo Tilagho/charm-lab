@@ -88,26 +88,25 @@ header{flex:none;display:flex;align-items:center;justify-content:space-between;g
 .hint{background:var(--hintbg);border:2.5px solid var(--ink);border-radius:999px;padding:10px 16px;font-weight:600;font-size:16px;text-align:center}
 .del{background:var(--pink);color:#fff}
 /* sheet */
-#sheet{flex:0 1 auto;height:var(--sheet-h,324px);min-height:0;margin:14px 12px 0;background:var(--card);border:3px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden}
+#sheet{flex:0 1 auto;height:var(--sheet-h,200px);min-height:0;margin:10px 12px 0;background:var(--card);border:3px solid var(--ink);border-bottom:0;border-radius:30px 30px 0 0;display:flex;flex-direction:column;transition:height .3s cubic-bezier(.3,1.2,.5,1);overflow:hidden}
 #app.collapsed #sheet{flex:none;height:48px}
 #sheet{position:relative;z-index:2;will-change:transform}
 #tabbar{position:relative;z-index:3;touch-action:none}
 #app.collapsed #sheet{touch-action:none}
-.grab{flex:none;height:48px;display:grid;place-items:center;cursor:pointer;touch-action:none;border:0;background:none;width:100%}
-.grab::before{content:'';width:56px;height:6px;border-radius:9px;background:var(--muted)}
-.panels{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:0 16px 24px}
+.grab{flex:none;height:36px;display:grid;place-items:center;cursor:pointer;touch-action:none;border:0;background:none;width:100%}
+.grab::before{content:'';width:48px;height:6px;border-radius:9px;background:var(--muted)}
+.panels{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:6px 10px 8px}
 .panel{display:none}.panel.on{display:block;animation:pin .22s ease}
 @keyframes pin{from{opacity:0;transform:translateY(8px)}}
-.ptitle{font-family:'Bagel Fat One';font-weight:400;font-size:22px;margin:0 2px 14px}
-.sub{font-size:16px;font-weight:600;opacity:.72;margin:20px 2px 12px}
-.shapes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.tile{min-height:92px;border:3px solid var(--ink);border-radius:22px;background:var(--card);box-shadow:3px 3px 0 var(--shd);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;transition:transform .08s,box-shadow .08s}
-.tile svg{width:46px;height:46px}
-.tile span{font-size:15px;font-weight:600}
-.tile.on{background:#fff4b8;outline:3px solid var(--pink);outline-offset:3px}
+.sub{font-size:15px;font-weight:600;opacity:.72;margin:10px 2px 6px}
+.panel>.sub:first-child{margin-top:2px}
+.shapes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tile{height:68px;min-height:0;border:3px solid var(--ink);border-radius:16px;background:var(--card);box-shadow:2px 2px 0 var(--shd);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:5px;transition:transform .08s,box-shadow .08s}
+.tile svg{width:100%;height:100%;display:block}
+.tile.on{background:#fff4b8;outline:3px solid var(--pink);outline-offset:2px}
 .pnote{font-size:15px;font-weight:600;margin:-6px 2px 14px;padding:8px 12px;border:2.5px dashed var(--dash);border-radius:16px;background:var(--card2);color:var(--ink)}
-.sws{display:flex;flex-wrap:wrap;gap:14px}
-.sw{width:56px;height:56px;border-radius:50%;border:3px solid var(--ink);box-shadow:2px 2px 0 var(--shd);cursor:pointer;position:relative;padding:0}
+.sws{display:flex;flex-wrap:wrap;gap:10px}
+.sw{width:48px;height:48px;border-radius:50%;border:3px solid var(--ink);box-shadow:2px 2px 0 var(--shd);cursor:pointer;position:relative;padding:0}
 .sw.on{outline:4px solid var(--blue);outline-offset:3px}
 .sw.none{background:repeating-conic-gradient(#e9e6f5 0 25%,#fff 0 50%) 0 0/14px 14px}
 .sw.none::after{content:'';position:absolute;left:50%;top:-3px;bottom:-3px;width:3px;margin-left:-1.5px;background:var(--pink);transform:rotate(45deg)}
@@ -123,8 +122,8 @@ input[type=text]:focus{background:var(--focus)}
 .trow{display:flex;gap:12px;margin-top:14px}
 .trow .pbtn{flex:1}
 .pri{background:var(--pink);color:#fff}
-.fonts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.fonts .pbtn{flex-direction:column;gap:0;min-height:72px;border-radius:22px;font-size:24px;padding:6px}
+.fonts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fonts .pbtn{flex-direction:column;gap:0;min-height:60px;border-radius:18px;font-size:22px;padding:4px}
 .fonts .pbtn small{font:600 15px 'Fredoka';opacity:.7}
 .fonts .pbtn.on{background:var(--yellow)}
 .rng{display:flex;align-items:center;gap:14px;font-weight:700;font-size:17px;min-height:56px}
@@ -132,14 +131,14 @@ input[type=text]:focus{background:var(--focus)}
 input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:22px;border-radius:999px;border:3px solid var(--ink);background:linear-gradient(90deg,var(--bubble),var(--lilac));outline:none;margin:0}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:40px;height:40px;border-radius:50%;background:var(--pink);border:3px solid var(--ink);box-shadow:2px 2px 0 var(--shd)}
 input[type=range]::-moz-range-thumb{width:34px;height:34px;border-radius:50%;background:var(--pink);border:3px solid var(--ink)}
-.stickers{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:12px}
-.stk{aspect-ratio:1;min-height:74px;border-radius:22px;border:3px dashed var(--dash);background:var(--card2);display:grid;place-items:center;cursor:pointer;padding:6px;touch-action:pan-y;transition:transform .08s}
+.stickers{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px}
+.stk{aspect-ratio:1;min-height:62px;border-radius:16px;border:3px dashed var(--dash);background:var(--card2);display:grid;place-items:center;cursor:pointer;padding:5px;touch-action:pan-y;transition:transform .08s}
 .stk img,.stk svg{width:100%;height:100%;pointer-events:none;-webkit-user-drag:none}
 .ghost{position:fixed;width:90px;height:90px;pointer-events:none;z-index:80;transform:translate(-50%,-50%) rotate(-8deg) scale(1.1)}
 .ghost img{width:100%;height:100%}
-.atts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.att{min-height:118px;border:3px solid var(--ink);border-radius:22px;background:var(--card);box-shadow:3px 3px 0 var(--shd);padding:8px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:700 16px 'Fredoka';transition:transform .08s}
-.att svg{width:48px;height:48px}
+.atts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.att{min-height:84px;border:3px solid var(--ink);border-radius:18px;background:var(--card);box-shadow:3px 3px 0 var(--shd);padding:6px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:700 15px 'Fredoka';transition:transform .08s}
+.att svg{width:40px;height:40px}
 .att em{font-style:normal;font-size:15px;font-weight:600;opacity:.7}
 .att.on{background:#e6ecff;outline:4px solid var(--blue);outline-offset:3px}
 .seg{display:flex;border:3px solid var(--ink);border-radius:999px;overflow:hidden;box-shadow:3px 3px 0 var(--shd)}
@@ -217,6 +216,8 @@ html[data-theme=dark] .mtag b{color:var(--lime)}
  #sheet{grid-column:2;grid-row:3;height:100%!important;max-height:100%;align-self:stretch;margin:0;border:3px solid var(--ink);border-bottom:0;border-radius:28px 28px 0 0}
  #sheet .grab{display:none}
  .panels{padding-top:18px}
+ .tile{height:88px}
+ .shapes{gap:12px}
  #tabbar{grid-column:2;grid-row:4;margin:0;border:3px solid var(--ink);border-top:0;border-radius:0 0 28px 28px;box-shadow:5px 5px 0 var(--shd)}
 }
 @media (max-width:360px){.tab{font-size:14px}.logo h1{font-size:26px}}
@@ -338,11 +339,9 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
   <button class="grab" id="grab" aria-label="show or hide tools"></button>
   <div class="panels" id="panels">
    <div class="panel on" data-panel="shape">
-    <div class="ptitle">pick a shape</div>
     <div class="shapes" id="shapes"></div>
    </div>
    <div class="panel" data-panel="color">
-    <div class="ptitle">colors</div>
     <div class="sub">print color</div>
     <div class="pnote">✦ colors print slightly softer than they look on screen</div>
     <div class="sws" id="fills"></div>
@@ -351,7 +350,6 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
     <button class="toggle" id="holoT"><span class="t1">holo stars ✦<small>holographic star film on the front</small></span><span class="sw2"></span></button>
    </div>
    <div class="panel" data-panel="text">
-    <div class="ptitle" id="txtMode">add text</div>
     <input type="text" id="txtIn" maxlength="24" placeholder="type something cute…" value="shaka" enterkeyhint="done" autocomplete="off">
     <div class="trow"><button class="pbtn pri" id="addTxt">+ add text</button><button class="pbtn" id="deselTxt" style="display:none">done ✓</button></div>
     <div class="sub">font</div>
@@ -363,11 +361,9 @@ if(window.visualViewport){visualViewport.addEventListener('resize',schedule);vis
     <button class="toggle" id="toutT" style="background:var(--card)"><span class="t1">sticker outline<small>ink line + white border, like the stickers</small></span><span class="sw2"></span></button>
    </div>
    <div class="panel" data-panel="stickers">
-    <div class="ptitle">tap to slap one on</div>
     <div class="stickers" id="stickers"></div>
    </div>
    <div class="panel" data-panel="order">
-    <div class="ptitle">make it a…</div>
     <div class="atts" id="atts"></div>
     <div class="sub">size</div>
     <div class="seg" id="sizes"></div>
@@ -739,7 +735,20 @@ function pulseStage(){const w=$('#stageWrap');w.animate([{transform:'scale(1)'},
 /* ---------- UI ---------- */
 $('#mq').innerHTML=['charm lab ✦','made in pāʻia','holo stars','stickers on stickers','acrylic but make it cute','shaka bb','custom everything','✿ ✿ ✿'].map(s=>`<span>${s}</span>`).join('').repeat(4);
 const TILECOLS=['#ffc2e2','#b8ff3c','#8fd8ff','#ffe14a','#c9b2ff','#5cf2c8','#ffc2e2','#ff8a3d'];
-$('#shapes').innerHTML=SHAPES.map((s,i)=>{const g=geo(s.id);const h=g.maxY-g.minY+20;return `<button class="tile" data-shape="${s.id}" aria-label="${s.name}"><svg viewBox="${-Math.max(165,h/2)} ${(g.minY-10).toFixed(0)} ${2*Math.max(165,h/2)} ${h.toFixed(0)}"><path d="${g.outerD} ${g.holeD}" fill-rule="evenodd" fill="${TILECOLS[i]}" stroke="currentColor" stroke-width="14" stroke-linejoin="round"/></svg><span>${s.name}</span></button>`;}).join('');
+/* picker icons only: a chubby hanging loop with a big hole, so the bail reads at thumbnail size.
+   the real cut (geo / export / 3D) stays the accurate small tab. */
+function tileIcon(id,fill){
+ const g=geo(id);
+ const xs=g.body.map(p=>p[0]),ys=g.body.map(p=>p[1]);
+ const left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bot=Math.max(...ys);
+ const bw=Math.max(1,right-left),bh=Math.max(1,bot-top);
+ const W=120,H=136,shapeTop=52,shapeBot=H-4;
+ const s=Math.min((W-12)/bw,(shapeBot-shapeTop)/bh);
+ const ox=(W-bw*s)/2-left*s,oy=shapeTop-top*s;
+ const sw=(8/s).toFixed(2);
+ return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><ellipse cx="60" cy="32" rx="36" ry="30" fill="${fill}" stroke="currentColor" stroke-width="7"/><g transform="translate(${ox.toFixed(2)} ${oy.toFixed(2)}) scale(${s.toFixed(4)})"><path d="${g.bodyD}" fill="${fill}" stroke="currentColor" stroke-width="${sw}" stroke-linejoin="round"/></g><ellipse cx="60" cy="32" rx="18" ry="14" fill="var(--card)" stroke="currentColor" stroke-width="5"/></svg>`;
+}
+$('#shapes').innerHTML=SHAPES.map((s,i)=>`<button class="tile" data-shape="${s.id}" aria-label="${s.name}">${tileIcon(s.id,TILECOLS[i])}</button>`).join('');
 $('#shapes').addEventListener('click',ev=>{const b=ev.target.closest('[data-shape]');if(!b)return;S.shape=b.dataset.shape;commit();});
 /* Drawer is tall enough for both shape rows, then the stage takes the rest.
    On a short visual viewport the stage keeps a floor and the drawer shrinks. */
@@ -749,15 +758,15 @@ function layoutSheet(){
   const sheet=$('#sheet'),tab=$('#tabbar'),head=app.querySelector('header');
   if(!sheet||!tab)return;
   const padTop=parseFloat(getComputedStyle(app).paddingTop)||0;
-  const stageMin=108,margin=14;
+  const stageMin=108,margin=10;
   const room=app.clientHeight-padTop-(head?head.offsetHeight:0)-tab.offsetHeight-stageMin-margin;
-  let preferred=324;
-  const shapes=$('#shapes'),grab=sheet.querySelector('.grab'),title=sheet.querySelector('.panel[data-panel=shape] .ptitle');
-  if(shapes&&shapes.offsetHeight&&grab&&title){
-    const mb=parseFloat(getComputedStyle(title).marginBottom)||0;
-    preferred=Math.ceil(grab.offsetHeight+title.offsetHeight+mb+shapes.offsetHeight+24+16);
+  let preferred=200;
+  const shapes=$('#shapes'),grab=sheet.querySelector('.grab'),panels=sheet.querySelector('.panels');
+  if(shapes&&shapes.offsetHeight&&grab){
+    const pad=panels?((parseFloat(getComputedStyle(panels).paddingTop)||0)+(parseFloat(getComputedStyle(panels).paddingBottom)||0)):0;
+    preferred=Math.ceil(grab.offsetHeight+shapes.offsetHeight+pad+6);
   }
-  const h=Math.round(Math.max(180,Math.min(420,Math.min(Math.max(room,180),preferred))));
+  const h=Math.round(Math.max(150,Math.min(260,Math.min(Math.max(room,150),preferred))));
   document.documentElement.style.setProperty('--sheet-h',h+'px');
 }
 addEventListener('charm-vv',()=>{layoutSheet();fitView();});
@@ -829,7 +838,7 @@ sheetEl.addEventListener('touchend',()=>{upEnd();swEnd();});sheetEl.addEventList
 /* swipe-UP-to-open: from the tab bar or the peeking handle while collapsed. The sheet follows the finger (height), opens
    past ~30% of its height or on a fast upward flick, otherwise snaps back. Starting on a tab opens that tab. */
 let up=null;const SHEET_MIN=48;
-const sheetOpenH=()=>{const n=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-h'));return n||324;};
+const sheetOpenH=()=>{const n=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-h'));return n||200;};
 function upStart(x,y,tab){if(!isDrawer()||!$('#app').classList.contains('collapsed'))return false;up={x0:x,y0:y,prev:curTab,tab:tab||curTab||'shape',active:false,d:0,H:sheetOpenH(),hist:[[performance.now(),y]]};return true;}
 function upMove(x,y,ev){if(!up)return;const dy=up.y0-y,dx=x-up.x0;
  if(!up.active){if(Math.abs(dy)<8&&Math.abs(dx)<8)return;if(dy>0&&dy>Math.abs(dx)){up.active=true;up.y0=y;sheetEl.style.transition='none';sheetEl.style.height=SHEET_MIN+'px';setTab(up.tab);}else{up=null;return;}}
@@ -909,7 +918,6 @@ function renderPanels(){
  $$('#outlines .sw[data-c]').forEach(b=>b.classList.toggle('on',b.dataset.c===S.outline));
  $('#holoT').classList.toggle('on',S.holo);
  const t=txtTarget();const src=t||tdef;
- $('#txtMode').textContent=t?'editing your text ✎':'add text';
  $('#addTxt').style.display=t?'none':'';$('#deselTxt').style.display=t?'':'none';
  if(document.activeElement!==$('#txtIn'))$('#txtIn').value=src.text;
  $$('#fonts .pbtn').forEach(b=>b.classList.toggle('on',b.dataset.font===src.font));
